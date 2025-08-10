@@ -1,0 +1,85 @@
+.navTabsContainer {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.tabsWrapper {
+  gap: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.tabItem {
+  padding-bottom: 14px;
+  border-bottom: 1px var(--border-primary) solid;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &.active {
+    .tabLabel {
+      font-weight: 700;
+    }
+  }
+}
+
+.tabContent {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+}
+
+.tabLabel {
+  color: black;
+  font-size: 20px;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 700;
+  line-height: 24px;
+  word-wrap: break-word;
+}
+
+.tabWithIcon {
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
+}
+
+.iconWrapper {
+  width: 10px;
+  height: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdownIcon {
+  width: 9px;
+  height: 4.50px;
+  left: 0.50px;
+  top: 2.75px;
+  position: absolute;
+  background: var(--text-primary);
+}
+
+.bottomBorder {
+  align-self: stretch;
+  height: 1px;
+  background: #E1E1E5;    
+}
+
+@media (max-width: 1440px) {
+  .navTabsContainer { min-width: 1000px; }
+}   

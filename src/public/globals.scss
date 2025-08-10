@@ -1,0 +1,18 @@
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; /* 브라우저 기본 마진 제거 */
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: #fff;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.main {
+  padding: 40px 52px 0 52px;
+  gap: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+}

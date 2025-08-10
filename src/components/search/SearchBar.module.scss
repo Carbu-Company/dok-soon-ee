@@ -1,0 +1,51 @@
+.search {
+  width: 623px;
+  padding: 16px 20px;
+  background: var(--background-secondary, #ECEDF0);
+  border-radius: 100px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  display: inline-flex;
+  border: none;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 18.90px;
+    height: 18.90px;
+    fill: var(--text-secondary, #9696A0);
+    position: absolute;
+    left: 2.40px;
+    top: 2.40px;
+  }
+}
+
+.input {
+  flex: 1 1 0;
+  color: var(--text-secondary, #9696A0);
+  font-size: 16px;
+  font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  line-height: 22.40px;
+  word-wrap: break-word;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  &::placeholder {
+    color: var(--text-secondary, #9696A0);
+  }
+
+  &:focus {
+    color: var(--text-primary, #222);
+  }
+}

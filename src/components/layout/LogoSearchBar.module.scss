@@ -1,0 +1,142 @@
+.wrap {
+  /* Figma 오토레이아웃 스펙 */
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+
+  height: 64px;
+  width: 1336px;         /* 필요시 100%로 바꾸고 max-width로 중앙정렬 */
+  margin: 0 auto;        /* 가운데 정렬 */
+  padding: 0;
+}
+
+.logo {
+  position: relative;
+  width: 123px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.icon {
+  position: absolute;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  svg {
+    display: block;
+    fill: #9aa0a6;
+  }
+}
+
+.actions {
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
+  flex: none;
+
+  ul {
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+    display: inline-flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    position: relative;
+    height: 38px;
+    border-radius: 100px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    
+    a {
+      left: 12px;
+      top: 10px;
+      position: absolute;
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
+      color: var(--text-primary, #19191D);
+      font-size: 14px;
+      font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+      font-weight: 700;
+      line-height: 17.50px;
+      word-wrap: break-word;
+      text-decoration: none;
+    }
+
+    /* 구분자 점 - 각 li 사이에 배치 */
+    & + li::before {
+      content: "";
+      width: 3px;
+      height: 3px;
+      background: var(--text-disabled, #C4C4CA);
+      border-radius: 9999px;
+      margin-right: 4px;
+      flex-shrink: 0;
+    }
+  }
+
+  /* 공지사항 */
+  li:first-child {
+    width: 73px;
+    
+    &::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      left: 61px;
+      top: 6px;
+      position: absolute;
+      background: var(--text-negative, #F33A33);
+      border-radius: 9999px;
+    }
+  }
+
+  /* 1:1 문의 */
+  li:nth-child(2) {
+    width: 69px;
+    
+    &::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      left: 57px;
+      top: 6px;
+      position: absolute;
+      background: var(--text-negative, #F33A33);
+      border-radius: 9999px;
+    }
+  }
+
+  /* 홈택스, 원부조회 */
+  li:nth-child(3),
+  li:nth-child(4) {
+    padding: 10px 12px;
+    gap: 4px;
+    
+    a {
+      position: static;
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+/* 반응형(선택) — 좁은 화면에서 검색폭 조절 */
+@media (max-width: 1440px) {
+  .wrap { width: 100%; padding: 0 16px; }
+  .search { max-width: 820px; }
+}
