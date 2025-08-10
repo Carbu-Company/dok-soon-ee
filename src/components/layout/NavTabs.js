@@ -8,15 +8,19 @@ const NavTabs = () => {
   const pathname = usePathname();
 
   const tabs = [
-    { label: "매입/매도차량", path: "/purchases", key: "purchases" },
-    { label: "상품화", path: "/productization", key: "productization" },
-    { label: "재고금융", path: "/inventory-finance", key: "inventory-finance" },
-    { label: "현금영수증", path: "/cash-receipts", key: "cash-receipts" },
-    { label: "세금계산서", path: "/tax-invoices", key: "tax-invoices" },
-    { label: "알선처리", path: "/brokerage", key: "brokerage" },
+    { label: "매입/매도차량", path: "/purchases/list", key: "purchases" },
+    { label: "상품화", path: "/productization/list", key: "productization" },
+    {
+      label: "재고금융",
+      path: "/inventory-finance/list",
+      key: "inventory-finance",
+    },
+    { label: "현금영수증", path: "/cash-receipts/list", key: "cash-receipts" },
+    { label: "세금계산서", path: "/tax-invoices/list", key: "tax-invoices" },
+    { label: "알선처리", path: "/brokerage/list", key: "brokerage" },
     {
       label: "종합현황",
-      path: "/overview",
+      path: "/overview/list",
       key: "overview",
       hasIcon: true,
     },
