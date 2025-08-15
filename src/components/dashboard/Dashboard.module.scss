@@ -1,0 +1,113 @@
+/* === Sales Purchase Summary (deduped) === */
+.salesPurchaseContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  
+  .salesPurchaseTitle {
+    color: var(--text-primary, #19191D);
+    font-size: 20px;
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 700;
+    line-height: 24px;
+    word-wrap: break-word;
+  }
+  
+  /* Table shell */
+  .tableWrapper {
+    width: 100%;
+    background: #fff;
+    border: 0.1px solid var(--border-primary, #E1E1E5);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  /* Table core */
+  .table {
+    width: 100%;
+    border-collapse: collapse;         /* 하나로 통일 */
+    border-spacing: 0;
+    font-size: 14px;
+    font-family: 'Pretendard', sans-serif;
+    color: var(--text-primary, #19191D);
+  }
+  
+  /* Cells */
+  .table th,
+  .table td {
+    padding: 9px 10px;                 /* 행 높이 통일 (원하는 높이면 여기만 조절) */
+    text-align: center;                /* 가운데 정렬 */
+    line-height: 19.6px;
+    border: 0.1px solid var(--border-primary, #E1E1E5);
+    word-wrap: break-word;
+  }
+  
+  /* Header */
+  .table thead th {
+    background: var(--background-primary, var(--ds-bg, #F8F9FA));
+    font-weight: 600;                  /* 가독성 위해 헤더는 굵게 */
+  }
+  
+  /* Column width helpers */
+  .categoryHeader,
+  .countHeader,
+  .financeHeader { min-width: 80px; }
+  
+  .subHeader {
+    background: var(--background-primary, #F8F9FA);
+    min-width: 120px;
+  }
+  
+  .purchasePriceHeader {
+    background: var(--background-primary, #F8F9FA);
+  }
+  
+  /* Optional per-cell classes (이미 center지만 필요 시 유지) */
+  .categoryCell,
+  .countCell,
+  .priceCell,
+  .financeCell { text-align: center; }
+  
+  /* Rows */
+  .totalRow { background: var(--background-primary, #F8F9FA); }
+  
+  /* Text helpers */
+  .negativeText { color: var(--text-negative, #F33A33) !important; }
+  .accentText   { color: var(--text-accent, #2979FF) !important; }
+  
+  /* Utilities */
+  .container { background: transparent; width: 100%; }
+  .title { color: var(--ds-text); font-weight: 700; margin: 0 0 12px 0; }
+  
+  .badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    background: #ffffff;
+    border: 0.1px solid var(--ds-muted);
+    color: var(--ds-text);
+  }
+  
+  .badgePrimary {
+    background: rgba(41, 121, 255, 0.12);
+    border-color: rgba(41, 121, 255, 0.24);
+    color: var(--ds-primary);
+  }
+  
+  .btn {
+    background: transparent;
+    border: 1px solid rgba(41, 121, 255, 0.24);
+    color: var(--ds-primary);
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .mutedText { color: #6b6b6f; }
+  .important { color: #ff3b30; font-weight: 600; }
+  
