@@ -1,5 +1,3 @@
-다음처럼 간단한 README.md를 작성하면 됩니다.
-
 ````markdown
 # dok-soon-ee
 
