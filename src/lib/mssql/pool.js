@@ -16,12 +16,4 @@ async function getPool() {
   return pool;
 }
 
-class Response {
-  constructor(success, data, error) {
-    this.success = success;
-    this.data = data;
-    this.error = error;
-  }
-}
-
-export { getPool, Response };
+export { getPool };

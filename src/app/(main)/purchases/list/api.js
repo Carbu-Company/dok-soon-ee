@@ -4,7 +4,6 @@ import sql from "mssql";
 import { getPool } from "@/lib/mssql/pool";
 
 export async function getBrokerageDataByCellNo(kor_nm, eng_nm) {
-  
   try {
     const pool = await getPool();
     const request = pool.request();
