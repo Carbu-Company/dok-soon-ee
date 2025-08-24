@@ -1,0 +1,40 @@
+import TopHeader from "@/components/layout/TopHeader";
+import LogoSearchBar from "@/components/layout/LogoSearchBar";
+import NavTabs from "@/components/layout/NavTabs";
+import Footer from "@/components/layout/Footer";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { verifySession } from "@/lib/auth";
+
+export const metadata = {
+  title: "똑순이 2.0",
+  description: "중고차 세무/정산 솔루션",
+};
+
+export default async function MainLayout({ children }) {
+  // 서버 사이드에서 쿠키를 확인하여 인증되지 않은 사용자는 로그인으로 리다이렉트
+  try {
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session")?.value;
+    if (!sessionCookie) {
+      redirect("/login");
+    }
+
+    // 토큰 검증; 실패하면 로그인으로 리다이렉트
+    await verifySession(sessionCookie);
+  } catch (err) {
+    redirect("/login");
+  }
+
+  return (
+    <div>
+      <TopHeader />
+      <div className="main">
+        <LogoSearchBar />
+        <NavTabs />
+        {children}
+        <Footer />
+      </div>
+    </div>
+  );
+}

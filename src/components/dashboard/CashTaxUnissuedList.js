@@ -3,27 +3,8 @@
 import React from "react";
 import styles from "./Dashboard.module.scss";
 
-export default function CashTaxUnissuedList({ items }) {
-  const rows =
-    items && items.length
-      ? items
-      : [
-          {
-            type: "현금",
-            dealer: "홍길동",
-            amount: "1,000,000원",
-            customer: "홍길동",
-            issued: false,
-          },
-          {
-            type: "세금",
-            dealer: "홍길동",
-            amount: "1,000,000원",
-            customer: "홍길동",
-            issued: true,
-          },
-        ];
-
+export default function CashTaxUnissuedList({ taxCashNoList }) {
+  const rows = taxCashNoList || [];
   return (
     <section
       className={styles.container}
@@ -47,15 +28,17 @@ export default function CashTaxUnissuedList({ items }) {
                 <td>
                   <span
                     className={`${styles.badge} ${
-                      row.type === "세금" ? styles.badgePrimary : ""
+                      row.CD_NM?.[1] === "전자세금계산서"
+                        ? styles.badgePrimary
+                        : ""
                     }`}
                   >
-                    {row.type}
+                    {row.CD_NM?.[1] || row.CD_NM?.[0]}
                   </span>
                 </td>
-                <td>{row.dealer}</td>
-                <td>{row.amount}</td>
-                <td>{row.customer}</td>
+                <td>{row.USR_NM}</td>
+                <td>{row.PUR_AMT?.toLocaleString()}</td>
+                <td>{row.OWNR_NM}</td>
                 <td>
                   {row.issued ? (
                     <button type="button" className={styles.btn}>
