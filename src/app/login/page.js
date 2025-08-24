@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import RegisterModal from "../../components/modal/RegisterModal";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -9,6 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -61,6 +63,13 @@ export default function LoginPage() {
           {loading ? "로그인 중..." : "로그인"}
         </button>
       </form>
+      {/* 회원 가입 */}
+      <button onClick={() => setShowRegisterModal(true)}>회원가입</button>
+
+      <RegisterModal
+        open={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+      />
     </div>
   );
 }
