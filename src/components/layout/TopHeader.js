@@ -14,13 +14,20 @@ export default function TopHeader() {
   const [isPending, startTransition] = useTransition();
 
   const handleLogout = () => {
-    // 필요에 맞게 교체:
-    // 1) 서버 라우트 호출: await fetch('/api/logout', { method: 'POST' })
-    // 2) 전용 페이지로 이동: router.push('/logout')
+    // 서버의 로그아웃 엔드포인트를 호출하여 쿠키를 삭제한 뒤 로그인 페이지로 이동
     startTransition(async () => {
       try {
-        // 예시: 페이지로 리다이렉트
-        router.push("/logout");
+        // CSRF 토큰을 double-submit cookie 방식으로 전달
+        const csrfMatch = document.cookie
+          .split("; ")
+          .find((c) => c.startsWith("csrf="));
+        const csrf = csrfMatch ? csrfMatch.split("=")[1] : null;
+
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          headers: csrf ? { "x-csrf-token": csrf } : {},
+        });
+        router.push("/login");
         router.refresh();
       } catch (e) {
         console.error(e);

@@ -3,14 +3,8 @@
 import React from "react";
 import styles from "./Dashboard.module.scss";
 
-export default function OneToOneInquiry({ inquiries }) {
-  const rows =
-    inquiries && inquiries.length
-      ? inquiries
-      : [
-          { content: "문의입니다.", date: "2025-07-04" },
-          { content: "확인바랍니다. [2]", date: "2025-07-04" },
-        ];
+export default function OneToOneInquiry({ inquiryStatus }) {
+  const rows = inquiryStatus || [];
 
   return (
     <section className={styles.container} aria-label="1대1 문의">
@@ -26,8 +20,8 @@ export default function OneToOneInquiry({ inquiries }) {
           <tbody>
             {rows.map((row, idx) => (
               <tr key={idx}>
-                <td>{row.content}</td>
-                <td className={styles.mutedText}>{row.date}</td>
+                <td>{row.BBC_TIT}</td>
+                <td className={styles.mutedText}>{row.REG_DT}</td>
               </tr>
             ))}
           </tbody>

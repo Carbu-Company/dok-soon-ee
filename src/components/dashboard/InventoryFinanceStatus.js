@@ -3,25 +3,8 @@
 import React from "react";
 import styles from "./Dashboard.module.scss";
 
-export default function InventoryFinanceStatus({ items }) {
-  const rows =
-    items && items.length
-      ? items
-      : [
-          {
-            name: "A캐피탈",
-            limit: "500,000,000원",
-            loan: "300,000,000원",
-            usage: "76%",
-          },
-          {
-            name: "B캐피탈",
-            limit: "500,000,000원",
-            loan: "300,000,000원",
-            usage: "76%",
-          },
-        ];
-
+export default function InventoryFinanceStatus({ inventoryFinanceStatus }) {
+  const rows = inventoryFinanceStatus || [];
   return (
     <section className={styles.container} aria-label="재고금융 이용 현황">
       <h3 className={styles.title}>재고금융 이용 현황</h3>
@@ -38,10 +21,10 @@ export default function InventoryFinanceStatus({ items }) {
           <tbody>
             {rows.map((row, idx) => (
               <tr key={idx}>
-                <td>{row.name}</td>
-                <td>{row.limit}</td>
-                <td>{row.loan}</td>
-                <td className={styles.mutedText}>{row.usage}</td>
+                <td>{row.LOAN_CORP_NM}</td>
+                <td>{row.TOT_LMT_AMT}</td>
+                <td>{row.TOT_LOAN_AMT}</td>
+                <td className={styles.mutedText}>{row.RT}</td>
               </tr>
             ))}
           </tbody>
