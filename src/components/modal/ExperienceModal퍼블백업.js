@@ -1,86 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import Image from 'next/image'
 export default function ExperienceRegistrationModal({ open = true, onClose, onPrint }) {
-
-  const [AgentNm, setAgentNm] = useState('우리상사사');
-  const [AgentRegNo, setAgentRegNo] = useState('012');
-  const [AgentRegNo2, setAgentRegNo2] = useState('34');
-  const [AgentRegNo3, setAgentRegNo3] = useState('56789');
-  const [CeoNm, setCeoNm] = useState('최대표표');
-  const [Email, setEmail] = useState('hgeol22@naver.com');
-  const [CombAgentCd, setCombAgentCd] = useState('22222');
-  const [UserId, setUserId] = useState('hgeol22');
-  const [UserPw, setUserPw] = useState('1234');
-  const [UsrNm, setUsrNm] = useState('홍길순');
-  const [UsrTel, setUsrTel] = useState('01012345678');
-  const [MailDomain, setMailDomain] = useState('naver.com');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  /*
-  const [AgentNm, setAgentNm] = useState('');
-  const [AgentRegNo, setAgentRegNo] = useState('');
-  const [AgentRegNo2, setAgentRegNo2] = useState('');
-  const [AgentRegNo3, setAgentRegNo3] = useState('');
-  const [CeoNm, setCeoNm] = useState('');
-  const [Email, setEmail] = useState('');
-  const [CombAgentCd, setCombAgentCd] = useState('');
-  const [UserId, setUserId] = useState('');
-  const [UserPw, setUserPw] = useState('');
-  const [UsrNm, setUsrNm] = useState('');
-  const [UsrTel, setUsrTel] = useState('');
-  const [MailDomain, setMailDomain] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  */
-
-  // 폼 제출 핸들러
-  const handleSubmit = async (e) => {
-      e.preventDefault();
-      setLoading(true);
-      setError(null);
-      const formData = new FormData(e.target);
-
-      const formValues = {
-        AgentNm: formData.get('AgentNm'),
-        AgentRegNo: formData.get('AgentRegNo'), 
-        AgentRegNo2: formData.get('AgentRegNo2'),
-        AgentRegNo3: formData.get('AgentRegNo3'),
-        CeoNm: formData.get('CeoNm'),
-        Email: formData.get('Email'),
-        CombAgentCd: formData.get('CombAgentCd'),
-        UserId: formData.get('UserId'),
-        UserPw: formData.get('UserPw'),
-        UsrNm: formData.get('UsrNm'),
-        UsrTel: formData.get('UsrTel'),
-        MailDomain: formData.get('MailDomain')
-      };
-
-      try {
-         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/registerUser`, {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json',
-           },
-           body: JSON.stringify(formValues)
-         });
-         const res = await response.json();
-         
-         onClose();
-         alert('신청 승인 되었습니다.'); // 테스트용 알림
-         setLoading(false);
-         return { success: true, res, error: null };
-      } catch (error) {
-         setError(error.message);
-         onClose();
-         alert('신청 승인 등록 중 오류가 발생했습니다.'); // 테스트용 알림
-         setLoading(false);
-         return { success: false, res: [], error: error.message };
-       }
-    }
-
-    return (
+  return (
     // .modal에 .modal--open 클래스 토글
     <div className={`modal ${open ? "modal--open" : ""}`} role="dialog" aria-modal="true" aria-labelledby="experience-modal-title">
       <div className="modal__container">
@@ -95,11 +16,10 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
 
         {/* modal content :: s */}
         <div className="modal__content">
-          <form onSubmit={handleSubmit}>
-            <div className="guidebox">
-              <p className="guidebox__title">체험등록 이용안내</p>
-              <p className="guidebox__desc">체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다.</p>
-            </div>
+          <div className="guidebox">
+            <p className="guidebox__title">체험등록 이용안내</p>
+            <p className="guidebox__desc">체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다.</p>
+          </div>
 
           <div className="modal__table">
             <p className="modal__section-title">신청상사 정보</p>
@@ -115,7 +35,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <th>상사명</th>
                   <td>
                     <div className="input">
-                      <input type="text" className="input__field" placeholder="상사명" name="AgentNm" value={AgentNm} onChange={(e) => setAgentNm(e.target.value)} />
+                      <input type="text" className="input__field" placeholder="상사명" />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -125,21 +45,21 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <td>
                     <div className="input-group">
                       <div className="input">
-                        <input type="number" className="input__field" placeholder="012" name="AgentRegNo" value={AgentRegNo} onChange={(e) => setAgentRegNo(e.target.value)} />
+                        <input type="number" className="input__field" placeholder="012" />
                         <div className="input__utils">
                           <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                         </div>
                       </div>
                       <span className="input-group__dash">-</span>
                       <div className="input">
-                        <input type="number" className="input__field" placeholder="34" name="AgentRegNo2" value={AgentRegNo2} onChange={(e) => setAgentRegNo2(e.target.value)} />
+                        <input type="number" className="input__field" placeholder="34" />
                         <div className="input__utils">
                           <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                         </div>
                       </div>
                       <span className="input-group__dash">-</span>
                       <div className="input">
-                        <input type="number" className="input__field" placeholder="56789" name="AgentRegNo3" value={AgentRegNo3} onChange={(e) => setAgentRegNo3(e.target.value)} />
+                        <input type="number" className="input__field" placeholder="56789" />
                         <div className="input__utils">
                           <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                         </div>
@@ -151,7 +71,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <th>대표자명</th>
                   <td>
                     <div className="input">
-                      <input type="text" className="input__field" placeholder="대표자명" name="CeoNm" value={CeoNm} onChange={(e) => setCeoNm(e.target.value)} />
+                      <input type="text" className="input__field" placeholder="대표자명" />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -161,7 +81,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <td>
                     <div className="input-group input-group--sm">
                       <div className="input w187">
-                        <input type="text" className="input__field" placeholder="이메일 주소" name="Email" value={Email} onChange={(e) => setEmail(e.target.value)} />
+                        <input type="text" className="input__field" placeholder="이메일 주소" />
                         <div className="input__utils">
                           <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                         </div>
@@ -169,7 +89,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                       <span className="input-group__dash">@</span>
                       {/* 커스텀 셀렉트 마크업 */}
                       <div className="select">
-                        <input className="select__input" type="hidden" name="MailDomain" defaultValue="gmail.com" value={MailDomain} onChange={(e) => setMailDomain(e.target.value)} />
+                        <input className="select__input" type="hidden" name="dealer" defaultValue="gmail.com" />
                         <button className="select__toggle" type="button">
                           <span className="select__text">gmail.com</span>
                           <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
@@ -189,7 +109,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <td colSpan={3}>
                     <div className="input-group">
                       <div className="input w246">
-                        <input type="text" className="input__field" placeholder="코드" name="CombAgentCd" value={CombAgentCd} onChange={(e) => setCombAgentCd(e.target.value)} />
+                        <input type="text" className="input__field" placeholder="코드" />
                         <div className="input__utils">
                           <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                         </div>
@@ -206,7 +126,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <th>희망 아이디</th>
                   <td>
                     <div className="input">
-                      <input type="text" className="input__field" placeholder="아이디" name="UserId" value={UserId} onChange={(e) => setUserId(e.target.value)} />
+                      <input type="text" className="input__field" placeholder="아이디" />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -215,7 +135,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <th>비밀번호</th>
                   <td>
                     <div className="input">
-                      <input type="text" className="input__field" placeholder="비밀번호" name="UserPw" value={UserPw} onChange={(e) => setUserPw(e.target.value)} />
+                      <input type="text" className="input__field" placeholder="비밀번호" />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -226,7 +146,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <th>신청자명</th>
                   <td>
                     <div className="input">
-                      <input type="text" className="input__field" placeholder="신청자명" name="UsrNm" value={UsrNm} onChange={(e) => setUsrNm(e.target.value)} />
+                      <input type="text" className="input__field" placeholder="신청자명" />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -235,7 +155,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <th>휴대폰 번호</th>
                   <td>
                     <div className="input">
-                      <input type="number" className="input__field" placeholder="- 없이 입력" name="UsrTel" value={UsrTel} onChange={(e) => setUsrTel(e.target.value)} />
+                      <input type="number" className="input__field" placeholder="- 없이 입력" />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -263,10 +183,9 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
 
           <div className="modal__btns">
             <button className="btn btn--light" type="button" onClick={onClose}>취소</button>
-            {/* <button className="btn btn--primary" type="button" disabled>확인</button> */}
-            <button className="btn btn--primary" type="submit">확인</button>
+            <button className="btn btn--primary" type="button" disabled>확인</button>
+            <button className="btn btn--primary" type="button">확인</button>
           </div>
-          </form>
         </div>
         {/* modal content :: e */}
       </div>
