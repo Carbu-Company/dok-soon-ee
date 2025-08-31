@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Experience from "../../components/modal/experience.js";
 
 export default function LoginPage() {
   const [userId, setUserId] = useState("");
@@ -14,6 +15,10 @@ export default function LoginPage() {
   const [loginError, setLoginError] = useState(null);
   const userIdInputRef = useRef(null);
   const userPwInputRef = useRef(null);
+  const [showExperience, setShowExperience] = useState(false);
+
+  const openExperience = () => setShowExperience(true);
+  const closeExperience = () => setShowExperience(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -199,10 +204,20 @@ export default function LoginPage() {
               비밀번호 찾기
             </a>
             <span className="login-form__nav-divi"></span>
-            <a className="login-form__nav-link" href="#">
+            <a
+              className="login-form__nav-link"
+              type="button"
+              onClick={(e) => {
+                e.preventDefault();
+                openExperience();
+              }}
+            >
               체험등록 신청
             </a>
           </div>
+          {showExperience && (
+            <Experience open={showExperience} onClose={closeExperience} />
+          )}
         </div>
       </main>
 
