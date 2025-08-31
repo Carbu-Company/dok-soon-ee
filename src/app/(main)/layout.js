@@ -1,10 +1,9 @@
-import TopHeader from "@/components/layout/TopHeader";
-import LogoSearchBar from "@/components/layout/LogoSearchBar";
-import NavTabs from "@/components/layout/NavTabs";
-import Footer from "@/components/layout/Footer";
+import Script from "next/script";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 export const metadata = {
   title: "똑순이 2.0",
@@ -27,14 +26,12 @@ export default async function MainLayout({ children }) {
   }
 
   return (
-    <div>
-      <TopHeader />
-      <div className="main">
-        <LogoSearchBar />
-        <NavTabs />
-        {children}
-        <Footer />
-      </div>
+    <div className="wrap">
+      <Header />
+      {children}
+      <Footer />
+      <Script src="https://code.jquery.com/jquery-3.6.0.min.js" strategy="afterInteractive" />
+      <Script src="/js/main.js" strategy="afterInteractive" />
     </div>
   );
 }

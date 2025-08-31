@@ -1,5 +1,6 @@
-// app/layout.js
-import "@/public/globals.scss";
+// app/layout.js;
+import "/public/css/reset.css";
+import "/public/css/style.css";
 
 export const metadata = {
   title: "똑순이 2.0",
