@@ -30,7 +30,9 @@ export default async function MainLayout({ children }) {
       <Header />
       {children}
       <Footer />
+      <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
       <Script src="https://code.jquery.com/jquery-3.6.0.min.js" strategy="afterInteractive" />
+      <Script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js" strategy="afterInteractive" />
       <Script src="/js/main.js" strategy="afterInteractive" />
     </div>
   );
