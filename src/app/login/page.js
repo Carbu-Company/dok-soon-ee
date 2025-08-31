@@ -41,7 +41,7 @@ export default function LoginPage() {
         if (data.csrf) {
           localStorage.setItem("csrf", data.csrf);
         }
-        router.push("/purchases");
+        router.push("/purchases/list");
       } else {
         setLoginError(data?.error || "로그인 실패");
       }
