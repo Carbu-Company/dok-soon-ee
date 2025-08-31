@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import PurchasesPage from "@/app/(main)/purchases/list/PurchasesPage";
-import { getPurchasesListNew } from "./api";
+import ListPage from "@/app/(main)/purchases/list/ListPage";
+import { getPurchasesListNew, getDealerList } from "./api";
 
 export default async function Purchases() {
   /* 쿠키에서 세션 정보 가져오기
@@ -15,8 +15,16 @@ export default async function Purchases() {
   */  
  const cookieStore = await cookies();
   const session = await verifySession(cookieStore.get("session")?.value).catch(console.error);
-  const res = await getPurchasesListNew(session.agentId, 1, 10);
+  const purchasesList = await getPurchasesListNew(session.agentId, 1, 10);
+  const dealerList = await getDealerList(session.agentId);
 
-  console.log(res);
-  return <PurchasesPage session={session} />;
+  console.log(purchasesList);
+  console.log(dealerList);
+
+  return <ListPage session={session}
+                   data={purchasesList.data}
+                   dealerList={dealerList.data}
+                   page={1}
+                   pageSize={10}
+   />;
 }
