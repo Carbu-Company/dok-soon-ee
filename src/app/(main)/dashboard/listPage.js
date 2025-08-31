@@ -22,7 +22,7 @@ export default function DashboardPage(props) {
 
       {/* 매입/매출 현황 (전체 너비) */}
       <div className={styles.fullWidth}>
-        <SalesPurchaseSummary />
+        <SalesPurchaseSummary salesPurchaseSummary={props.salesPurchaseSummary || []} />
       </div>
 
       {/* 1:1 문의 및 공지사항 */}

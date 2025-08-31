@@ -3,45 +3,10 @@
 import React from "react";
 import styles from "./Dashboard.module.scss";
 
-export default function SalesPurchaseSummary({ rows }) {
-  const defaultRows =
-    rows && rows.length
-      ? rows
-      : [
-          {
-            kind: "매출",
-            count: "100건",
-            supply: "1,000,000원",
-            tax: "100,000원",
-            total: "1,100,000원",
-            inventoryFinance: "500,000원",
-            performanceFee: "50,000원",
-            acquisitionTax: "150,000원",
-            purchaseFee: "165,000원",
-          },
-          {
-            kind: "매입",
-            count: "100건",
-            supply: "1,000,000원",
-            tax: "100,000원",
-            total: "1,100,000원",
-            inventoryFinance: "500,000원",
-            performanceFee: "50,000원",
-            acquisitionTax: "150,000원",
-            purchaseFee: "165,000원",
-          },
-          {
-            kind: "합계",
-            count: "100건",
-            supply: "1,000,000원",
-            tax: "100,000원",
-            total: "1,100,000원",
-            inventoryFinance: "500,000원",
-            performanceFee: "50,000원",
-            acquisitionTax: "150,000원",
-            purchaseFee: "165,000원",
-          },
-        ];
+export default function SalesPurchaseSummary({ salesPurchaseSummary }) {
+  const rows = salesPurchaseSummary || [];
+
+  console.log(rows);
 
   return (
     <div className={styles.salesPurchaseContainer}>
@@ -79,43 +44,43 @@ export default function SalesPurchaseSummary({ rows }) {
             </tr>
           </thead>
           <tbody>
-            {defaultRows.map((row, index) => (
+            {rows.map((row, index) => (
               <tr
                 key={index}
                 className={row.kind === "합계" ? styles.totalRow : ""}
               >
-                <td className={styles.categoryCell}>{row.kind}</td>
-                <td className={styles.countCell}>{row.count}</td>
-                <td className={styles.priceCell}>{row.supply}</td>
-                <td className={styles.priceCell}>{row.tax}</td>
-                <td className={styles.priceCell}>{row.total}</td>
+                <td className={styles.categoryCell}>{row.GUBUN}</td>
+                <td className={styles.countCell}>{row.CNT?.toLocaleString()}</td>
+                <td className={styles.priceCell}>{row.SUP_AMT?.toLocaleString()}</td>
+                <td className={styles.priceCell}>{row.VAT?.toLocaleString()}</td>
+                <td className={styles.priceCell}>{row.AMT?.toLocaleString()}</td>
                 <td
                   className={`${styles.financeCell} ${
                     row.kind === "매출" ? styles.negativeText : ""
                   }`}
                 >
-                  {row.inventoryFinance}
+                  {row.CAR_LOAN_AMT?.toLocaleString()}
                 </td>
                 <td
                   className={`${styles.financeCell} ${
                     row.kind === "매출" ? styles.accentText : ""
                   }`}
                 >
-                  {row.performanceFee}
+                  {row.TOT_CMRC_COST_FEE?.toLocaleString()}
                 </td>
                 <td
                   className={`${styles.financeCell} ${
                     row.kind === "매출" ? styles.accentText : ""
                   }`}
                 >
-                  {row.acquisitionTax}
+                  {row.GAIN_TAX?.toLocaleString()}
                 </td>
                 <td
                   className={`${styles.financeCell} ${
                     row.kind === "매출" ? styles.accentText : ""
                   }`}
                 >
-                  {row.purchaseFee}
+                  {row.TOT_PAY_FEE?.toLocaleString()}
                 </td>
               </tr>
             ))}
