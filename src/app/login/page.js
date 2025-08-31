@@ -30,6 +30,8 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        // 쿠키를 브라우저에 저장/전송하려면 credentials 설정 필요
+        credentials: "include",
         body: JSON.stringify({ loginId: userId, password: userPw }),
       });
       const data = await res.json();
