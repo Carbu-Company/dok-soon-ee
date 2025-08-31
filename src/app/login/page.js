@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Experience from "@/components/modal/experience";
+import Experience from "@/components/modal/ExperienceModal";
 
 export default function LoginPage() {
   const [userId, setUserId] = useState("");
