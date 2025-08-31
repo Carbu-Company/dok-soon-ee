@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./SearchBar.module.scss";
-import searchIcon from "@/public/icon/search.svg";
 import Image from "next/image";
 
 export default function SearchBar() {
@@ -19,9 +18,7 @@ export default function SearchBar() {
 
   return (
     <form className={styles.search} role="search" onSubmit={onSubmit}>
-      <div className={styles.icon}>
-        <Image src={searchIcon} alt="검색" />
-      </div>
+      <div className={styles.icon}></div>
       <input
         id="global-search"
         type="text"

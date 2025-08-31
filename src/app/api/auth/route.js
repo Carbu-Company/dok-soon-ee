@@ -79,11 +79,23 @@ export async function POST(req) {
       usrNm: user.USR_NM,
     });
     const maxAge = 60 * 60 * 24 * 7; // 7 days
-    const sessionCookie = `session=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+
+    // 배포 환경에서만 Secure 플래그를 추가하도록 방어적 설정
+    const isProduction = process.env.NODE_ENV === "production";
+    // 프록시 뒤에 있을 경우 x-forwarded-proto 확인 (https인지)
+    const forwardedProto = (req.headers.get("x-forwarded-proto") || "").split(",")[0];
+    const isSecure = isProduction && forwardedProto === "https";
+    const secureAttr = isSecure ? "; Secure" : "";
+
+    const cookieBase = `Path=/; SameSite=Lax; Max-Age=${maxAge}${secureAttr}`;
+    const sessionCookie = `session=${token}; ${cookieBase}; HttpOnly`;
 
     // CSRF 토큰 생성 및 쿠키로 발행 (JS에서 읽을 수 있도록 HttpOnly 아님)
     const csrfToken = randomBytes(16).toString("hex");
-    const csrfCookie = `csrf=${csrfToken}; Path=/; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+    const csrfCookie = `csrf=${csrfToken}; ${cookieBase}`;
+
+    // 디버그용: 배포에서 쿠키가 설정되는지 확인 (토큰 자체는 로그에 남기지 않음)
+    console.error("AUTH: setting cookies secure=", isSecure);
 
     return new Response(JSON.stringify({ success: true, csrf: csrfToken }), {
       status: 200,

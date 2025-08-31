@@ -4,9 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:prod": "next dev -p 3000",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "build:dev": "env-cmd -f .env.development next build",
+    "build:prod": "env-cmd -f .env.production next build",
+    "start": "next start -H 0.0.0.0",
+    "start:dev": "env-cmd -f .env.development next start -H 0.0.0.0",
+    "start:prod": "env-cmd -f .env.production next start -H 0.0.0.0"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
