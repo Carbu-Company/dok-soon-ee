@@ -3,30 +3,49 @@ import Image from 'next/image'
 import { isValidResidentNumber, isValidBusinessNumber, isValidCorporateNumber } from '../../../../../public/js/util.js'
 import { useState } from 'react'
 
-export default function RegPage({ session = null, dealerList = [], evdcCDList = [] }) {
+export default function RegPage({ session = null, dealerList = [], evdcCdList = [] }) {
+    console.log(evdcCdList);
     // 유효한 증빙코드 목록만 필터링
-    const validEvdcList = evdcCDList.filter(item => item || item.CD_ID || item.CD_NM);
+    const validEvdcList = evdcCdList.filter(item => item || item.CD_ID || item.CD_NM);
+
+    // 연락처 상태 관리
+    const [phoneNumber, setPhoneNumber] = useState('01012345678');
+    
+    // 고객 정보 상태 관리
+    const [customerName, setCustomerName] = useState('홍길동');
+    const [evdcCd, setEvdcCd] = useState('001');
+    const [emailId, setEmailId] = useState('test');
+    const [emailDomain, setEmailDomain] = useState('naver.com');
+    const [address, setAddress] = useState('서울특별시 성동구 왕십리로 12길 27, 6층');
+    const [addressDetail, setAddressDetail] = useState('제이플랜 파크빌 605호');
+
+    // 파일 업로드 상태 관리
+    const [attachedFiles, setAttachedFiles] = useState([
+      { id: 1, name: '홍길동_추가 서류_1.pdf' },
+      { id: 2, name: '홍길동_추가 서류_2.pdf' }
+    ]);
 
     // 상태 관리
-    const [residentNumber, setResidentNumber] = useState('');
-    const [businessNumber, setBusinessNumber] = useState('');
+    const [residentNumber, setResidentNumber] = useState('821212-1527515');
+    const [businessNumber, setBusinessNumber] = useState('790-35-42372');
     const [customerType, setCustomerType] = useState('개인'); // '개인' 또는 '법인'
     const [validationErrors, setValidationErrors] = useState({});
 
     // 금액 관련 상태
-    const [purchaseAmount, setPurchaseAmount] = useState('0');          // 매입금액
-    const [brokerageAmount, setBrokerageAmount] = useState('0');       // 상사매입비
-    const [acquisitionTax, setAcquisitionTax] = useState('0');         // 취득세
-    const [brokerageDate, setBrokerageDate] = useState('');           // 상사매입비 입금일
-    const [purchaseDate, setPurchaseDate] = useState('');             // 매입일
+    const [purchaseAmount, setPurchaseAmount] = useState('5000000');          // 매입금액
+    const [brokerageAmount, setBrokerageAmount] = useState('222220');       // 상사매입비
+    const [acquisitionTax, setAcquisitionTax] = useState('11110');         // 취득세
+    const [brokerageDate, setBrokerageDate] = useState('2025-09-02');           // 상사매입비 입금일
+    const [purchaseDate, setPurchaseDate] = useState('2025-09-02');             // 매입일
 
     // 차량 관련 상태
     const [vehicleType, setVehicleType] = useState('승용');            // 차량 유형
-    const [vehicleName, setVehicleName] = useState('');               // 차량명
-    const [vehicleNumberAfter, setVehicleNumberAfter] = useState(''); // 차량번호(매입후)
+    const [vehicleName, setVehicleName] = useState('렉서스');               // 차량명
+    const [vehicleNumberAfter, setVehicleNumberAfter] = useState('69보고 70톤'); // 차량번호(매입후)
     const [vehicleNumberBefore, setVehicleNumberBefore] = useState(''); // 차량번호(매입전)
     const [selectedDealer, setSelectedDealer] = useState('');         // 매입딜러
     const [presentationType, setPresentationType] = useState('상사매입'); // 제시구분
+    const [isSelectOpen, setIsSelectOpen] = useState(false);         // 셀렉트 박스 열림/닫힘 상태
 
     // 주민(법인)등록번호 유효성 검사
     const validateResidentNumber = (value) => {
@@ -114,6 +133,96 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
     };
 
 
+    // 전체 입력 항목 체크
+    useEffect(() => {
+        // 필수 입력 항목들이 모두 채워졌는지 확인
+        // purchaseAmount: 매입금액
+        // purchaseDate: 매입일자
+        // brokerageAmount: 중개수수료
+        // brokerageDate: 중개일자
+        // acquisitionTax: 취득세
+        // vehicleName: 차량명
+        // vehicleNumberAfter: 차량번호(이전)
+        // vehicleNumberBefore: 차량번호(현재)      - 미지정
+        // customerName: 고객명                    - 미지정
+        // evdcCd: 증빙코드
+        // phoneNumber: 연락처                     - 미지정
+        // emailId: 이메일 아이디                   - 미지정
+        // emailDomain: 이메일 도메인               - 미지정
+        // address: 주소                           - 미지정
+        // addressDetail: 상세주소                  - 미지정
+        const allFieldsFilled = 
+            purchaseAmount &&
+            purchaseDate &&
+            brokerageAmount &&
+            brokerageDate &&
+            acquisitionTax &&
+            vehicleName &&
+            vehicleNumberAfter &&
+            //vehicleNumberBefore &&
+            //customerName &&
+            evdcCd 
+            //phoneNumber &&
+            //emailId &&
+            //emailDomain &&
+            //address &&
+            //addressDetail
+            ;
+        
+        setAllinputCheck(allFieldsFilled);
+    }, [purchaseAmount, purchaseDate, brokerageAmount, brokerageDate, acquisitionTax,
+        vehicleName, vehicleNumberAfter, vehicleNumberBefore, customerName, evdcCd,
+        phoneNumber, emailId, emailDomain, address, addressDetail, attachedFiles]);
+
+          // 폼 제출 핸들러
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+        const formData = new FormData(e.target);
+
+        const formValues = {
+        purchaseAmount: formData.get('purchaseAmount'),
+        purchaseDate: formData.get('purchaseDate'),
+        brokerageAmount: formData.get('brokerageAmount'),
+        brokerageDate: formData.get('brokerageDate'),
+        acquisitionTax: formData.get('acquisitionTax'),
+        vehicleName: formData.get('vehicleName'),
+        vehicleNumberAfter: formData.get('vehicleNumberAfter'),
+        vehicleNumberBefore: formData.get('vehicleNumberBefore'),
+        customerName: formData.get('customerName'),
+        evdcCd: formData.get('evdcCd'),
+        phoneNumber: formData.get('phoneNumber'),
+        emailId: formData.get('emailId'),
+        emailDomain: formData.get('emailDomain'),
+        address: formData.get('address'),
+        addressDetail: formData.get('addressDetail'),
+        attachedFiles: formData.get('attachedFiles')
+        };
+
+        console.log(formValues);
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertSuggest`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formValues)
+            });
+            const res = await response.json();
+            
+            alert('신청 승인 되었습니다.'); // 테스트용 알림
+            setLoading(false);
+            return { success: true, res, error: null };
+         } catch (error) {
+            setError(error.message);
+            alert('신청 승인 등록 중 오류가 발생했습니다.'); // 테스트용 알림
+            setLoading(false);
+            return { success: false, res: [], error: error.message };
+         }
+
+    };
     return (
         <main className="container container--page">
         <div className="container__head">
@@ -172,28 +281,38 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                       className="select__input" 
                       type="hidden" 
                       name="dealer" 
-                      value={selectedDealer} 
+                      value={selectedDealer || ''} 
                     />
-                    <button className="select__toggle" type="button">
+                    <button 
+                      className="select__toggle" 
+                      type="button"
+                      onClick={() => setIsSelectOpen(!isSelectOpen)}
+                    >
                       <span className="select__text">
                         {selectedDealer ? dealerList.find(d => d.dealerCd === selectedDealer)?.USR_NM || '선택' : '선택'}
                       </span>
                       <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                     </button>
 
-                    <ul className="select__menu">
+                    <ul className="select__menu" style={{ display: isSelectOpen ? 'block' : 'none' }}>
                       <li 
                         key="default-dealer"
                         className={`select__option ${!selectedDealer ? 'select__option--selected' : ''}`}
                         data-value=""
-                        onClick={() => handleDealerSelect('')}
+                        onClick={() => {
+                          handleDealerSelect('');
+                          setIsSelectOpen(false);
+                        }}
                       >선택</li>
                       {dealerList && dealerList.map((dealer) => (
                         <li 
                           key={`dealer-${dealer.USR_ID}`}
                           className={`select__option ${selectedDealer === dealer.dealerCd ? 'select__option--selected' : ''}`}
                           data-value={dealer.dealerCd}
-                          onClick={() => handleDealerSelect(dealer.dealerCd)}
+                          onClick={() => {
+                            handleDealerSelect(dealer.dealerCd);
+                            setIsSelectOpen(false);
+                          }}
                         >{dealer.USR_NM}</li>
                       ))}
                     </ul>
@@ -284,7 +403,13 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                 </th>
                 <td>
                   <div className="input">
-                    <input type="text" className="input__field" placeholder="(예상)취득세" defaultValue="0" />
+                    <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="(예상)취득세" 
+                      value={acquisitionTax} 
+                      onChange={(e) => setAcquisitionTax(e.target.value)}
+                    />
                     <div className="input__utils">
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
@@ -298,7 +423,12 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                   <div className="input-group input-group--sm">
 
                     <div className="select w120">
-                      <input className="select__input" type="hidden" name="dealer" defaultValue="승용" />
+                      <input 
+                        className="select__input" 
+                        type="hidden" 
+                        name="dealer" 
+                        value={vehicleType} 
+                      />
                       <button className="select__toggle" type="button">
                         <span className="select__text">승용</span>
                         <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
@@ -313,7 +443,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                     </div>
 
                     <div className="input w300">
-                      <input type="text" className="input__field" placeholder="차량명" />
+                      <input type="text" className="input__field" placeholder="차량명" value={vehicleName} onChange={(e) => setVehicleName(e.target.value)} />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -324,7 +454,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                 <th>차량번호(매입후)</th>
                 <td>
                   <div className="input">
-                    <input type="text" className="input__field" placeholder="차량번호(매입후)" />
+                    <input type="text" className="input__field" placeholder="차량번호(매입후)" value={vehicleNumberAfter} onChange={(e) => setVehicleNumberAfter(e.target.value)} />
                     <div className="input__utils">
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
@@ -333,7 +463,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                 <th>차량번호(매입전)</th>
                 <td>
                   <div className="input">
-                    <input type="text" className="input__field" placeholder="차량번호(매입전)" />
+                    <input type="text" className="input__field" placeholder="차량번호(매입전)" value={vehicleNumberBefore} onChange={(e) => setVehicleNumberBefore(e.target.value)} />
                     <div className="input__utils">
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
@@ -347,7 +477,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                 <td>
                   <div className="input-group">
                     <div className="input w400">
-                      <input type="text" className="input__field" placeholder="고객명 " />
+                      <input type="text" className="input__field" placeholder="고객명 " value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -378,7 +508,13 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                 <th>증빙종류</th>
                 <td>
                   <div className="select">
-                    <input className="select__input" type="hidden" name="dealer" defaultValue="value1" />
+                    <input 
+                      className="select__input" 
+                      type="hidden" 
+                      name="dealer" 
+                      value={evdcCd || ''}
+                      onChange={(e) => setEvdcCd(e.target.value)}
+                    />
                     <button className="select__toggle" type="button">
                       <span className="select__text">선택</span>
                       <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
@@ -541,8 +677,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
 
         <div className="container__btns">
           <button className="btn btn--light" type="button" onClick={() => { window.location.href = 'm1.jsp'; }}>취소</button>
-          <button className="btn btn--primary" type="button" disabled>확인</button>
-          <button className="btn btn--primary" type="button">확인</button>
+          <button className="btn btn--primary" type="submit" disabled={!allinputCheck}>확인</button>
         </div>
 
         <div className="table-wrap">
@@ -608,7 +743,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                 <th>연락처</th>
                 <td>
                   <div className="input w200">
-                    <input type="text" className="input__field" placeholder="- 없이 입력" />
+                    <input type="text" className="input__field" placeholder="- 없이 입력" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
                     <div className="input__utils">
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
@@ -618,23 +753,54 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                 <td>
                   <div className="input-group input-group--sm">
                     <div className="input w160">
-                      <input type="text" className="input__field" placeholder="e메일 주소" />
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="e메일 주소" 
+                        value={emailId}
+                        onChange={(e) => setEmailId(e.target.value)}
+                      />
                       <div className="input__utils">
-                        <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => setEmailId('')}
+                        >삭제</button>
                       </div>
                     </div>
                     <span className="input-group__dash">@</span>
                     <div className="select w140">
-                      <input className="select__input" type="hidden" name="dealer" defaultValue="naver.com" />
+                      <input 
+                        className="select__input" 
+                        type="hidden" 
+                        name="emailDomain" 
+                        value={emailDomain}
+                      />
                       <button className="select__toggle" type="button">
-                        <span className="select__text">naver.com</span>
+                        <span className="select__text">{emailDomain}</span>
                         <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                       </button>
                       <ul className="select__menu">
-                        <li className="select__option select__option--selected" data-value="naver.com">naver.com</li>
-                        <li className="select__option" data-value="daum.net">daum.net</li>
-                        <li className="select__option" data-value="naver.com">gmail.com</li>
-                        <li className="select__option" data-value="nate.com">nate.com</li>
+                        <li 
+                          className={`select__option ${emailDomain === 'naver.com' ? 'select__option--selected' : ''}`}
+                          data-value="naver.com"
+                          onClick={() => setEmailDomain('naver.com')}
+                        >naver.com</li>
+                        <li 
+                          className={`select__option ${emailDomain === 'daum.net' ? 'select__option--selected' : ''}`}
+                          data-value="daum.net"
+                          onClick={() => setEmailDomain('daum.net')}
+                        >daum.net</li>
+                        <li 
+                          className={`select__option ${emailDomain === 'gmail.com' ? 'select__option--selected' : ''}`}
+                          data-value="gmail.com"
+                          onClick={() => setEmailDomain('gmail.com')}
+                        >gmail.com</li>
+                        <li 
+                          className={`select__option ${emailDomain === 'nate.com' ? 'select__option--selected' : ''}`}
+                          data-value="nate.com"
+                          onClick={() => setEmailDomain('nate.com')}
+                        >nate.com</li>
                       </ul>
                     </div>
                   </div>
@@ -647,16 +813,37 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                   <div className="input-group">
 
                     <div className="input w400">
-                      <input type="text" className="input__field" placeholder="검색 버튼을 눌러주세요" />
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="검색 버튼을 눌러주세요" 
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        readOnly
+                      />
                       <div className="input__utils">
-                        <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => setAddress('')}
+                        >삭제</button>
                       </div>
                     </div>
                     <button className="btn btn--dark" type="button">주소 검색</button>
                     <div className="input w400">
-                      <input type="text" className="input__field" placeholder="상세 주소" />
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="상세 주소" 
+                        value={addressDetail}
+                        onChange={(e) => setAddressDetail(e.target.value)}
+                      />
                       <div className="input__utils">
-                        <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => setAddressDetail('')}
+                        >삭제</button>
                       </div>
                     </div>
                   </div>
@@ -768,25 +955,56 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                 <td colSpan={5}>
                   <div className="input-group">
                     <div className="input w440">
-                      <input type="text" className="input__field input__field--file" placeholder="파일을 선택하세요" defaultValue="홍길동_추가 서류_1.pdf" disabled />
-                      <div className="input__utils">
-                        <button type="button" className="input__remove ico ico--trash">삭제</button>
-                      </div>
+                      {attachedFiles.map((file) => (
+                        <div key={file.id} className="input-file-row">
+                          <input 
+                            type="text" 
+                            className="input__field input__field--file" 
+                            placeholder="파일을 선택하세요" 
+                            value={file.name} 
+                            disabled 
+                          />
+                          <div className="input__utils">
+                            <button 
+                              type="button" 
+                              className="input__remove ico ico--trash"
+                              onClick={() => {
+                                const newFiles = attachedFiles.filter(f => f.id !== file.id);
+                                setAttachedFiles(newFiles);
+                              }}
+                            >삭제</button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    {/* <button className="btn btn--dark" type="button">파일 선택</button> */}
-                  </div>
-                  <div className="input-group">
-                    <div className="input w440">
-                      <input type="text" className="input__field input__field--file" placeholder="파일을 선택하세요" defaultValue="홍길동_추가 서류_2.pdf" disabled />
-                      <div className="input__utils">
-                        <button type="button" className="input__remove ico ico--trash">삭제</button>
-                      </div>
-                    </div>
-                    {/* <button className="btn btn--dark" type="button">파일 선택</button> */}
                   </div>
 
                   <div className="input-group">
-                    <button type="submit" className="btn btn--sm btn--light "><span className="ico ico--add-black"></span>추가</button>
+                    <input
+                      type="file"
+                      id="fileInput"
+                      style={{display: 'none'}}
+                      onChange={(e) => {
+                        if (e.target.files.length > 0) {
+                          const file = e.target.files[0];
+                          const newFile = {
+                            id: attachedFiles.length + 1,
+                            name: file.name
+                          };
+                          setAttachedFiles([...attachedFiles, newFile]);
+                          e.target.value = ''; // Reset file input
+                        }
+                      }}
+                    />
+                    <button 
+                      type="button" 
+                      className="btn btn--sm btn--light"
+                      onClick={() => {
+                        document.getElementById('fileInput').click();
+                      }}
+                    >
+                      <span className="ico ico--add-black"></span>추가
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -797,7 +1015,12 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                   <div className="input-group input-group--sm">
 
                     <div className="select w200">
-                      <input className="select__input" type="hidden" name="dealer" defaultValue="선택" />
+                      <input 
+                      className="select__input" 
+                      type="hidden" 
+                      name="dealer" 
+                      value="선택" 
+                    />
                       <button className="select__toggle" type="button">
                         <span className="select__text">선택</span>
                         <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
