@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Image from 'next/image'
 export default function ExperienceRegistrationModal({ open = true, onClose, onPrint }) {
 
@@ -8,32 +10,86 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
   const [AgentRegNo3, setAgentRegNo3] = useState('56789');
   const [CeoNm, setCeoNm] = useState('최대표표');
   const [Email, setEmail] = useState('hgeol22@naver.com');
-  const [CombAgentCd, setCombAgentCd] = useState('22222');
+  const [CombAgentCd, setCombAgentCd] = useState('302347');
   const [UserId, setUserId] = useState('hgeol22');
   const [UserPw, setUserPw] = useState('1234');
   const [UsrNm, setUsrNm] = useState('홍길순');
   const [UsrTel, setUsrTel] = useState('01012345678');
-  const [MailDomain, setMailDomain] = useState('naver.com');
+  const [MailDomain, setMailDomain] = useState('gmail.com');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [sangsaCodeCheck, setSangsaCodeCheck] = useState(false);
+  const [sangsaCodeCheckMsg, setSangsaCodeCheckMsg] = useState(null);
+  const [sangsaCodeCheckCss, setSangsaCodeCheckCss] = useState(null);
+  const [allinputCheck, setAllinputCheck] = useState(false);
 
   /*
-  const [AgentNm, setAgentNm] = useState('');
-  const [AgentRegNo, setAgentRegNo] = useState('');
-  const [AgentRegNo2, setAgentRegNo2] = useState('');
-  const [AgentRegNo3, setAgentRegNo3] = useState('');
-  const [CeoNm, setCeoNm] = useState('');
-  const [Email, setEmail] = useState('');
-  const [CombAgentCd, setCombAgentCd] = useState('');
-  const [UserId, setUserId] = useState('');
-  const [UserPw, setUserPw] = useState('');
-  const [UsrNm, setUsrNm] = useState('');
-  const [UsrTel, setUsrTel] = useState('');
-  const [MailDomain, setMailDomain] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+   const [AgentNm, setAgentNm] = useState('');
+   const [AgentRegNo, setAgentRegNo] = useState('');
+   const [AgentRegNo2, setAgentRegNo2] = useState('');
+   const [AgentRegNo3, setAgentRegNo3] = useState('');
+   const [CeoNm, setCeoNm] = useState('');
+   const [Email, setEmail] = useState('');
+   const [CombAgentCd, setCombAgentCd] = useState('');
+   const [UserId, setUserId] = useState('');
+   const [UserPw, setUserPw] = useState('');
+   const [UsrNm, setUsrNm] = useState('');
+   const [UsrTel, setUsrTel] = useState('');
+   const [MailDomain, setMailDomain] = useState('');
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState(null);
 
   */
+
+  // 전체 입력 항목 체크
+  useEffect(() => {
+    const allFieldsFilled = 
+      AgentNm.trim() !== '' &&
+      AgentRegNo.trim() !== '' &&
+      AgentRegNo2.trim() !== '' &&
+      AgentRegNo3.trim() !== '' &&
+      CeoNm.trim() !== '' &&
+      Email.trim() !== '' &&
+      CombAgentCd.trim() !== '' &&
+      UserId.trim() !== '' &&
+      UserPw.trim() !== '' &&
+      UsrNm.trim() !== '' &&
+      UsrTel.trim() !== '' &&
+      MailDomain.trim() !== '';
+    
+    setAllinputCheck(allFieldsFilled);
+  }, [AgentNm, AgentRegNo, AgentRegNo2, AgentRegNo3, CeoNm, Email, CombAgentCd, UserId, UserPw, UsrNm, UsrTel, MailDomain]);
+
+  const handleSangsaCodeCheck = async () => {
+
+    try {
+      console.log(CombAgentCd);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/checkSangsaCode?SangsaCode=${CombAgentCd}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      const data = await res.json();
+
+      console.log(data);
+
+      if (data === 1) {
+        setSangsaCodeCheck(true);
+        setSangsaCodeCheckMsg('등록 가능합니다');
+        setSangsaCodeCheckCss('input-notice');
+      } else {
+        setSangsaCodeCheck(false);
+        setSangsaCodeCheckMsg('등록 불가능합니다');
+        setSangsaCodeCheckCss('input-error');
+      }
+
+    } catch (error) {
+      console.log(error);
+      //setSangsaCodeCheckMsg('등록 불가능합니다');
+    }
+  } 
+
 
   // 폼 제출 핸들러
   const handleSubmit = async (e) => {
@@ -95,15 +151,15 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
 
         {/* modal content :: s */}
         <div className="modal__content">
-          <form onSubmit={handleSubmit}>
-            <div className="guidebox">
-              <p className="guidebox__title">체험등록 이용안내</p>
-              <p className="guidebox__desc">체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다.</p>
-            </div>
+          <div className="guidebox">
+            <p className="guidebox__title">체험등록 이용안내</p>
+            <p className="guidebox__desc">체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다. 체험등록 이용 안내 텍스트 문구가 들어갑니다.</p>
+          </div>
 
-          <div className="modal__table">
-            <p className="modal__section-title">신청상사 정보</p>
-            <table className="table table--lg">
+          <form onSubmit={handleSubmit}>
+            <div className="modal__table">
+              <p className="modal__section-title">신청상사 정보</p>
+              <table className="table table--lg">
               <colgroup>
                 <col style={{ width: "140px" }} />
                 <col style={{ width: "263px" }} />
@@ -169,9 +225,9 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                       <span className="input-group__dash">@</span>
                       {/* 커스텀 셀렉트 마크업 */}
                       <div className="select">
-                        <input className="select__input" type="hidden" name="MailDomain" defaultValue="gmail.com" value={MailDomain} onChange={(e) => setMailDomain(e.target.value)} />
+                        <input className="select__input" type="hidden" name="MailDomain" value={MailDomain} />
                         <button className="select__toggle" type="button">
-                          <span className="select__text">gmail.com</span>
+                          <span className="select__text">{MailDomain}</span>
                           <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                         </button>
                         <ul className="select__menu">
@@ -194,11 +250,9 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                           <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                         </div>
                       </div>
-                      <button className="btn btn--dark" type="button" disabled>확인</button>
-                      <button className="btn btn--dark" type="button">확인</button>
+                      <button className="btn btn--dark" type="button" onClick={handleSangsaCodeCheck} disabled={sangsaCodeCheck}>확인</button>
 
-                      <span className="input-notice">등록 가능합니다</span>
-                      <span className="input-error">등록 불가능합니다</span>
+                      <span className={`${sangsaCodeCheckCss}`}>{sangsaCodeCheckMsg}</span>
                     </div>
                   </td>
                 </tr>
@@ -244,9 +298,9 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                 </tr>
               </tbody>
             </table>
-          </div>
+            </div>
 
-          <div className="terms">
+            <div className="terms">
             <p className="terms__title">이용약관 및 개인정보 이용 동의</p>
             <div className="terms__content">
               <ul className="terms__list">
@@ -259,13 +313,12 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                 <li>개인정보 처리 위탁 동의 (해당 시): [예: 본인은 개인정보 처리를 다음의 업체에 위탁하는 것에 동의합니다. (수탁업체, 위탁 업무 내용, 위탁 기간)] </li>
               </ul>
             </div>
-          </div>
+            </div>
 
-          <div className="modal__btns">
-            <button className="btn btn--light" type="button" onClick={onClose}>취소</button>
-            {/* <button className="btn btn--primary" type="button" disabled>확인</button> */}
-            <button className="btn btn--primary" type="submit">확인</button>
-          </div>
+            <div className="modal__btns">
+              <button className="btn btn--light" type="button" onClick={onClose}>취소</button>
+              <button className="btn btn--primary" type="submit" disabled={!sangsaCodeCheck || !allinputCheck}>확인</button>
+            </div>
           </form>
         </div>
         {/* modal content :: e */}

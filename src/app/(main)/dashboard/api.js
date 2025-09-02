@@ -58,35 +58,3 @@ export const getNoticeStatus = async (agent_id) => {
     return { success: false, data: [], error: error.message };
   }
 };
-
-
-/* 딜러 목록 */
-export async function getDealerList(agent_id) {
-  try {
-    const pool = await getPool();
-    const request = pool.request();
-    request.input("agent_id", sql.VarChar(200), agent_id);
-
-    const query = `
-        SELECT *
-        FROM CJB_USR
-        WHERE AGENT_ID = @agent_id
-        AND USR_GRADE_CD = '9'
-    `;
-
-    const result = await request.query(query);
-
-    return {
-      success: true,
-      data: result.recordset,
-      error: null,
-    };
-  } catch (error) {
-    console.error("getDealerList Error:", error);
-    return {
-      success: false,
-      data: [],
-      error: error.message || "딜러 목록 조회 중 오류가 발생했습니다.",
-    };
-  }
-}

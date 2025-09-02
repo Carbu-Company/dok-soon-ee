@@ -1,7 +1,9 @@
 "use client";
 import Image from 'next/image'
 
-export default function ListPage({ session = null }) {
+export default function ListPage({ session = null, data = [], dealerList = [], page = 1, pageSize = 10 }) {
+
+    
     return (
         <main className="container container--page">
         <div className="container__head">

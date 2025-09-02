@@ -1,11 +1,118 @@
 "use client";
 import Image from 'next/image'
+import { isValidResidentNumber, isValidBusinessNumber, isValidCorporateNumber } from '../../../../../public/js/util.js'
+import { useState } from 'react'
 
-export default function RegPage({ session = null }) {
+export default function RegPage({ session = null, dealerList = [], evdcCDList = [] }) {
+    // 유효한 증빙코드 목록만 필터링
+    const validEvdcList = evdcCDList.filter(item => item && item.CD_ID && item.CD_NM);
 
-    console.log(session);
+    // 상태 관리
+    const [residentNumber, setResidentNumber] = useState('');
+    const [businessNumber, setBusinessNumber] = useState('');
+    const [customerType, setCustomerType] = useState('개인'); // '개인' 또는 '법인'
+    const [validationErrors, setValidationErrors] = useState({});
 
-    
+    // 금액 관련 상태
+    const [purchaseAmount, setPurchaseAmount] = useState('0');          // 매입금액
+    const [brokerageAmount, setBrokerageAmount] = useState('0');       // 상사매입비
+    const [acquisitionTax, setAcquisitionTax] = useState('0');         // 취득세
+    const [brokerageDate, setBrokerageDate] = useState('');           // 상사매입비 입금일
+    const [purchaseDate, setPurchaseDate] = useState('');             // 매입일
+
+    // 차량 관련 상태
+    const [vehicleType, setVehicleType] = useState('승용');            // 차량 유형
+    const [vehicleName, setVehicleName] = useState('');               // 차량명
+    const [vehicleNumberAfter, setVehicleNumberAfter] = useState(''); // 차량번호(매입후)
+    const [vehicleNumberBefore, setVehicleNumberBefore] = useState(''); // 차량번호(매입전)
+    const [selectedDealer, setSelectedDealer] = useState('');         // 매입딜러
+    const [presentationType, setPresentationType] = useState('상사매입'); // 제시구분
+
+    // 주민(법인)등록번호 유효성 검사
+    const validateResidentNumber = (value) => {
+        if (!value.trim()) {
+            return '';
+        }
+
+        let isValid = false;
+        if (customerType === '개인') {
+            isValid = isValidResidentNumber(value);
+        } else if (customerType === '법인') {
+            isValid = isValidCorporateNumber(value);
+        }
+
+        return isValid ? '' : `유효하지 않은 ${customerType === '개인' ? '주민등록번호' : '법인등록번호'}입니다.`;
+    };
+
+    // 사업자등록번호 유효성 검사
+    const validateBusinessNumber = (value) => {
+        if (!value.trim()) {
+            return '';
+        }
+        return isValidBusinessNumber(value) ? '' : '유효하지 않은 사업자등록번호입니다.';
+    };
+
+    // 입력값 변경 핸들러
+    const handleResidentNumberChange = (e) => {
+        const value = e.target.value;
+        setResidentNumber(value);
+        
+        const error = validateResidentNumber(value);
+        setValidationErrors(prev => ({
+            ...prev,
+            residentNumber: error
+        }));
+    };
+
+    const handleBusinessNumberChange = (e) => {
+        const value = e.target.value;
+        setBusinessNumber(value);
+        
+        const error = validateBusinessNumber(value);
+        setValidationErrors(prev => ({
+            ...prev,
+            businessNumber: error
+        }));
+    };
+
+    const handleCustomerTypeChange = (type) => {
+        setCustomerType(type);
+        // 고객구분이 변경되면 주민(법인)등록번호 재검증
+        if (residentNumber) {
+            const error = validateResidentNumber(residentNumber);
+            setValidationErrors(prev => ({
+                ...prev,
+                residentNumber: error
+            }));
+        }
+    };
+
+    // 금액 입력 핸들러 (숫자만 입력 가능하도록)
+    const handleNumberInput = (value, setter) => {
+        const numericValue = value.replace(/[^0-9]/g, '');
+        setter(numericValue);
+    };
+
+    // 날짜 입력 핸들러
+    const handleDateInput = (value, setter) => {
+        setter(value);
+    };
+
+    // 제시구분 변경 핸들러
+    const handlePresentationTypeChange = (e) => {
+        setPresentationType(e.target.checked ? '고객위탁' : '상사매입');
+    };
+
+    // 매입딜러 선택 핸들러
+    const handleDealerSelect = (dealerCd) => {
+        setSelectedDealer(dealerCd);
+    };
+
+    // 차량 유형 선택 핸들러
+    const handleVehicleTypeSelect = (type) => {
+        setVehicleType(type);
+    };
+
 
     return (
         <main className="container container--page">
@@ -36,13 +143,23 @@ export default function RegPage({ session = null }) {
                   <div className="form-option-wrap">
                     <div className="form-option">
                       <label className="form-option__label">
-                        <input type="radio" name="radiogroup01" defaultChecked />
+                        <input 
+                          type="radio" 
+                          name="radiogroup01" 
+                          checked={presentationType === '상사매입'}
+                          onChange={() => setPresentationType('상사매입')}
+                        />
                         <span className="form-option__title">상사매입</span>
                       </label>
                     </div>
                     <div className="form-option">
                       <label className="form-option__label">
-                        <input type="radio" name="radiogroup01" />
+                        <input 
+                          type="radio" 
+                          name="radiogroup01"
+                          checked={presentationType === '고객위탁'}
+                          onChange={() => setPresentationType('고객위탁')}
+                        />
                         <span className="form-option__title">고객위탁</span>
                       </label>
                     </div>
@@ -51,24 +168,34 @@ export default function RegPage({ session = null }) {
                 <th>매입딜러</th>
                 <td>
                   <div className="select">
-                    <input className="select__input" type="hidden" name="dealer" defaultValue="value1" />
+                    <input 
+                      className="select__input" 
+                      type="hidden" 
+                      name="dealer" 
+                      value={selectedDealer} 
+                    />
                     <button className="select__toggle" type="button">
-                      <span className="select__text">선택</span>
+                      <span className="select__text">
+                        {selectedDealer ? dealerList.find(d => d.dealerCd === selectedDealer)?.USR_NM || '선택' : '선택'}
+                      </span>
                       <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                     </button>
 
                     <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">선택</li>
-                      <li className="select__option" data-value="value2">선택2</li>
-                      <li className="select__option" data-value="value3">선택3</li>
-                      <li className="select__option" data-value="value4">선택4</li>
-                      <li className="select__option" data-value="value5">선택5</li>
-                      <li className="select__option" data-value="value6">선택6</li>
-                      <li className="select__option" data-value="value7">선택7</li>
-                      <li className="select__option" data-value="value8">선택8</li>
-                      <li className="select__option" data-value="value9">선택9</li>
-                      <li className="select__option" data-value="value10">선택10</li>
-                      <li className="select__option" data-value="value11">선택11</li>
+                      <li 
+                        key="default-dealer"
+                        className={`select__option ${!selectedDealer ? 'select__option--selected' : ''}`}
+                        data-value=""
+                        onClick={() => handleDealerSelect('')}
+                      >선택</li>
+                      {dealerList && dealerList.map((dealer) => (
+                        <li 
+                          key={`dealer-${dealer.USR_ID}`}
+                          className={`select__option ${selectedDealer === dealer.dealerCd ? 'select__option--selected' : ''}`}
+                          data-value={dealer.dealerCd}
+                          onClick={() => handleDealerSelect(dealer.dealerCd)}
+                        >{dealer.USR_NM}</li>
+                      ))}
                     </ul>
                   </div>
                 </td>
@@ -77,9 +204,19 @@ export default function RegPage({ session = null }) {
                 <td>
                   <div className="input-group input-group--sm">
                     <div className="input w160">
-                      <input type="text" className="input__field" placeholder="매입금액 " defaultValue="0" />
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="매입금액" 
+                        value={purchaseAmount}
+                        onChange={(e) => handleNumberInput(e.target.value, setPurchaseAmount)}
+                      />
                       <div className="input__utils">
-                        <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => setPurchaseAmount('0')}
+                        >삭제</button>
                       </div>
                     </div>
                     <span className="input-help">1,000,000 / 100,000</span>
@@ -92,7 +229,14 @@ export default function RegPage({ session = null }) {
                 <td>
                   <div className="input-group">
                     <div className="input w200">
-                      <input type="text" className="jsStartDate input__field input__field--date" placeholder="매입일" autoComplete="off" />
+                      <input 
+                        type="text" 
+                        className="jsStartDate input__field input__field--date" 
+                        placeholder="매입일" 
+                        value={purchaseDate}
+                        onChange={(e) => handleDateInput(e.target.value, setPurchaseDate)}
+                        autoComplete="off" 
+                      />
                     </div>
                     <span className="input-help">조합전산 제시일</span>
                   </div>
@@ -101,14 +245,31 @@ export default function RegPage({ session = null }) {
                 <td>
                   <div className="input-group input-group--sm">
                     <div className="input w200">
-                      <input type="text" className="input__field" placeholder="상사매입비" defaultValue="0" />
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="상사매입비" 
+                        value={brokerageAmount}
+                        onChange={(e) => handleNumberInput(e.target.value, setBrokerageAmount)}
+                      />
                       <div className="input__utils">
-                        <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => setBrokerageAmount('0')}
+                        >삭제</button>
                       </div>
                     </div>
 
                     <div className="input w200">
-                      <input type="text" className="jsStartDate input__field input__field--date" placeholder="상사매입비 입금일" autoComplete="off" />
+                      <input 
+                        type="text" 
+                        className="jsStartDate input__field input__field--date" 
+                        placeholder="상사매입비 입금일" 
+                        value={brokerageDate}
+                        onChange={(e) => handleDateInput(e.target.value, setBrokerageDate)}
+                        autoComplete="off" 
+                      />
                     </div>
                   </div>
                 </td>
@@ -198,15 +359,19 @@ export default function RegPage({ session = null }) {
                 <th>고객구분</th>
                 <td>
                   <div className="select">
-                    <input className="select__input" type="hidden" name="dealer" defaultValue="value1" />
+                    <input className="select__input" type="hidden" name="customerType" value={customerType} />
                     <button className="select__toggle" type="button">
-                      <span className="select__text">개인</span>
+                      <span className="select__text">{customerType}</span>
                       <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                     </button>
 
                     <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">개인</li>
-                      <li className="select__option" data-value="value2">법인</li>
+                      <li className={`select__option ${customerType === '개인' ? 'select__option--selected' : ''}`} 
+                          data-value="개인" 
+                          onClick={() => handleCustomerTypeChange('개인')}>개인</li>
+                      <li className={`select__option ${customerType === '법인' ? 'select__option--selected' : ''}`} 
+                          data-value="법인" 
+                          onClick={() => handleCustomerTypeChange('법인')}>법인</li>
                     </ul>
                   </div>
                 </td>
@@ -215,14 +380,30 @@ export default function RegPage({ session = null }) {
                   <div className="select">
                     <input className="select__input" type="hidden" name="dealer" defaultValue="value1" />
                     <button className="select__toggle" type="button">
-                      <span className="select__text">의제매입</span>
+                      <span className="select__text">선택</span>
                       <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                     </button>
 
                     <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">의제매입</li>
-                      <li className="select__option" data-value="value2">세금계산서</li>
-                      <li className="select__option" data-value="value2">계산서</li>
+                      <li 
+                        key="default" 
+                        className="select__option select__option--selected" 
+                        data-value="">
+                        선택
+                      </li>
+                      {validEvdcList.map((item, index) => {
+                        // CD_ID나 CD_NM이 없는 항목은 건너뛰기
+                        if (!item.CD_ID || !item.CD_NM) return null;
+                        
+                        return (
+                          <li 
+                            key={`evdc-${item.CD_ID}-${index}`}
+                            className="select__option"
+                            data-value={item.CD_NM}>
+                            {item.CD_NM}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </td>
@@ -404,11 +585,25 @@ export default function RegPage({ session = null }) {
                 <th>주민(법인)등록번호</th>
                 <td>
                   <div className="input">
-                    <input type="text" className="input__field" placeholder="주민(법인)등록번호" />
+                    <input 
+                      type="text" 
+                      className={`input__field ${validationErrors.residentNumber ? 'input__field--error' : ''}`}
+                      placeholder={customerType === '개인' ? '주민등록번호 (- 없이 입력)' : '법인등록번호 (- 없이 입력)'} 
+                      value={residentNumber}
+                      onChange={handleResidentNumberChange}
+                    />
                     <div className="input__utils">
-                      <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                      <button type="button" className="jsInputClear input__clear ico ico--input-delete" onClick={() => {
+                        setResidentNumber('');
+                        setValidationErrors(prev => ({...prev, residentNumber: ''}));
+                      }}>삭제</button>
                     </div>
                   </div>
+                  {validationErrors.residentNumber && (
+                    <div className="input-error-message" style={{color: 'red', fontSize: '12px', marginTop: '4px'}}>
+                      {validationErrors.residentNumber}
+                    </div>
+                  )}
                 </td>
                 <th>연락처</th>
                 <td>
@@ -474,11 +669,25 @@ export default function RegPage({ session = null }) {
                 <th>사업자등록번호</th>
                 <td>
                   <div className="input">
-                    <input type="text" className="input__field" placeholder="-없이 입력" />
+                    <input 
+                      type="text" 
+                      className={`input__field ${validationErrors.businessNumber ? 'input__field--error' : ''}`}
+                      placeholder="사업자등록번호 (- 없이 입력)" 
+                      value={businessNumber}
+                      onChange={handleBusinessNumberChange}
+                    />
                     <div className="input__utils">
-                      <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                      <button type="button" className="jsInputClear input__clear ico ico--input-delete" onClick={() => {
+                        setBusinessNumber('');
+                        setValidationErrors(prev => ({...prev, businessNumber: ''}));
+                      }}>삭제</button>
                     </div>
                   </div>
+                  {validationErrors.businessNumber && (
+                    <div className="input-error-message" style={{color: 'red', fontSize: '12px', marginTop: '4px'}}>
+                      {validationErrors.businessNumber}
+                    </div>
+                  )}
                 </td>
 
                 <th>매입(세금)계산서</th>
@@ -492,9 +701,9 @@ export default function RegPage({ session = null }) {
 
                     <ul className="select__menu">
                       <li className="select__option select__option--selected" data-value="value1">선택</li>
-                      <li className="select__option" data-value="value2">해당없음</li>
-                      <li className="select__option" data-value="value3">수취</li>
-                      <li className="select__option" data-value="value3">미수취</li>
+                      <li className="select__option" data-value="">해당없음</li>
+                      <li className="select__option" data-value="Y">수취</li>
+                      <li className="select__option" data-value="N">미수취</li>
                     </ul>
                   </div>
                 </td>
