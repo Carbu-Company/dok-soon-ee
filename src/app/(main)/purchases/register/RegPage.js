@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 export default function RegPage({ session = null, dealerList = [], evdcCDList = [] }) {
     // 유효한 증빙코드 목록만 필터링
-    const validEvdcList = evdcCDList.filter(item => item && item.CD_ID && item.CD_NM);
+    const validEvdcList = evdcCDList.filter(item => item || item.CD_ID || item.CD_NM);
 
     // 상태 관리
     const [residentNumber, setResidentNumber] = useState('');
@@ -393,7 +393,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCDList = 
                       </li>
                       {validEvdcList.map((item, index) => {
                         // CD_ID나 CD_NM이 없는 항목은 건너뛰기
-                        if (!item.CD_ID || !item.CD_NM) return null;
+                        // if (!item.CD_ID || !item.CD_NM) return null;
                         
                         return (
                           <li 
