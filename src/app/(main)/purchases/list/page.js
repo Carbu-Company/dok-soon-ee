@@ -3,6 +3,32 @@ import { verifySession } from "@/lib/auth";
 import ListPage from "@/app/(main)/purchases/list/ListPage";
 import { getPurchasesListNew, getDealerList } from "./api";
 
+// Server Action 정의
+async function searchPurchasesList(searchParams) {
+  "use server";
+  
+  try {
+    const cookieStore = await cookies();
+    const session = await verifySession(cookieStore.get("session")?.value);
+    
+    const defaultParams = {
+      carAgent: session.agentId,
+      page: searchParams.page,
+      pageSize: searchParams.pageSize
+    };
+
+    const result = await getPurchasesListNew({
+      ...defaultParams,
+      ...searchParams
+    });
+
+    return { success: true, data: result };
+  } catch (error) {
+    console.error('검색 중 오류 발생:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 export default async function Purchases() {
   /* 쿠키에서 세션 정보 가져오기
   {
@@ -12,19 +38,21 @@ export default async function Purchases() {
   iat: 1756640299,
   exp: 1757245099
   } 
-  */  
- const cookieStore = await cookies();
+  */
+  const cookieStore = await cookies();
   const session = await verifySession(cookieStore.get("session")?.value).catch(console.error);
-  const purchasesList = await getPurchasesListNew(session.agentId, 1, 10);
+
+  const purchasesList = await searchPurchasesList({page: 1, pageSize: 10});
   const dealerList = await getDealerList(session.agentId);
 
-  console.log(purchasesList);
-  console.log(dealerList);
+  //console.log(purchasesList.data);
+  //console.log(dealerList.data);
 
   return <ListPage session={session}
-                   data={purchasesList.data}
+                   carList={purchasesList.data}
                    dealerList={dealerList.data}
                    page={1}
                    pageSize={10}
+                   searchAction={searchPurchasesList}
    />;
 }

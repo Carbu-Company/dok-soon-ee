@@ -14,14 +14,14 @@ export const getDealerList = async (carAgent) => {
 };
 
 
-export const getPurchasesListNew = async (carAgent, page, pageSize) => {
+export const getPurchasesListNew = async (params) => {
     try {
       const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getSuggestListNew`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ carAgent, page, pageSize })
+        body: JSON.stringify(params)
       }).then(res => res.json());
       return { success: true, data, error: null };
     } catch (error) {

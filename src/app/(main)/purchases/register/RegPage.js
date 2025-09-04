@@ -1,23 +1,37 @@
 "use client";
+import React, { useState, useEffect } from "react";
 import Image from 'next/image'
 import { isValidResidentNumber, isValidBusinessNumber, isValidCorporateNumber } from '../../../../../public/js/util.js'
-import { useState } from 'react'
 
-export default function RegPage({ session = null, dealerList = [], evdcCdList = [] }) {
-    console.log(evdcCdList);
+export default function RegPage({ session = null, dealerList = [], evdcCdList = [], parkingLocationList = [], carKndList = [] }) {
+    const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
+    const [isCarKndSelectOpen, setIsCarKndSelectOpen] = useState(false);
+    const [isParkingLocationSelectOpen, setIsParkingLocationSelectOpen] = useState(false);
+
+    const [parkingLocation, setParkingLocation] = useState('');
+    const [dealerCd, setDealerCd] = useState('');
+    const [carKndNm, setCarKndNm] = useState('');  // 기본값 설정 (CD_ID)
     // 유효한 증빙코드 목록만 필터링
     const validEvdcList = evdcCdList.filter(item => item || item.CD_ID || item.CD_NM);
 
+    // 주차위치 목록만 필터링
+    const validParkingLocationList = parkingLocationList.filter(item => item || item.CD_ID || item.CD_NM);
+
+    
+    // 주차위치 목록만 필터링
     // 연락처 상태 관리
-    const [phoneNumber, setPhoneNumber] = useState('01012345678');
+    const [phoneNumber, setPhoneNumber] = useState('01012345678');                   // 연락처
     
     // 고객 정보 상태 관리
-    const [customerName, setCustomerName] = useState('홍길동');
-    const [evdcCd, setEvdcCd] = useState('001');
-    const [emailId, setEmailId] = useState('test');
-    const [emailDomain, setEmailDomain] = useState('naver.com');
-    const [address, setAddress] = useState('서울특별시 성동구 왕십리로 12길 27, 6층');
-    const [addressDetail, setAddressDetail] = useState('제이플랜 파크빌 605호');
+    const [customerName, setCustomerName] = useState('홍길동');                        // 고객명
+    const [evdcCd, setEvdcCd] = useState('001');                                     // 증빙종류
+    const [emailId, setEmailId] = useState('test'); // 이메일 아이디
+    const [emailDomain, setEmailDomain] = useState('naver.com'); // 이메일 도메인
+    const [address, setAddress] = useState('서울특별시 성동구 왕십리로 12길 27, 6층'); // 주소
+    const [addressDetail, setAddressDetail] = useState('제이플랜 파크빌 605호');      // 상세주소
+    const [fctCndcYn, setFctCndcYn] = useState('N');                             // 사실 확인서 여부
+    const [puracshRcvYn, setPuracshRcvYn] = useState('N');                       // 매입수취여부
+    const [ownrZip, setOwnrZip] = useState('');                                   // 주소 우편번호
 
     // 파일 업로드 상태 관리
     const [attachedFiles, setAttachedFiles] = useState([
@@ -26,10 +40,13 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
     ]);
 
     // 상태 관리
-    const [residentNumber, setResidentNumber] = useState('821212-1527515');
-    const [businessNumber, setBusinessNumber] = useState('790-35-42372');
-    const [customerType, setCustomerType] = useState('개인'); // '개인' 또는 '법인'
-    const [validationErrors, setValidationErrors] = useState({});
+    const [residentNumber, setResidentNumber] = useState('821212-1527515');  // 주민등록번호
+    const [businessNumber, setBusinessNumber] = useState('790-35-42372');    // 사업자등록번호
+    const [customerType, setCustomerType] = useState('개인');                    // '개인' 또는 '법인'
+    const [validationErrors, setValidationErrors] = useState({});                  // 증빙 오류 
+    const [parkingLocationDesc, setParkingLocationDesc] = useState('');            // 주차위치 설명
+    const [keyNumber, setKeyNumber] = useState('');                              // Key번호
+    const [custNo, setCustNo] = useState('');                                  // 고객번호
 
     // 금액 관련 상태
     const [purchaseAmount, setPurchaseAmount] = useState('5000000');          // 매입금액
@@ -39,13 +56,20 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
     const [purchaseDate, setPurchaseDate] = useState('2025-09-02');             // 매입일
 
     // 차량 관련 상태
-    const [vehicleType, setVehicleType] = useState('승용');            // 차량 유형
     const [vehicleName, setVehicleName] = useState('렉서스');               // 차량명
     const [vehicleNumberAfter, setVehicleNumberAfter] = useState('69보고 70톤'); // 차량번호(매입후)
     const [vehicleNumberBefore, setVehicleNumberBefore] = useState(''); // 차량번호(매입전)
-    const [selectedDealer, setSelectedDealer] = useState('');         // 매입딜러
     const [presentationType, setPresentationType] = useState('상사매입'); // 제시구분
-    const [isSelectOpen, setIsSelectOpen] = useState(false);         // 셀렉트 박스 열림/닫힘 상태
+    const [ownrTpNm, setOwnrTpNm] = useState('0');                    // 소유자 유형
+    const [purDesc, setPurDesc] = useState('');                       // 매입설명
+
+    // 세금 관련 
+    const [txblIssuDt, setTxblIssuDt] = useState(''); // 세금 납부일
+    const [allinputCheck, setAllinputCheck] = useState(false);
+
+    // 입력 항목 체크 
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     // 주민(법인)등록번호 유효성 검사
     const validateResidentNumber = (value) => {
@@ -117,22 +141,6 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
         setter(value);
     };
 
-    // 제시구분 변경 핸들러
-    const handlePresentationTypeChange = (e) => {
-        setPresentationType(e.target.checked ? '고객위탁' : '상사매입');
-    };
-
-    // 매입딜러 선택 핸들러
-    const handleDealerSelect = (dealerCd) => {
-        setSelectedDealer(dealerCd);
-    };
-
-    // 차량 유형 선택 핸들러
-    const handleVehicleTypeSelect = (type) => {
-        setVehicleType(type);
-    };
-
-
     // 전체 입력 항목 체크
     useEffect(() => {
         // 필수 입력 항목들이 모두 채워졌는지 확인
@@ -152,16 +160,16 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
         // address: 주소                           - 미지정
         // addressDetail: 상세주소                  - 미지정
         const allFieldsFilled = 
-            purchaseAmount &&
-            purchaseDate &&
+            purchaseAmount !== '' &&    
+            purchaseDate !== '' &&
             brokerageAmount &&
-            brokerageDate &&
-            acquisitionTax &&
-            vehicleName &&
-            vehicleNumberAfter &&
+            brokerageDate !== '' &&
+            acquisitionTax !== '' &&
+            vehicleName !== '' &&
+            vehicleNumberAfter !== '' &&
             //vehicleNumberBefore &&
             //customerName &&
-            evdcCd 
+            evdcCd !== '' 
             //phoneNumber &&
             //emailId &&
             //emailDomain &&
@@ -179,25 +187,41 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
         e.preventDefault();
         setLoading(true);
         setError(null);
-        const formData = new FormData(e.target);
 
         const formValues = {
-        purchaseAmount: formData.get('purchaseAmount'),
-        purchaseDate: formData.get('purchaseDate'),
-        brokerageAmount: formData.get('brokerageAmount'),
-        brokerageDate: formData.get('brokerageDate'),
-        acquisitionTax: formData.get('acquisitionTax'),
-        vehicleName: formData.get('vehicleName'),
-        vehicleNumberAfter: formData.get('vehicleNumberAfter'),
-        vehicleNumberBefore: formData.get('vehicleNumberBefore'),
-        customerName: formData.get('customerName'),
-        evdcCd: formData.get('evdcCd'),
-        phoneNumber: formData.get('phoneNumber'),
-        emailId: formData.get('emailId'),
-        emailDomain: formData.get('emailDomain'),
-        address: formData.get('address'),
-        addressDetail: formData.get('addressDetail'),
-        attachedFiles: formData.get('attachedFiles')
+          carAgent: session?.agentId,                                 // 상사사 ID
+          purchaseAmount,         //  매입금액
+          purchaseDate,             // 매입일   
+          brokerageAmount,       // 상사매입비
+          brokerageDate,          // 상사매입비 입금일
+          acquisitionTax,        // 취득세
+          vehicleName,                // 차량명
+          vehicleNumberAfter,   // 차량번호(매입후)
+          vehicleNumberBefore, // 차량번호(매입전)
+          ownrTpNm,                // 소유자 유형
+          residentNumber,         // 주민등록번호
+          businessNumber,         // 사업자등록번호
+          customerName,               // 고객명
+          ownrZip,                          // 주소 우편번호
+          evdcCd,                           // 증빙종류
+          carKndNm: carKndNm || undefined,  // 차량 유형 - select에서 선택하지 않으면 undefined
+          presentationType,                   // 제시 구분
+          phoneNumber,                 // 연락처
+          emailId,                        // 이메일 아이디
+          emailDomain,                // 이메일 도메인
+          txblIssuDt,                 // 세금 납부일
+          purDesc,                        // 매입설명
+          address,                        // 주소
+          addressDetail,             // 상세주소
+          attachedFiles,              // 관련 서류 첨부
+          usrId: session?.usrId,                                     // 사용자 ID
+          dealerCd,
+          parkingLocation,         // 주차위치 코드
+          parkingLocationDesc,   // 주차위치 설명
+          keyNumber,                      // Key번호
+          fctCndcYn,                  // 사실 확인서 여부
+          puracshRcvYn,              // 매입수취여부
+          custNo                           // 고객번호
         };
 
         console.log(formValues);
@@ -280,38 +304,38 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
                     <input 
                       className="select__input" 
                       type="hidden" 
-                      name="dealer" 
-                      value={selectedDealer || ''} 
+                      name="dealerCd" 
+                      value={dealerCd || ''} 
                     />
                     <button 
                       className="select__toggle" 
                       type="button"
-                      onClick={() => setIsSelectOpen(!isSelectOpen)}
+                      onClick={() => setIsDealerSelectOpen(!isDealerSelectOpen)}
                     >
                       <span className="select__text">
-                        {selectedDealer ? dealerList.find(d => d.dealerCd === selectedDealer)?.USR_NM || '선택' : '선택'}
+                        {dealerCd ? dealerList.find(d => d.USR_ID === dealerCd)?.USR_NM || '선택' : '선택'}
                       </span>
                       <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                     </button>
 
-                    <ul className="select__menu" style={{ display: isSelectOpen ? 'block' : 'none' }}>
+                    <ul className="select__menu" style={{ display: isDealerSelectOpen ? 'block' : 'none' }}>
                       <li 
                         key="default-dealer"
-                        className={`select__option ${!selectedDealer ? 'select__option--selected' : ''}`}
+                        className={`select__option ${!dealerCd ? 'select__option--selected' : ''}`}
                         data-value=""
                         onClick={() => {
-                          handleDealerSelect('');
-                          setIsSelectOpen(false);
+                          setDealerCd('');
+                          setIsDealerSelectOpen(false);
                         }}
                       >선택</li>
                       {dealerList && dealerList.map((dealer) => (
                         <li 
                           key={`dealer-${dealer.USR_ID}`}
-                          className={`select__option ${selectedDealer === dealer.dealerCd ? 'select__option--selected' : ''}`}
+                          className={`select__option ${dealerCd === dealer.dealerCd ? 'select__option--selected' : ''}`}
                           data-value={dealer.dealerCd}
                           onClick={() => {
-                            handleDealerSelect(dealer.dealerCd);
-                            setIsSelectOpen(false);
+                            setDealerCd(dealer.USR_ID);
+                            setIsDealerSelectOpen(false);
                           }}
                         >{dealer.USR_NM}</li>
                       ))}
@@ -426,24 +450,44 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
                       <input 
                         className="select__input" 
                         type="hidden" 
-                        name="dealer" 
-                        value={vehicleType} 
+                        name="carKndNm" 
+                        value={carKndNm || ''} 
                       />
-                      <button className="select__toggle" type="button">
-                        <span className="select__text">승용</span>
+                      <button 
+                        className="select__toggle" 
+                        type="button"
+                        onClick={() => setIsCarKndSelectOpen(!isCarKndSelectOpen)}
+                      >
+                        <span className="select__text">
+                            {carKndNm ? carKndList.find(d => d.CD_ID === carKndNm)?.CD_NM || '선택' : '선택'}
+                        </span>
+                        
                         <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                       </button>
-                      <ul className="select__menu">
-                        <li className="select__option select__option--selected" data-value="승용">승용</li>
-                        <li className="select__option" data-value="daum.net">승합</li>
-                        <li className="select__option" data-value="naver.com">경차</li>
-                        <li className="select__option" data-value="naver.com">화물</li>
-                        <li className="select__option" data-value="nate.com">특수</li>
+                      <ul className="select__menu" style={{ display: isCarKndSelectOpen ? 'block' : 'none' }}>
+                        {carKndList.map((item, index) => (
+                          <li 
+                            key={index}
+                            className={`select__option ${carKndNm === item.CD_ID ? 'select__option--selected' : ''}`}
+                            onClick={() => {
+                              setCarKndNm(item.CD_ID);
+                              setIsCarKndSelectOpen(false);
+                            }}
+                          >
+                            {item.CD_NM}
+                          </li>
+                        ))}
                       </ul>
                     </div>
 
                     <div className="input w300">
-                      <input type="text" className="input__field" placeholder="차량명" value={vehicleName} onChange={(e) => setVehicleName(e.target.value)} />
+                                             <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="차량명" 
+                        value={vehicleName || ''} 
+                        onChange={(e) => setVehicleName(e.target.value)}
+                      />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -477,6 +521,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
                 <td>
                   <div className="input-group">
                     <div className="input w400">
+                      <input type="hidden" name="custNo" value={custNo} />
                       <input type="text" className="input__field" placeholder="고객명 " value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
@@ -498,10 +543,16 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
                     <ul className="select__menu">
                       <li className={`select__option ${customerType === '개인' ? 'select__option--selected' : ''}`} 
                           data-value="개인" 
-                          onClick={() => handleCustomerTypeChange('개인')}>개인</li>
+                          onClick={() => {
+                            handleCustomerTypeChange('개인');
+                            setOwnrTpNm('0');
+                          }}>개인</li>
                       <li className={`select__option ${customerType === '법인' ? 'select__option--selected' : ''}`} 
                           data-value="법인" 
-                          onClick={() => handleCustomerTypeChange('법인')}>법인</li>
+                          onClick={() => {
+                            handleCustomerTypeChange('법인');
+                            setOwnrTpNm('1');
+                          }}>법인</li>
                     </ul>
                   </div>
                 </td>
@@ -677,7 +728,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
 
         <div className="container__btns">
           <button className="btn btn--light" type="button" onClick={() => { window.location.href = 'm1.jsp'; }}>취소</button>
-          <button className="btn btn--primary" type="submit" disabled={!allinputCheck}>확인</button>
+          <button className="btn btn--primary" type="submit" disabled={!allinputCheck} onClick={handleSubmit}>확인</button>
         </div>
 
         <div className="table-wrap">
@@ -813,6 +864,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
                   <div className="input-group">
 
                     <div className="input w400">
+                      <input type="hidden" name="ownrZip" value={ownrZip} />
                       <input 
                         type="text" 
                         className="input__field" 
@@ -887,10 +939,10 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
                     </button>
 
                     <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">선택</li>
-                      <li className="select__option" data-value="">해당없음</li>
-                      <li className="select__option" data-value="Y">수취</li>
-                      <li className="select__option" data-value="N">미수취</li>
+                      <li className="select__option select__option--selected" data-value={puracshRcvYn === '' ? '' : puracshRcvYn} onClick={() => setPuracshRcvYn('')}>선택</li>
+                      <li className="select__option" data-value="" onClick={() => setPuracshRcvYn('')}>해당없음</li>
+                      <li className="select__option" data-value="Y" onClick={() => setPuracshRcvYn('Y')}>수취</li>
+                      <li className="select__option" data-value="N" onClick={() => setPuracshRcvYn('N')}>미수취</li>
                     </ul>
                   </div>
                 </td>
@@ -898,7 +950,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
                 <td>
                   <div className="input-group">
                     <div className="input w200">
-                      <input type="text" className="jsStartDate input__field input__field--date" placeholder="발행일" autoComplete="off" />
+                      <input type="text" className="jsStartDate input__field input__field--date" placeholder="발행일" autoComplete="off" value={txblIssuDt} onChange={(e) => handleDateInput(e.target.value, setTxblIssuDt)} />
                     </div>
                     <span className="input-help">계산서 발행일 및 계약서 계약일</span>
                   </div>
@@ -916,17 +968,17 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
                     </button>
 
                     <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">선택</li>
-                      <li className="select__option" data-value="value2">해당없음</li>
-                      <li className="select__option" data-value="value3">수취</li>
-                      <li className="select__option" data-value="value3">미수취</li>
+                      <li className="select__option select__option--selected" data-value={fctCndcYn === '' ? '' : fctCndcYn} onClick={() => setFctCndcYn('')}>선택</li>
+                      <li className="select__option" data-value="" onClick={() => setFctCndcYn('')}>해당없음</li>
+                      <li className="select__option" data-value="Y" onClick={() => setFctCndcYn('Y')}>수취</li>
+                      <li className="select__option" data-value="N" onClick={() => setFctCndcYn('N')}>미수취</li>
                     </ul>
                   </div>
                 </td>
                 <th>특이사항</th>
                 <td colSpan={3}>
                   <div className="input">
-                    <textarea className="input__field" placeholder="내용 입력"></textarea>
+                    <textarea className="input__field" placeholder="내용 입력" value={purDesc} onChange={(e) => setPurDesc(e.target.value)}></textarea>
                     <div className="input__utils">
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
@@ -1016,24 +1068,53 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
 
                     <div className="select w200">
                       <input 
-                      className="select__input" 
-                      type="hidden" 
-                      name="dealer" 
-                      value="선택" 
-                    />
-                      <button className="select__toggle" type="button">
-                        <span className="select__text">선택</span>
+                        className="select__input" 
+                        type="hidden" 
+                        name="parkingLocation" 
+                        value={parkingLocation || ''} 
+                      />
+                      <button 
+                        className="select__toggle" 
+                        type="button"
+                        onClick={() => setIsParkingLocationSelectOpen(!isParkingLocationSelectOpen)}
+                      >
+                        <span className="select__text">
+                          {parkingLocation ? parkingLocationList.find(p => p.CD_ID === parkingLocation)?.CD_NM || '선택' : '선택'}
+                        </span>
                         <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                       </button>
-                      <ul className="select__menu">
-                        <li className="select__option select__option--selected" data-value="선택">선택</li>
-                        <li className="select__option" data-value="daum.net">주차위치코드1</li>
-                        <li className="select__option" data-value="daum.net">주차위치코드2</li>
+                      <ul className="select__menu" style={{ display: isParkingLocationSelectOpen ? 'block' : 'none' }}>
+                        <li 
+                          key="parking-location-default"
+                          className={`select__option ${!parkingLocation ? 'select__option--selected' : ''}`}
+                          data-value=""
+                          onClick={() => {
+                            setParkingLocation('');
+                            //setParkingLocationDesc('');
+                            setIsParkingLocationSelectOpen(false);
+                          }}
+                        >
+                          선택
+                        </li>
+                        {parkingLocationList && parkingLocationList.map((location, index) => (
+                          <li 
+                            key={`parking-location-${location.CD_ID || index}`}
+                            className={`select__option ${parkingLocation === location.CD_ID ? 'select__option--selected' : ''}`}
+                            data-value={location.CD_ID}
+                            onClick={() => {
+                              setParkingLocation(location.CD_ID);
+                              //setParkingLocationDesc(location.CD_NM || '');
+                              setIsParkingLocationSelectOpen(false);
+                            }}
+                          >
+                            {location.CD_NM}
+                          </li>
+                        ))}
                       </ul>
                     </div>
 
                     <div className="input w800">
-                      <input type="text" className="input__field" placeholder="주차위치" />
+                      <input type="text" className="input__field" placeholder="주차위치" value={parkingLocationDesc} onChange={(e) => setParkingLocationDesc(e.target.value)} />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -1044,7 +1125,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
                 <th>Key번호</th>
                 <td>
                   <div className="input">
-                    <input type="text" className="input__field" placeholder="Key번호" />
+                    <input type="text" className="input__field" placeholder="Key번호" value={keyNumber} onChange={(e) => setKeyNumber(e.target.value)} />
                     <div className="input__utils">
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
