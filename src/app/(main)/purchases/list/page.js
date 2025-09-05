@@ -4,23 +4,17 @@ import ListPage from "@/app/(main)/purchases/list/ListPage";
 import { getPurchasesListNew, getDealerList } from "./api";
 
 // Server Action 정의
-async function searchPurchasesList(searchParams) {
+async function searchPurchasesList(defaultParams, searchParams) {
   "use server";
   
   try {
-    const cookieStore = await cookies();
-    const session = await verifySession(cookieStore.get("session")?.value);
-    
-    const defaultParams = {
-      carAgent: session.agentId,
-      page: searchParams.page,
-      pageSize: searchParams.pageSize
+
+    const searchParamsWithPage = {
+      ...defaultParams, 
+      ...searchParams
     };
 
-    const result = await getPurchasesListNew({
-      ...defaultParams,
-      ...searchParams
-    });
+    const result = await getPurchasesListNew(searchParamsWithPage);
 
     return { success: true, data: result };
   } catch (error) {
@@ -42,7 +36,14 @@ export default async function Purchases() {
   const cookieStore = await cookies();
   const session = await verifySession(cookieStore.get("session")?.value).catch(console.error);
 
-  const purchasesList = await searchPurchasesList({page: 1, pageSize: 10});
+  // 기본 파라미터
+  const defaultParams = {
+    carAgent: session.agentId,
+    page: 1,
+    pageSize: 10
+  };
+
+  const purchasesList = await searchPurchasesList(defaultParams, {});
   const dealerList = await getDealerList(session.agentId);
 
   //console.log(purchasesList.data);

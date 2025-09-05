@@ -14,9 +14,10 @@ export default function ListPage(props) {
     const [loading, setLoading] = useState(false);
     const [carList, setCarList] = useState(props.carList?.data || []);
     const [dealerList, setDealerList] = useState(props.dealerList || []);
-    const [page, setPage] = useState(props.page || 1);
+    const [currentPage, setCurrentPage] = useState(props.page || 1);
     const [pageSize, setPageSize] = useState(props.pageSize || 10);
     const searchAction = props.searchAction;
+    const [totalPages, setTotalPages] = useState(props.carList?.pagination?.totalPages || 2);
 
     //console.log(props.carList);
 
@@ -35,10 +36,6 @@ export default function ListPage(props) {
     const [startDt, setStartDt] = useState('');
     const [endDt, setEndDt] = useState('');
 
-    // 페이지 번호, 페이지당 아이템 수
-    const [currentPage, setCurrentPage] = useState(page);
-    const [totalPages, setTotalPages] = useState(1);
-    const itemsPerPage = 10;
 
     // 현재 페이지 데이터는 서버에서 받아온 데이터를 그대로 사용
     const currentPageData = carList;
@@ -48,9 +45,6 @@ export default function ListPage(props) {
     //carList && carList.map((item, index) => {
     //  console.log(`[${index}] 차량정보:`, item);
     //});
-
-
-    
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -69,7 +63,7 @@ export default function ListPage(props) {
     const [ordAscDesc, setOrdAscDesc] = useState('desc');
     const [isOrdAscDescSelectOpen, setIsOrdAscDescSelectOpen] = useState(false);
 
-    // 건수
+    // 건수 - pageSize 
     const [listCount, setListCount] = useState(10);
     const [isListCountSelectOpen, setIsListCountSelectOpen] = useState(false);
 
@@ -126,14 +120,20 @@ export default function ListPage(props) {
     // 검색 영역
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // 기본 파라미터
+    const defaultParams = {
+      carAgent: props.session?.agentId,
+      page: currentPage,
+      pageSize: pageSize
+    };
+
+    // 검색 파라미터
     const [searchParams, setSearchParams] = useState({
       carNo: carNo,  
       dealer: selectedDealer,  
       dtGubun: dtGubun,  
       startDt: startDt,  
-      endDt: endDt,  
-      page: currentPage,
-      pageSize: itemsPerPage
+      endDt: endDt  
     });
 
 
@@ -141,13 +141,11 @@ export default function ListPage(props) {
     const handleSearch = async (pageNum = 1) => {
       console.log('검색 버튼 클릭');
 
-      
       try {
         setLoading(true);
         const searchParamsWithPage = {
-          ...searchParams,
-          page: pageNum,
-          pageSize: itemsPerPage
+          ...defaultParams,
+          ...searchParams
         };
   
         const result = await searchAction(searchParamsWithPage);
@@ -346,7 +344,7 @@ export default function ListPage(props) {
                     </div>
 
                     {/* disabled 속성 제거 시, 활성화 상태 적용 */}
-                    <button type="button" className="btn btn--type03" onClick={handleSearch}>
+                    <button type="button" className="btn btn--type03" onClick={handleSearch} disabled={loading}>
                       <span className="ico ico--search"></span>차량검색
                     </button>
                     <button
@@ -1065,6 +1063,7 @@ export default function ListPage(props) {
                     className={`select__option ${listCount === 10 ? 'select__option--selected' : ''}`}
                     onClick={() => {
                       setListCount(10);
+                      setPageSize(10);
                       setIsListCountSelectOpen(false);
                     }}
                   >
@@ -1074,6 +1073,7 @@ export default function ListPage(props) {
                     className={`select__option ${listCount === 30 ? 'select__option--selected' : ''}`}
                     onClick={() => {
                       setListCount(30);
+                      setPageSize(30);
                       setIsListCountSelectOpen(false);
                     }}
                   >
@@ -1083,6 +1083,7 @@ export default function ListPage(props) {
                     className={`select__option ${listCount === 50 ? 'select__option--selected' : ''}`}
                     onClick={() => {
                       setListCount(50);
+                      setPageSize(50);
                       setIsListCountSelectOpen(false);
                     }}
                   >
@@ -1189,6 +1190,7 @@ export default function ListPage(props) {
               )}
             </tbody>
           </table>
+
           {/* 페이지네이션 */}
           {currentPageData && currentPageData.length > 0 && (
           <div className="pagination">
