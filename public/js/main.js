@@ -12,6 +12,13 @@ $(document).ready(function () {
         changeMonth: true,
         changeYear: true,
         showButtonPanel: true,
+        onSelect: function(dateText) {
+          $(this).val(dateText).trigger('change');
+          // 매입일 필드인 경우 React state 업데이트
+          if ($(this).attr('name') === 'carPurDt' && window.updateCarPurDt) {
+            window.updateCarPurDt(dateText);
+          }
+        }
       })
       .on("change", function () {
         to.datepicker("option", "minDate", getDate(this));
@@ -22,6 +29,9 @@ $(document).ready(function () {
         changeMonth: true,
         changeYear: true,
         showButtonPanel: true,
+        onSelect: function(dateText) {
+          $(this).val(dateText).trigger('change');
+        }
       })
       .on("change", function () {
         from.datepicker("option", "maxDate", getDate(this));

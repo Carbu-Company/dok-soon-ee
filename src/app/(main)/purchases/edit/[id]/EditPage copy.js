@@ -1,7 +1,7 @@
 "use client";
 import Image from 'next/image'
 
-export default function EditPage({ session = null }) {
+export default function EditorPage({ session = null }) {
     return (
         <main className="container container--page">
           <div className="container__head">

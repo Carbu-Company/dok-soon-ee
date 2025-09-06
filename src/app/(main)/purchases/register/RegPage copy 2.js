@@ -1,7 +1,6 @@
 "use client";
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
-import { isValidResidentNumber, isValidBusinessNumber, isValidCorporateNumber } from '../../../../../public/js/util.js'
 
 export default function RegPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = []}) {
 
@@ -47,9 +46,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
       setPurVat(0);
     }
   }, [purAmt]);
-
-  // 상사매입비 
-  const [agentPurCst, setAgentPurCst] = useState('0');
+  
 
   // 매입일 선택 상태 관리
   const [carPurDt, setCarPurDt] = useState('');
@@ -69,9 +66,6 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
     };
   }, []);
 
-  // 취득세 선택 상태 관리
-  const [gainTax, setGainTax] = useState('0');
-
   // 상사매입비 입금일 선택 상태 관리
   const [brokerageDate, setBrokerageDate] = useState('');
 
@@ -80,9 +74,6 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
 
   // 발행일 선택 상태 관리
   const [txblIssuDt, setTxblIssuDt] = useState('');
-
-  // 차량명 
-  const [carNm, setCarNm] = useState('');
 
   // 차량번호(매입후) 선택 상태 관리
   const [carNo, setCarNo] = useState('');
@@ -113,119 +104,25 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
   const [emailDomain, setEmailDomain] = useState('');
   const [isEmailDomainOpen, setIsEmailDomainOpen] = useState(false);
 
-  // 우편번호
-  const [ownrZip, setOwnrZip] = useState('');
-
-  // 주소1 값 저장
-  const [ownrAddr1, setOwnrAddr1] = useState('');
-  // 주소2 값 저장
-  const [ownrAddr2, setOwnrAddr2] = useState('');
-
-  // 사업자등록번호 값 저장
-  const [ownrBrno, setOwnrBrno] = useState('');
-
-  // 세금 납부일 값 저장
-  const [txblRcvYn, setTxblRcvYn] = useState('');
-  const [isTxblRcvYnOpen, setIsTxblRcvYnOpen] = useState(false);
-
   // 특이사항 선택 상태 관리
   const [purDesc, setPurDesc] = useState('');
 
   // 주차위치 설명 선택 상태 관리
   const [parkingLocationDesc, setParkingLocationDesc] = useState('');
 
-  // Key번호 선택 상태 관리
-  const [parkKeyNo, setParkKeyNo] = useState('');
-
   // 사실확인서 선택 상태 관리
   const [fctCndcYn, setFctCndcYn] = useState('');
-  const [isFctCndcYnOpen, setIsFctCndcYnOpen] = useState(false);
 
-  // 관련 서류 첨부 상태 관리
-  const [attachedFiles, setAttachedFiles] = useState([]);
 
-  // 입력 항목 체크 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  // 주민(법인)등록번호 유효성 검사
-  const validateResidentNumber = (value) => {
-      if (!value.trim()) {
-          return '';
-      }
-
-      let isValid = false;
-      if (customerType === '개인') {
-          isValid = isValidResidentNumber(value);
-      } else if (customerType === '법인') {
-          isValid = isValidCorporateNumber(value);
-      }
-
-      return isValid ? '' : `유효하지 않은 ${customerType === '개인' ? '주민등록번호' : '법인등록번호'}입니다.`;
-  };
-
-  // 사업자등록번호 유효성 검사
-  const validateBusinessNumber = (value) => {
-      if (!value.trim()) {
-          return '';
-      }
-      return isValidBusinessNumber(value) ? '' : '유효하지 않은 사업자등록번호입니다.';
-  };
-
-  // 입력값 변경 핸들러
-  const handleResidentNumberChange = (e) => {
-      const value = e.target.value;
-      setResidentNumber(value);
-      
-      const error = validateResidentNumber(value);
-      setValidationErrors(prev => ({
-          ...prev,
-          residentNumber: error
-      }));
-  };
-
-  const handleBusinessNumberChange = (e) => {
-      const value = e.target.value;
-      setBusinessNumber(value);
-      
-      const error = validateBusinessNumber(value);
-      setValidationErrors(prev => ({
-          ...prev,
-          businessNumber: error
-      }));
-  };
-
-  const handleCustomerTypeChange = (type) => {
-      setCustomerType(type);
-      // 고객구분이 변경되면 주민(법인)등록번호 재검증
-      if (residentNumber) {
-          const error = validateResidentNumber(residentNumber);
-          setValidationErrors(prev => ({
-              ...prev,
-              residentNumber: error
-          }));
-      }
-  };
-
-  const handleSubmit = async () => {
-
-    setLoading(true);
-    setError(null);
-
+  const handleSubmit = () => {
     console.log('dealerId', dealerId);    // 매입딜러 ID
     console.log('carKndCd', carKndCd);    // 차량 종류 코드
     console.log('evdcCd', evdcCd);    // 증빙종류 코드
-    console.log('carNm', carNm);    // 차량명
-
+    console.log('parkingCd', parkingCd);    // 주차위치 코드
     console.log('prsnSctCd', prsnSctCd);    // 제시구분 코드
     console.log('purAmt', purAmt);    // 매입금액
-    console.log('purSupPrc', purSupPrc);    // 공급가액
-    console.log('purVat', purVat);    // 부가세    
     console.log('carPurDt', carPurDt);    // 매입일
-    console.log('agentPurCst', agentPurCst);    // 상사매입비
     console.log('brokerageDate', brokerageDate);    // 상사매입비 입금일
-    console.log('carRegDt', carRegDt);    // 이전일
-    console.log('txblIssuDt', txblIssuDt);    // 발행일
     console.log('carNo', carNo);    // 차량번호(매입후)
     console.log('purBefCarNo', purBefCarNo);    // 차량번호(매입전)
     console.log('ownrNm', ownrNm);    // 고객명
@@ -235,163 +132,9 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
     console.log('ownrPhon', ownrPhon);    // 연락처
     console.log('ownrEmail', ownrEmail);    // e메일 주소
     console.log('emailDomain', emailDomain);    // e메일 도메인
-    console.log('ownrAddr1', ownrAddr1);    // 주소1
-    console.log('ownrAddr2', ownrAddr2);    // 주소2
-    console.log('ownrBrno', ownrBrno);    // 사업자등록번호
-    console.log('txblRcvYn', txblRcvYn);    // 세금 납부일
     console.log('purDesc', purDesc);    // 특이사항
-    console.log('parkingCd', parkingCd);    // 주차위치 코드
     console.log('parkingLocationDesc', parkingLocationDesc);    // 주차위치 설명
     console.log('fctCndcYn', fctCndcYn);    // 사실확인서
-    console.log('attachedFiles', attachedFiles);    // 관련 서류 첨부
-    console.log('parkKeyNo', parkKeyNo);    // Key번호
-
-    // 매입딜러
-    if(!dealerId) {
-      alert('매입딜러를 선택해주세요.');
-      return;
-    }
-
-    // 매입금액
-    if(!purAmt || purAmt === '0') {
-      alert('매입금액을 입력해주세요.');
-      return;
-    }
-
-    // 매입일
-    if(!carPurDt) {
-      alert('매입일을 선택해주세요.');
-      return;
-    }
-
-    // 상사매입비
-    if(!agentPurCst) {
-      alert('상사매입비를 입력해주세요.');
-      return;
-    }
-
-    // 취득세
-    if(!gainTax) {
-      alert('취득세를 선택해주세요.');
-      return;
-    }
-
-    // 차량 유형
-    if(!carKndCd) {
-      alert('차량 유형을 선택해주세요.');
-      return;
-    }
-
-    // 차량명
-    if(!carNm) {
-      alert('차량명을 입력해주세요.');
-      return;
-    }
-
-    // 차량번호(매입후)
-    if(!carNo) {
-      alert('차량번호(매입후)를 입력해주세요.');
-      return;
-    }
-
-    // 고객명
-    if(!ownrNm) {
-      alert('매도자/전소유자명을 입력해주세요.');
-      return;
-    }
-
-    // 고객구분
-    if(!ownrTpCd) {
-      alert('고객구분을 선택해주세요.');
-      return;
-    }
-
-    // 증빙종류
-    if(!evdcCd) {
-      alert('증빙종류를 선택해주세요.');
-      return;
-    }
-
-    // 주민(법인)등록번호
-    if(ownrSsn) {
-
-      // 주민번호 체크 
-      if(!isValidResidentNumber(ownrSsn) && ownrTpCd === '001') {
-        alert('주민등록번호를 확인해주세요.');
-        return;
-      } else if(!isValidCorporateNumber(ownrSsn) && ownrTpCd === '002') {
-        alert('법인등록번호를 확인해주세요.');
-        return;
-      }
-
-    }
-
-    // 사업자번호
-    if(ownrBrno) {
-      if(!isValidBusinessNumber(ownrBrno)) {
-        alert('사업자등록번호를 확인해주세요.');
-        return;
-      }
-    }
-
-    const formValues = {
-      carAgent: session?.agentId,                                // 상사사 ID
-      purAmt,                                                    // 매입금액
-      purSupPrc,                                                 // 공급가액
-      purVat,                                                    // 부가세
-      carPurDt,                                                  // 매입일   
-      agentPurCst,                                               // 상사매입비
-      brokerageDate,                                             // 상사매입비 입금일
-      gainTax,                                                   // 취득세
-      carNm,                                                     // 차량명
-      carNo,                                                     // 차량번호(매입후)
-      purBefCarNo,                                               // 차량번호(매입전)
-      ownrTpCd,                                                  // 소유자 유형
-      ownrSsn,                                                   // 주민등록번호
-      ownrBrno,                                                  // 사업자등록번호
-      ownrNm,                                                    // 고객명
-      ownrZip,                                                   // 주소 우편번호
-      evdcCd,                                                    // 증빙종류
-      carKndCd,                                                  // 차량 유형 
-      prsnSctCd,                                                 // 제시 구분
-      ownrPhon,                                                  // 연락처
-      ownrEmail,                                                 // 이메일 아이디
-      emailDomain,                                               // 이메일 도메인
-      txblIssuDt,                                                // 세금 납부일
-      purDesc,                                                   // 매입설명
-      ownrAddr1,                                                 // 주소
-      ownrAddr2,                                                 // 상세주소
-      attachedFiles,                                             // 관련 서류 첨부
-      usrId: session?.usrId,                                     // 사용자 ID
-      dealerId,                                                  // 딜러 코드
-      parkingCd,                                                 // 주차위치 코드
-      parkingLocationDesc,                                       // 주차위치 설명
-      parkKeyNo,                                                 // Key번호
-      fctCndcYn,                                                 // 사실 확인서 여부
-      txblRcvYn,                                                 // 매입수취여부
-      ctshNo                                                     // 계약서번호
-    };
-    
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertSuggest`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formValues)
-      });
-      const res = await response.json();
-      
-      alert('신청 승인 되었습니다.'); // 테스트용 알림
-      setLoading(false);
-      return { success: true, res, error: null };
-    } catch (error) {
-      setError(error.message);
-      alert('신청 승인 등록 중 오류가 발생했습니다.'); // 테스트용 알림
-      setLoading(false);
-      return { success: false, res: [], error: error.message };
-    }
-
   };
 
   return (
@@ -500,8 +243,8 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                       className="input__field" 
                       placeholder="매입금액" 
                       name="purAmt"
-                      value={purAmt ? Number(purAmt).toLocaleString() : '0'}
-                      onChange={(e) => setPurAmt(e.target.value.replace(/[^\d]/g, ''))}
+                      value={purAmt || '0'}
+                      onChange={(e) => setPurAmt(e.target.value)}
                       onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
@@ -518,15 +261,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
               <td>
                   <div className="input-group">
                     <div className="input w200">
-                      <input 
-                        type="date" 
-                        className="input__field" 
-                        placeholder="매입일" 
-                        autoComplete="off"
-                        name='carPurDt'
-                        onChange={(e) => setCarPurDt(e.target.value)}
-                        value={carPurDt || ''} 
-                      />
+                      <input type="text" className="jsStartDate input__field input__field--date" placeholder="매입일" readOnly autoComplete="off" name='carPurDt' value={carPurDt || ''} onChange={(e) => setCarPurDt(e.target.value)}/>
                     </div>
                     <span className="input-help">조합전산 제시일</span>
                   </div>
@@ -535,15 +270,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
               <td>
                 <div className="input-group input-group--sm">
                   <div className="input w200">
-                    <input 
-                      type="text" 
-                      className="input__field" 
-                      placeholder="상사매입비" 
-                      name="agentPurCst"
-                      value={agentPurCst ? Number(agentPurCst).toLocaleString() : '0'}
-                      onChange={(e) => setAgentPurCst(e.target.value.replace(/[^\d]/g, ''))}
-                      onFocus={(e) => e.target.select()}
-                    />
+                    <input type="text" className="input__field" placeholder="상사매입비" defaultValue="0" />
                     <div className="input__utils">
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
@@ -557,7 +284,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                       autoComplete="off"
                       name='brokerageDate'
                       onChange={(e) => setBrokerageDate(e.target.value)}
-                      value={brokerageDate || ''} 
+                      value={brokerageDate || new Date().toISOString().split('T')[0]} 
                     />
                   </div>
                 </div>
@@ -577,9 +304,8 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                     type="text" 
                     className="input__field" 
                     placeholder="(예상)취득세" 
+                    defaultValue="0"
                     name="gainTax"
-                    value={gainTax ? Number(gainTax).toLocaleString() : '0'}
-                    onChange={(e) => setGainTax(e.target.value.replace(/[^\d]/g, ''))}
                     onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
@@ -636,7 +362,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                   </div>
 
                   <div className="input w300">
-                    <input type="text" className="input__field" placeholder="차량명" name="carNm" value={carNm} onChange={(e) => setCarNm(e.target.value)} onFocus={(e) => e.target.select()} />
+                    <input type="text" className="input__field" placeholder="차량명" />
                     <div className="input__utils">
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
@@ -962,7 +688,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                       autoComplete="off"
                       name='carRegDt'
                       onChange={(e) => setCarRegDt(e.target.value)}
-                      value={carRegDt || ''} 
+                      value={carRegDt || new Date().toISOString().split('T')[0]} 
                     />
                   </div>
                   <span className="input-help">조합전산 이전일</span>
@@ -1076,7 +802,6 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                 <div className="input-group">
 
                   <div className="input w400">
-                    <input type="hidden" name="ownrZip" value={ownrZip} />
                     <input 
                       type="text" 
                       className="input__field" 
@@ -1091,7 +816,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                   </div>
                   <button className="btn btn--dark" type="button">주소 검색</button>
                   <div className="input w400">
-                    <input  
+                    <input 
                       type="text" 
                       className="input__field" 
                       placeholder="상세 주소"
@@ -1193,7 +918,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                       autoComplete="off"
                       name='txblIssuDt'
                       onChange={(e) => setTxblIssuDt(e.target.value)}
-                      value={txblIssuDt || ''} 
+                      value={txblIssuDt || new Date().toISOString().split('T')[0]} 
                     />
                   </div>
                   <span className="input-help">계산서 발행일 및 계약서 계약일</span>
@@ -1284,48 +1009,27 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
             <tr>
               <th>관련 서류 첨부</th>
               <td colSpan={5}>
-                {attachedFiles.length > 0 && attachedFiles.map((file, index) => (
-                  <div className="input-group" key={index}>
-                    <div className="input w440">
-                      <input 
-                        type="text" 
-                        className="input__field input__field--file" 
-                        placeholder="파일을 선택하세요" 
-                        value={file.name} 
-                        disabled 
-                      />
-                      <div className="input__utils">
-                        <button 
-                          type="button" 
-                          className="input__remove ico ico--trash"
-                          onClick={() => {
-                            const newFiles = [...attachedFiles];
-                            newFiles.splice(index, 1);
-                            setAttachedFiles(newFiles);
-                          }}
-                        >삭제</button>
-                      </div>
+                <div className="input-group">
+                  <div className="input w440">
+                    <input type="text" className="input__field input__field--file" placeholder="파일을 선택하세요" defaultValue="홍길동_추가 서류_1.pdf" disabled />
+                    <div className="input__utils">
+                      <button type="button" className="input__remove ico ico--trash">삭제</button>
                     </div>
                   </div>
-                ))}
+                  {/* <button className="btn btn--dark" type="button">파일 선택</button> */}
+                </div>
+                <div className="input-group">
+                  <div className="input w440">
+                    <input type="text" className="input__field input__field--file" placeholder="파일을 선택하세요" defaultValue="홍길동_추가 서류_2.pdf" disabled />
+                    <div className="input__utils">
+                      <button type="button" className="input__remove ico ico--trash">삭제</button>
+                    </div>
+                  </div>
+                  {/* <button className="btn btn--dark" type="button">파일 선택</button> */}
+                </div>
 
                 <div className="input-group">
-                  <button 
-                    type="button" 
-                    className="btn btn--sm btn--light"
-                    onClick={() => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.onchange = (e) => {
-                        if (e.target.files?.[0]) {
-                          setAttachedFiles([...attachedFiles, e.target.files[0]]);
-                        }
-                      };
-                      input.click();
-                    }}
-                  >
-                    <span className="ico ico--add-black"></span>추가
-                  </button>
+                  <button type="submit" className="btn btn--sm btn--light "><span className="ico ico--add-black"></span>추가</button>
                 </div>
               </td>
             </tr>
@@ -1394,14 +1098,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
               <th>Key번호</th>
               <td>
                 <div className="input">
-                  <input 
-                    type="text" 
-                    className="input__field" 
-                    placeholder="Key번호"
-                    name="parkKeyNo"
-                    value={parkKeyNo || ''}
-                    onChange={(e) => setParkKeyNo(e.target.value)}
-                  />
+                  <input type="text" className="input__field" placeholder="Key번호" />
                   <div className="input__utils">
                     <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                   </div>

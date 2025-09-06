@@ -72,18 +72,18 @@ export default function ListPage(props) {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // 상세 검색 차량번호
-    const [dtlCarNo, setDtlCarNo] = useState(carNo);
+    const [dtlCarNo, setDtlCarNo] = useState('');
     // 상세 검색 담당 딜러
-    const [dtlDealer, setDtlDealer] = useState(selectedDealer);
+    const [dtlDealer, setDtlDealer] = useState('');
     const [isDtlDealerSelectOpen, setIsDtlDealerSelectOpen] = useState(false);
 
     // 상세 검색 검색기간 구분
-    const [dtlDtGubun, setDtlDtGubun] = useState(dtGubun);
+    const [dtlDtGubun, setDtlDtGubun] = useState('');
     const [isDtlDtGubunSelectOpen, setIsDtlDtGubunSelectOpen] = useState(false);
 
     // 상세 검색 검색기간 
-    const [dtlStartDt, setDtlStartDt] = useState(startDt);
-    const [dtlEndDt, setDtlEndDt] = useState(endDt);
+    const [dtlStartDt, setDtlStartDt] = useState('');
+    const [dtlEndDt, setDtlEndDt] = useState('');
 
     // 상세 검색 고객명
     const [dtlCustomerName, setDtlCustomerName] = useState('');
@@ -112,8 +112,8 @@ export default function ListPage(props) {
     // 상세 검색 차량번호(매입전)
     const [dtlCarNoBefore, setDtlCarNoBefore] = useState('');
 
-    // 상세 검색 정렬순서
-    const [dtlSortGubun, setDtlSortGubun] = useState('desc');
+    // setSearchBtn
+    const [searchBtn, setSearchBtn] = useState(1);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 검색 영역
@@ -127,13 +127,24 @@ export default function ListPage(props) {
     };
 
     // 검색 파라미터
-    const [searchParams, setSearchParams] = useState({
-      carNo: carNo,  
-      dealer: selectedDealer,  
-      dtGubun: dtGubun,  
-      startDt: startDt,  
-      endDt: endDt  
-    });
+    const searchParams = {
+      carNo: searchBtn === 1 ? carNo : dtlCarNo,  
+      dealer: searchBtn === 1 ? selectedDealer : dtlDealer,  
+      dtGubun: searchBtn === 1 ? dtGubun : dtlDtGubun,  
+      startDt: searchBtn === 1 ? startDt : dtlStartDt,  
+      endDt: searchBtn === 1 ? endDt : dtlEndDt,  
+      dtlCustomerName: dtlCustomerName, 
+      dtlCustGubun: dtlCustGubun, 
+      dtlEvdcGubun: dtlEvdcGubun, 
+      dtlPrsnGubun: dtlPrsnGubun, 
+      dtlOwnerBrno: dtlOwnerBrno, 
+      dtlOwnerSsn: dtlOwnerSsn, 
+      dtlCtshNo: dtlCtshNo , 
+      dtlCarNoBefore: dtlCarNoBefore, 
+      orderItem: ordItem, 
+      ordAscDesc: ordAscDesc, 
+      listCount: listCount, 
+    };
 
 
     // 검색 버튼 클릭 핸들러
@@ -343,7 +354,10 @@ export default function ListPage(props) {
                     </div>
 
                     {/* disabled 속성 제거 시, 활성화 상태 적용 */}
-                    <button type="button" className="btn btn--type03" onClick={handleSearch} disabled={loading}>
+                    <button type="button" className="btn btn--type03" onClick={() => {
+                      setSearchBtn(1);
+                      handleSearch();
+                    }} disabled={loading}>
                       <span className="ico ico--search"></span>차량검색
                     </button>
                     <button
@@ -1131,7 +1145,7 @@ export default function ListPage(props) {
             <tbody>
             {currentPageData && currentPageData.length > 0 ? (
               currentPageData.map((car, index) => (
-                <tr key={`${car.CAR_REGID}-${index}`} className="hover:bg-purple-900/10 cursor-pointer" onClick={() => window.location.href = `/car/sugg/detail/${car.CAR_REGID}`}>
+                <tr key={`${car.CAR_REG_ID}-${index}`} className="hover:bg-purple-900/10 cursor-pointer" onClick={() => window.location.href = `./edit/${car.CAR_REG_ID}`}>
                   <td>{car.CAR_REG_DT}</td>
                   <td>상사</td>
                   <td>{car.CAR_NO}</td>

@@ -43,6 +43,27 @@ export default async function Purchases() {
     pageSize: 10
   };
 
+  // 검색 파라미터
+  const searchParams = {
+    carNo: '',  
+    dealer: '',  
+    dtGubun: '',  
+    startDt: '',  
+    endDt: '',  
+    dtlCustomerName: '', 
+    dtlCustGubun: '', 
+    dtlEvdcGubun: '', 
+    dtlPrsnGubun: '', 
+    dtlOwnerBrno: '', 
+    dtlOwnerSsn: '', 
+    dtlCtshNo: '' , 
+    dtlCarNoBefore: '', 
+    orderItem: '제시일', 
+    ordAscDesc: 'desc', 
+    listCount: 10, 
+  };
+
+
   const purchasesList = await searchPurchasesList(defaultParams, {});
   const dealerList = await getDealerList(session.agentId);
 
