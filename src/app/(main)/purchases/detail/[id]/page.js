@@ -3,7 +3,7 @@ import { verifySession } from "@/lib/auth";
 import DetailPage from "@/app/(main)/purchases/detail/[id]/DetailPage";
 import { getSuggestOne } from "@/app/(main)/purchases/detail/[id]/api";
 
-export default async function DetailPage({ params }) {
+export default async function Detail({ params }) {
   const cookieStore = await cookies();
   const session = await verifySession(cookieStore.get("session")?.value).catch(console.error);
 

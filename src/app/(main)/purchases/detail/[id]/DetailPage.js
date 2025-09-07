@@ -1,19 +1,8 @@
-import React from "react";
+import DetailModalTrigger from "./DetailModalTrigger";
 
-// Next.js/React 컴포넌트로 변환된 JSX
-// 사용법: 페이지 또는 컴포넌트에서 <PurchaseVehicleDetail openModal={(id) => console.log(id)} />
-// openModal prop을 전달하지 않으면 기본 console.log로 동작합니다.
-
-export default function PurchaseVehicleDetail({ openModal }: { openModal?: (id: string) => void }) {
-  const handleOpen = (id: string) => {
-    if (openModal) return openModal(id);
-    // 기본 동작: 콘솔 로그 (필요시 모달 로직으로 교체)
-    // eslint-disable-next-line no-console
-    console.log("openModal:", id);
-  };
-
-  return (
-    <main className="container container--page">
+export default function DetailPage({ params }) {
+    return (
+        <main className="container container--page">
       <div className="container__head">
         <h2 className="container__title">매입차량 상세보기</h2>
 
@@ -173,10 +162,7 @@ export default function PurchaseVehicleDetail({ openModal }: { openModal?: (id: 
           </tbody>
         </table>
         <div className="table-wrap__utils">
-          <button type="button" className="btn btn--light" onClick={() => handleOpen("1")}>
-            <span className="ico ico--print"></span>
-            인쇄
-          </button>
+          <DetailModalTrigger />
         </div>
       </div>
 
@@ -391,6 +377,6 @@ export default function PurchaseVehicleDetail({ openModal }: { openModal?: (id: 
           목록으로 돌아가기
         </a>
       </div>
-    </main>
-  );
+    </main>    
+    )
 }

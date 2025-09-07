@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import DetailModal from "../../../../../../components/modal/DetailModal";
+import DetailModal from "@/components/modal/DetailModal";
 
 export default function DetailModalTrigger() {
   const [open, setOpen] = useState(false);
