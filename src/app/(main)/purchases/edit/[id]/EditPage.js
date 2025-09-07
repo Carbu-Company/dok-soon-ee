@@ -1,31 +1,34 @@
 "use client";
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
+import { updatePurchase } from "@/app/(main)/purchases/edit/[id]/api";
 import { isValidResidentNumber, isValidBusinessNumber, isValidCorporateNumber } from '../../../../../../public/js/util.js'
 
 export default function EditPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = [], carPurDetail = []}) {
 
+  //console.log('carPurDetail', carPurDetail);
+  
   // 매입딜러 선택 상태 관리 (콤보 박스)
   const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
-  const [dealerId, setDealerId] = useState(carPurDetail.DLR_ID);
+  const [dealerId, setDealerId] = useState(carPurDetail.DLR_ID || '');
 
   // 차량 종류 선택 상태 관리 (콤보 박스)
   const [isCarKndSelectOpen, setIsCarKndSelectOpen] = useState(false);
-  const [carKndCd, setCarKndCd] = useState(carPurDetail.CAR_KND_CD);
+  const [carKndCd, setCarKndCd] = useState(carPurDetail.CAR_KND_CD || '');
 
   // 증빙종류 선택 상태 관리 (콤보 박스)
   const [isEvdcCdSelectOpen, setIsEvdcCdSelectOpen] = useState(false);
-  const [evdcCd, setEvdcCd] = useState(carPurDetail.PUR_EVDC_CD);
+  const [evdcCd, setEvdcCd] = useState(carPurDetail.PUR_EVDC_CD || '');
 
   // 주차위치 선택 상태 관리 (콤보 박스)
   const [isParkingCdSelectOpen, setIsParkingCdSelectOpen] = useState(false);
-  const [parkingCd, setParkingCd] = useState(carPurDetail.PARK_ZON_CD);
+  const [parkingCd, setParkingCd] = useState(carPurDetail.PARK_ZON_CD || '');
 
   // 제시구분 선택 상태 관리 (옵션버튼)
-  const [prsnSctCd, setPrsnSctCd] = useState(carPurDetail.PRSN_SCT_CD); 
+  const [prsnSctCd, setPrsnSctCd] = useState(carPurDetail.PRSN_SCT_CD || '0'); 
 
   // 매입금액 선택 상태 관리
-  const [purAmt, setPurAmt] = useState(carPurDetail.PUR_AMT || '0');
+  const [purAmt, setPurAmt] = useState(carPurDetail?.PUR_AMT ? carPurDetail.PUR_AMT.toString() : '0');
   const [purSupPrc, setPurSupPrc] = useState(carPurDetail.PUR_SUP_PRC);
   const [purVat, setPurVat] = useState(carPurDetail.PUR_VAT);
 
@@ -51,10 +54,10 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
   }, [purAmt]);
 
   // 상사매입비 
-  const [agentPurCst, setAgentPurCst] = useState(carPurDetail.AGENT_PUR_CST);
+  const [agentPurCst, setAgentPurCst] = useState(carPurDetail.AGENT_PUR_CST || '0');
 
   // 매입일 선택 상태 관리
-  const [carPurDt, setCarPurDt] = useState(carPurDetail.AGENT_PUR_CST_PAY_DT);
+  const [carPurDt, setCarPurDt] = useState(carPurDetail.CAR_PUR_DT || '');
 
   // jQuery datepicker와 React state 연동을 위한 전역 콜백 등록
   useEffect(() => {
@@ -72,75 +75,75 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
   }, []);
 
   // 취득세 선택 상태 관리
-  const [gainTax, setGainTax] = useState(carPurDetail.GAIN_TAX);
+  const [gainTax, setGainTax] = useState(carPurDetail.GAIN_TAX || '0');
 
   // 상사매입비 입금일 선택 상태 관리
-  const [brokerageDate, setBrokerageDate] = useState(carPurDetail.AGENT_PUR_CST_PAY_DT);
+  const [brokerageDate, setBrokerageDate] = useState(carPurDetail.AGENT_PUR_CST_PAY_DT || '');
 
   // 이전일 선택 상태 관리
-  const [carRegDt, setCarRegDt] = useState(carPurDetail.CAR_REG_DT);
+  const [carRegDt, setCarRegDt] = useState(carPurDetail.CAR_REG_DT || '');
 
   // 발행일 선택 상태 관리
-  const [txblIssuDt, setTxblIssuDt] = useState(carPurDetail.TXBL_ISSU_DT);
+  const [txblIssuDt, setTxblIssuDt] = useState(carPurDetail.TXBL_ISSU_DT || '');
 
   // 차량명 
-  const [carNm, setCarNm] = useState(carPurDetail.CAR_NM);
+  const [carNm, setCarNm] = useState(carPurDetail.CAR_NM || '');
 
   // 차량번호(매입후) 선택 상태 관리
-  const [carNo, setCarNo] = useState(carPurDetail.CAR_NO);
+  const [carNo, setCarNo] = useState(carPurDetail.CAR_NO || '');
 
   // 차량번호(매입전) 선택 상태 관리
-  const [purBefCarNo, setPurBefCarNo] = useState(carPurDetail.PUR_BEF_CAR_NO);
+  const [purBefCarNo, setPurBefCarNo] = useState(carPurDetail.PUR_BEF_CAR_NO || '');
 
   // 고객명 선택 상태 관리
-  const [ownrNm, setOwnrNm] = useState(carPurDetail.OWNR_NM);
+  const [ownrNm, setOwnrNm] = useState(carPurDetail.OWNR_NM || '');
 
   // 고객구분 선택 상태 관리
-  const [ownrTpCd, setOwnrTpCd] = useState(carPurDetail.OWNR_TP_CD);
+  const [ownrTpCd, setOwnrTpCd] = useState(carPurDetail.OWNR_TP_CD || '001');
   const [isOwnrTpCdOpen, setIsOwnrTpCdOpen] = useState(false);
 
   // 계약서번호 선택 상태 관리
-  const [ctshNo, setCtshNo] = useState(carPurDetail.CTSH_NO);
+  const [ctshNo, setCtshNo] = useState(carPurDetail.CTSH_NO || '');
 
   // 주민(법인)등록번호 선택 상태 관리
-  const [ownrSsn, setOwnrSsn] = useState(carPurDetail.OWNR_SSN);
+  const [ownrSsn, setOwnrSsn] = useState(carPurDetail.OWNR_SSN || '');
 
   // 연락처 선택 상태 관리
-  const [ownrPhon, setOwnrPhon] = useState(carPurDetail.OWNR_PHON);
+  const [ownrPhon, setOwnrPhon] = useState(carPurDetail.OWNR_PHON || '');
 
   // e메일 주소 선택 상태 관리
-  const [ownrEmail, setOwnrEmail] = useState(carPurDetail.OWNR_EMAIL);
+  const [ownrEmail, setOwnrEmail] = useState(carPurDetail.OWNR_EMAIL || '');
 
   // e메일 도메인 선택 상태 관리
-  const [emailDomain, setEmailDomain] = useState(carPurDetail.EMAIL_DOMAIN);
+  const [emailDomain, setEmailDomain] = useState(carPurDetail.OWNR_EMAIL_DOMAIN || '');
   const [isEmailDomainOpen, setIsEmailDomainOpen] = useState(false);
 
   // 우편번호
-  const [ownrZip, setOwnrZip] = useState(carPurDetail.OWNR_ZIP);
+  const [ownrZip, setOwnrZip] = useState(carPurDetail.OWNR_ZIP || '');
 
   // 주소1 값 저장
-  const [ownrAddr1, setOwnrAddr1] = useState(carPurDetail.OWNR_ADDR1);
+  const [ownrAddr1, setOwnrAddr1] = useState(carPurDetail.OWNR_ADDR1 || '');
   // 주소2 값 저장
-  const [ownrAddr2, setOwnrAddr2] = useState(carPurDetail.OWNR_ADDR2);
+  const [ownrAddr2, setOwnrAddr2] = useState(carPurDetail.OWNR_ADDR2 || '');
 
   // 사업자등록번호 값 저장
-  const [ownrBrno, setOwnrBrno] = useState(carPurDetail.OWNR_BRNO);
+  const [ownrBrno, setOwnrBrno] = useState(carPurDetail.OWNR_BRNO || '');
 
   // 세금 납부일 값 저장
-  const [txblRcvYn, setTxblRcvYn] = useState(carPurDetail.TXBL_RCV_YN);
+  const [txblRcvYn, setTxblRcvYn] = useState(carPurDetail.TXBL_RCV_YN || '');
   const [isTxblRcvYnOpen, setIsTxblRcvYnOpen] = useState(false);
 
   // 특이사항 선택 상태 관리
-  const [purDesc, setPurDesc] = useState(carPurDetail.PUR_DESC);
+  const [purDesc, setPurDesc] = useState(carPurDetail.PUR_DESC || '');
 
   // 주차위치 설명 선택 상태 관리
-  const [parkingLocationDesc, setParkingLocationDesc] = useState(carPurDetail.PARK_ZON_DESC);
+  const [parkingLocationDesc, setParkingLocationDesc] = useState(carPurDetail.PARK_ZON_DESC || '');
 
   // Key번호 선택 상태 관리
-  const [parkKeyNo, setParkKeyNo] = useState(carPurDetail.PARK_KEY_NO);
+  const [parkKeyNo, setParkKeyNo] = useState(carPurDetail.PARK_KEY_NO || '');
 
   // 사실확인서 선택 상태 관리
-  const [fctCndcYn, setFctCndcYn] = useState(carPurDetail.FCT_CNDC_YN);
+  const [fctCndcYn, setFctCndcYn] = useState(carPurDetail.FCT_CNDC_YN || '');
   const [isFctCndcYnOpen, setIsFctCndcYnOpen] = useState(false);
 
   // 관련 서류 첨부 상태 관리
@@ -210,7 +213,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
   };
 
   const handleSubmit = async () => {
-
+    console.log('formValues============================');
+    
+    
     setLoading(true);
     setError(null);
 
@@ -337,6 +342,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
     }
 
     const formValues = {
+      carRegId : carPurDetail.CAR_REG_ID,                        // 매입차량 ID
       carAgent: session?.agentId,                                // 상사사 ID
       purAmt,                                                    // 매입금액
       purSupPrc,                                                 // 공급가액
@@ -374,8 +380,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
       ctshNo                                                     // 계약서번호
     };
     
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertSuggest`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updatePurchase`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -384,16 +391,15 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
       });
       const res = await response.json();
       
-      alert('신청 승인 되었습니다.'); // 테스트용 알림
+      alert('매입차량 수정 완료되었습니다.'); // 테스트용 알림
       setLoading(false);
       return { success: true, res, error: null };
     } catch (error) {
       setError(error.message);
-      alert('신청 승인 등록 중 오류가 발생했습니다.'); // 테스트용 알림
+      alert('매입차량 수정 중 오류가 발생했습니다.'); // 테스트용 알림
       setLoading(false);
       return { success: false, res: [], error: error.message };
     }
-
   };
 
   return (

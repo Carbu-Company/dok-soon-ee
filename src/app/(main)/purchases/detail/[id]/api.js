@@ -1,4 +1,4 @@
-  export const getSuggestOne = async (mgtKey) => {
+export const getSuggestOne = async (mgtKey) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getSuggestDetailNew?car_regid=${mgtKey}`, {
             method: 'GET',
@@ -12,27 +12,11 @@
         }
 
         const data = await response.json();
+        console.log(data);
 
         return data;
     } catch (error) {
         console.error('매입차량 정보 조회 오류:', error);
-        throw error;
-    }
-};
-
-
-
-export const updatePurchase = async (data) => {
-    try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updatePurchase`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
-    } catch (error) {
-        console.error('매입차량 수정 오류:', error);
         throw error;
     }
 };
