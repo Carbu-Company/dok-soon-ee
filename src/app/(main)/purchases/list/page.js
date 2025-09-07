@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import ListPage from "@/app/(main)/purchases/list/ListPage";
-import { getPurchasesListNew, getDealerList } from "./api";
+import { getPurchasesListNew, getDealerList, getPurchasesSummary } from "./api";
 
 // Server Action 정의
 async function searchPurchasesList(searchParamsWithPage) {
@@ -68,6 +68,7 @@ export default async function Purchases() {
 
   const purchasesList = await searchPurchasesList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
+  const purchasesSummary = await getPurchasesSummary({ ...defaultParams, ...searchParams });
 
   console.log(purchasesList.data);
   //console.log(dealerList.data);
@@ -78,6 +79,7 @@ export default async function Purchases() {
                    page={1}
                    pageSize={10}
                    searchAction={searchPurchasesList}
+                   purchasesSummary={purchasesSummary.data}
 
    />;
 }
