@@ -29,8 +29,8 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
 
   // 매입금액 선택 상태 관리
   const [purAmt, setPurAmt] = useState(carPurDetail?.PUR_AMT ? carPurDetail.PUR_AMT.toString() : '0');
-  const [purSupPrc, setPurSupPrc] = useState(carPurDetail.PUR_SUP_PRC);
-  const [purVat, setPurVat] = useState(carPurDetail.PUR_VAT);
+  const [purSupPrc, setPurSupPrc] = useState(carPurDetail.PUR_SUP_PRC || 0);
+  const [purVat, setPurVat] = useState(carPurDetail.PUR_VAT || 0);
 
   // 매입금액이 변경될 때 공급가액과 부가세 계산
   useEffect(() => {
@@ -45,13 +45,23 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
       // 부가세 = 매입금액 - 공급가액
       const vat = amount - supplyPrice;
       
-      setPurSupPrc(supplyPrice);
-      setPurVat(vat);
+      // 값이 실제로 변경된 경우에만 state 업데이트
+      if (purSupPrc !== supplyPrice) {
+        setPurSupPrc(supplyPrice);
+      }
+      if (purVat !== vat) {
+        setPurVat(vat);
+      }
     } else {
-      setPurSupPrc(0);
-      setPurVat(0);
+      // 값이 실제로 변경된 경우에만 state 업데이트
+      if (purSupPrc !== 0) {
+        setPurSupPrc(0);
+      }
+      if (purVat !== 0) {
+        setPurVat(0);
+      }
     }
-  }, [purAmt]);
+  }, [purAmt, purSupPrc, purVat]);
 
   // 상사매입비 
   const [agentPurCst, setAgentPurCst] = useState(carPurDetail.AGENT_PUR_CST || '0');

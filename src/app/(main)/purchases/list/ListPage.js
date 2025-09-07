@@ -13,22 +13,21 @@ export default function ListPage(props) {
     // props 값 가져오기
     const [loading, setLoading] = useState(false);
 
-    // 초기 데이터: 서버에서 전달된 데이터가 배열이면 그대로 사용, 아니면 props.carList.data 형식도 지원
-    const initialCarList = Array.isArray(props.carList)
-      ? props.carList
-      : (props.carList && Array.isArray(props.carList.data) ? props.carList.data : []);
+    // 초기 데이터: 서버에서 전달된 데이터 구조 처리
+    const initialCarListData = props.carList?.data?.carlist || [];
+    const initialPagination = props.carList?.data?.pagination || {};
+    
+    const initialPurchasesSummary = props.purchasesSummary?.data || [];
 
-    const initialPurchasesSummary = Array.isArray(props.purchasesSummary)
-      ? props.purchasesSummary
-      : (props.purchasesSummary && Array.isArray(props.purchasesSummary.data) ? props.purchasesSummary.data : []);
-
-    const [carList, setCarList] = useState(initialCarList);
+    const [carList, setCarList] = useState(initialCarListData);
+    const [pagination, setPagination] = useState(initialPagination);
     const [purchasesSummary, setPurchasesSummary] = useState(initialPurchasesSummary);
     const [dealerList, setDealerList] = useState(props.dealerList || []);
-    const [currentPage, setCurrentPage] = useState(props.page || 1);
-    const [pageSize, setPageSize] = useState(props.pageSize || 10);
+    const [evdcCdList, setEvdcCdList] = useState(props.evdcCdList || []);
+    const [currentPage, setCurrentPage] = useState(initialPagination.currentPage || 1);
+    const [pageSize, setPageSize] = useState(initialPagination.pageSize || 10);
     const searchAction = props.searchAction;
-    const [totalPages, setTotalPages] = useState(props.carList?.pagination?.totalPages || 2);
+    const [totalPages, setTotalPages] = useState(initialPagination.totalPages || 1);
 
     //console.log(props.carList);
 
@@ -40,7 +39,7 @@ export default function ListPage(props) {
     const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
 
     // 검색 구분 항목
-    const [dtGubun, setDtGubun] = useState('01');
+    const [dtGubun, setDtGubun] = useState('');
     const [isDtGubunSelectOpen, setIsDtGubunSelectOpen] = useState(false);
 
     // 검색 기간
@@ -48,7 +47,7 @@ export default function ListPage(props) {
     const [endDt, setEndDt] = useState('');
 
 
-    // 현재 페이지 데이터는 서버에서 받아온 데이터를 그대로 사용
+    // 현재 페이지 데이터는 carList 상태값을 사용
     const currentPageData = carList;
 
     //console.log(currentPageData);
@@ -78,6 +77,11 @@ export default function ListPage(props) {
     const [listCount, setListCount] = useState(10);
     const [isListCountSelectOpen, setIsListCountSelectOpen] = useState(false);
 
+    // listCount가 변경될 때만 pageSize 업데이트
+    useEffect(() => {
+        setPageSize(listCount);
+    }, [listCount]);
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 상세 검색 영역
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,15 +104,15 @@ export default function ListPage(props) {
     const [dtlCustomerName, setDtlCustomerName] = useState('');
 
     // 상세 검색 고객구분
-    const [dtlCustGubun, setDtlCustGubun] = useState('01');
+    const [dtlCustGubun, setDtlCustGubun] = useState('');
     const [isDtlCustGubunSelectOpen, setIsDtlCustGubunSelectOpen] = useState(false);
     
     // 상세 검색 증빙종류
-    const [dtlEvdcGubun, setDtlEvdcGubun] = useState('01');
+    const [dtlEvdcGubun, setDtlEvdcGubun] = useState('');
     const [isDtlEvdcGubunSelectOpen, setIsDtlEvdcGubunSelectOpen] = useState(false);
 
     // 상세 검색 제시구분분
-    const [dtlPrsnGubun, setDtlPrsnGubun] = useState('01');
+    const [dtlPrsnGubun, setDtlPrsnGubun] = useState('');
     const [isDtlPrsnGubunSelectOpen, setIsDtlPrsnGubunSelectOpen] = useState(false);
 
     // 상세 검색 사업자등록번호
@@ -153,8 +157,7 @@ export default function ListPage(props) {
       dtlCtshNo: dtlCtshNo , 
       dtlCarNoBefore: dtlCarNoBefore, 
       orderItem: ordItem, 
-      ordAscDesc: ordAscDesc, 
-      listCount: listCount, 
+      ordAscDesc: ordAscDesc
     };
 
 
@@ -174,19 +177,25 @@ export default function ListPage(props) {
           const result = await searchAction(searchParamsWithPage);
 
           if (result && result.success) {
-            const data = result.data || [];
-            setCarList(data);
+            const responseData = result.data?.carlist || [];
+            const paginationInfo = result.data?.pagination || {};
             
-            // 페이지네이션 로직: 현재 페이지에 데이터가 pageSize만큼 있으면 다음 페이지가 있을 수 있음
-            if (data.length === pageSize) {
-              // 현재 페이지가 가득 찼으면 최소한 다음 페이지까지는 있다고 가정
-              setTotalPages(pageNum + 1);
+            setCarList(responseData);
+            setPagination(paginationInfo);
+            
+            // 페이지네이션 정보가 있으면 사용, 없으면 기본 로직
+            if (paginationInfo.totalPages) {
+              setTotalPages(paginationInfo.totalPages);
+              setCurrentPage(paginationInfo.currentPage || pageNum);
             } else {
-              // 현재 페이지가 가득 차지 않았으면 이것이 마지막 페이지
-              setTotalPages(pageNum);
+              // 페이지네이션 로직: 현재 페이지에 데이터가 pageSize만큼 있으면 다음 페이지가 있을 수 있음
+              if (responseData.length === pageSize) {
+                setTotalPages(pageNum + 1);
+              } else {
+                setTotalPages(pageNum);
+              }
+              setCurrentPage(pageNum);
             }
-            
-            setCurrentPage(pageNum);
           } else if (result && Array.isArray(result)) {
             // 일부 구현은 배열을 직접 반환할 수 있음
             setCarList(result || []);
@@ -217,7 +226,7 @@ export default function ListPage(props) {
     // 컴포넌트 마운트 시: 서버에서 이미 데이터가 전달되었다면 그걸 우선 사용하고,
     // 데이터가 없을 때만 검색을 수행합니다 (중복 호출 방지).
     useEffect(() => {
-      if (!initialCarList || initialCarList.length === 0) {
+      if (!initialCarListData || initialCarListData.length === 0) {
         handleSearch(1);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -225,7 +234,8 @@ export default function ListPage(props) {
 
     // 상세 검색 버튼 클릭 핸들러
     const handleDtlSearch = () => {
-      console.log('상세 검색 버튼 클릭');
+      setSearchBtn(2);
+      handleSearch(1);
     };
     
 
@@ -740,7 +750,7 @@ export default function ListPage(props) {
                             className="select__input"
                             type="hidden"
                             name="dealer"
-                            defaultValue="01"
+                            defaultValue=""
                           />
                           <button className="select__toggle" type="button" onClick={() => setIsDtlCustGubunSelectOpen(!isDtlCustGubunSelectOpen)}>
                             <span className="select__text">{dtlCustGubun === '01' ? '개인' : dtlCustGubun === '02' ? '법인' : '선택'}</span>
@@ -754,6 +764,15 @@ export default function ListPage(props) {
                           </button>
 
                           <ul className="select__menu" style={{ display: isDtlCustGubunSelectOpen ? 'block' : 'none' }}>
+                            <li
+                              className={`select__option ${dtlCustGubun === '' ? 'select__option--selected' : ''}`}
+                              onClick={() => {
+                                setDtlCustGubun('');
+                                setIsDtlCustGubunSelectOpen(false);
+                              }}
+                            >
+                              선택
+                            </li>
                             <li
                               className={`select__option ${dtlCustGubun === '01' ? 'select__option--selected' : ''}`}
                               onClick={() => {
@@ -785,10 +804,12 @@ export default function ListPage(props) {
                             className="select__input"
                             type="hidden"
                             name="dealer"
-                            defaultValue="01"
+                            defaultValue=""
                           />
                           <button className="select__toggle" type="button" onClick={() => setIsDtlEvdcGubunSelectOpen(!isDtlEvdcGubunSelectOpen)}>
-                            <span className="select__text">{dtlEvdcGubun === '01' ? '의제매입' : dtlEvdcGubun === '02' ? '세금계산서' : dtlEvdcGubun === '03' ? '계산서' : '선택'}</span>
+                            <span className="select__text">
+                              {dtlEvdcGubun ? evdcCdList.find(item => item.CD === dtlEvdcGubun)?.CD_NM : '선택'}
+                            </span>
                             <Image
                                 className="select__arrow"
                                 src="/images/ico-dropdown.svg"
@@ -800,32 +821,26 @@ export default function ListPage(props) {
 
                           <ul className="select__menu" style={{ display: isDtlEvdcGubunSelectOpen ? 'block' : 'none' }}>
                             <li
-                              className={`select__option ${dtlEvdcGubun === '01' ? 'select__option--selected' : ''}`}
+                              className={`select__option ${dtlEvdcGubun === '' ? 'select__option--selected' : ''}`}
                               onClick={() => {
-                                setDtlEvdcGubun('01');
+                                setDtlEvdcGubun('');
                                 setIsDtlEvdcGubunSelectOpen(false);
                               }}
                             >
-                              의제매입
+                              선택
                             </li>
-                            <li 
-                              className={`select__option ${dtlEvdcGubun === '02' ? 'select__option--selected' : ''}`}
-                              onClick={() => {
-                                setDtlEvdcGubun('02');
-                                setIsDtlEvdcGubunSelectOpen(false);
-                              }}
-                            >
-                              세금계산서
-                            </li>
-                            <li 
-                              className={`select__option ${dtlEvdcGubun === '03' ? 'select__option--selected' : ''}`}
-                              onClick={() => {
-                                setDtlEvdcGubun('03');
-                                setIsDtlEvdcGubunSelectOpen(false);
-                              }}
-                            >
-                              계산서
-                            </li>
+                            {evdcCdList.map((item) => (
+                              <li 
+                                key={item.CD}
+                                className={`select__option ${dtlEvdcGubun === item.CD ? 'select__option--selected' : ''}`}
+                                onClick={() => {
+                                  setDtlEvdcGubun(item.CD);
+                                  setIsDtlEvdcGubunSelectOpen(false);
+                                }}
+                              >
+                                {item.CD_NM}
+                              </li>
+                            ))}
                           </ul>
                         </div>
                       </td>
@@ -990,7 +1005,7 @@ export default function ListPage(props) {
 
         <div className="table-wrap">
           <h2 className="table-wrap__title">
-            매입차량 리스트<span>Total 100건</span>
+            매입차량 리스트<span>Total {pagination?.totalCount || currentPageData?.length || 0}건</span>
           </h2>
           <div className="table-wrap__head table-wrap__title">
             <button
@@ -1198,14 +1213,13 @@ export default function ListPage(props) {
                   <td>{car.CAR_REG_DT}</td>
                   <td>상사</td>
                   <td>{car.CAR_NO}</td>
-                  <td>쏘나타</td>
-                  <td>100,000,000</td>
-                  <td>나딜러</td>
-                  <td>100,000,000</td>
-                  <td>1,500,000</td>
-                  <td>165,000</td>
-                  <td></td>
-
+                  <td>{car.CAR_NM}</td>
+                  <td>{car.PUR_AMT.toLocaleString()}</td>
+                  <td>{car.DLR_NM}</td>
+                  <td>{car.CAR_LOAN_AMT.toLocaleString()}</td>
+                  <td>{car.TOT_CMRC_COST_FEE.toLocaleString()}</td>
+                  <td>{car.AGENT_PUR_CST.toLocaleString()}</td>
+                  <td>{car.TXBL_ISSU_DT}</td>
                   <td>
                     <div className="input-group input-group--sm input-group--center">
                       <div className="select select--utils">

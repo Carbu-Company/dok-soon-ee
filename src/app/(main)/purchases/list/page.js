@@ -1,7 +1,8 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import ListPage from "@/app/(main)/purchases/list/ListPage";
-import { getPurchasesListNew, getDealerList, getPurchasesSummary } from "./api";
+import { getPurchasesListNew, getPurchasesSummary } from "./api";
+import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
 // Server Action 정의
 async function searchPurchasesList(searchParamsWithPage) {
@@ -61,13 +62,13 @@ export default async function Purchases() {
     dtlCtshNo: '' , 
     dtlCarNoBefore: '', 
     orderItem: '제시일', 
-    ordAscDesc: 'desc', 
-    listCount: 10, 
+    ordAscDesc: 'desc'
   };
 
 
   const purchasesList = await searchPurchasesList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
+  const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const purchasesSummary = await getPurchasesSummary({ ...defaultParams, ...searchParams });
 
   console.log(purchasesList.data);
@@ -76,10 +77,8 @@ export default async function Purchases() {
   return <ListPage session={session}
                    carList={purchasesList.data}
                    dealerList={dealerList.data}
-                   page={1}
-                   pageSize={10}
+                   evdcCdList={evdcCDList.data}
                    searchAction={searchPurchasesList}
-                   purchasesSummary={purchasesSummary.data}
-
+                   purchasesSummary={purchasesSummary}
    />;
 }
