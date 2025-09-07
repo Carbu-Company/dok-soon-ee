@@ -26,9 +26,17 @@ export default async function EditorPage({ params }) {
 
   // 차량 등록 번호
   const { id } = await params;
-  const carPurDetail = await getSuggestOne(id);
-
-  //console.log(id);
+  const carPurDetail = {
+    data: {
+      id: id,
+      offerType: '상사매입',
+      modelName: '그랜저(승용)',
+      carNo: '123가1234 (123허1234)',
+      dealerName: '홍길동',
+      purchaseDate: '2025-08-01',
+      purchaseAmount: 100000000
+    }
+  }
   return <EditPage session={session}
                    dealerList={dealerList.data}
                    carKndList={carKndList.data}

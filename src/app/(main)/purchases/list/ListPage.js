@@ -12,7 +12,19 @@ export default function ListPage(props) {
 
     // props 값 가져오기
     const [loading, setLoading] = useState(false);
-    const [carList, setCarList] = useState(props.carList?.data || []);
+
+    // 개발용: 임의 데이터 (props.carList가 비어있을 경우 mock으로 대체)
+    const mockCarList = [
+      { CAR_REG_ID: '1', CAR_REG_DT: '2025-08-01', CAR_NO: '12가3456' },
+      { CAR_REG_ID: '2', CAR_REG_DT: '2025-08-02', CAR_NO: '34나7890' },
+      { CAR_REG_ID: '3', CAR_REG_DT: '2025-08-03', CAR_NO: '56다0123' }
+    ];
+
+    const initialCarList = (props.carList && Array.isArray(props.carList?.data) && props.carList.data.length > 0)
+      ? props.carList.data
+      : mockCarList;
+
+    const [carList, setCarList] = useState(initialCarList);
     const [dealerList, setDealerList] = useState(props.dealerList || []);
     const [currentPage, setCurrentPage] = useState(props.page || 1);
     const [pageSize, setPageSize] = useState(props.pageSize || 10);
@@ -1189,7 +1201,7 @@ export default function ListPage(props) {
                   </td>
                   <td>
                     <button type="button" className="btn btn--light btn--sm">
-                      <Link href={`/car/sugg/detail/${car.CAR_REGID}`}>상세보기</Link>
+                      <Link href={`/purchases/list/detail/${car.CAR_REG_ID}`}>상세보기</Link>
                     </button>
                   </td>
                 </tr>
