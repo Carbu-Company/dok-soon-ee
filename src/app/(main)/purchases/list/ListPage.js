@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PaginationComponent from '@/components/utils/PaginationComponent';
+import PurchaseRemoveModal from '@/components/modal/PurchaseRemoveModal';
 
 export default function ListPage(props) {
 
@@ -46,6 +47,9 @@ export default function ListPage(props) {
     const [startDt, setStartDt] = useState('');
     const [endDt, setEndDt] = useState('');
 
+    // 매입취소/삭제 모달 관련 state
+    const [isPurchaseRemoveModalOpen, setIsPurchaseRemoveModalOpen] = useState(false);
+    const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
 
     // 현재 페이지 데이터는 carList 상태값을 사용
     const currentPageData = carList;
@@ -237,6 +241,25 @@ export default function ListPage(props) {
     const handleDtlSearch = () => {
       setSearchBtn(2);
       handleSearch(1);
+    };
+
+    // 매입취소/삭제 모달 관련 핸들러
+    const handlePurchaseRemoveModalOpen = (car) => {
+      setSelectedCarForRemove(car);
+      setIsPurchaseRemoveModalOpen(true);
+    };
+
+    const handlePurchaseRemoveModalClose = () => {
+      setIsPurchaseRemoveModalOpen(false);
+      setSelectedCarForRemove(null);
+    };
+
+    const handlePurchaseRemoveConfirm = async () => {
+      // TODO: 실제 매입취소/삭제 API 호출 구현
+      console.log('매입취소/삭제 확인:', selectedCarForRemove);
+      // API 호출 후 성공하면 모달 닫기 및 목록 새로고침
+      handlePurchaseRemoveModalClose();
+      // handleSearch(currentPage); // 목록 새로고침
     };
     
 
@@ -1249,10 +1272,30 @@ export default function ListPage(props) {
                             <Link href={`/purchases/edit/${car.CAR_REG_ID}`}>매입 수정</Link>
                           </li>
                           <li className="select__option">
-                            <Link href="#">매입 취소</Link>
+                            <button 
+                              type="button" 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handlePurchaseRemoveModalOpen(car);
+                              }}
+                              style={{ border: 'none', background: 'none', padding: 0, color: 'inherit', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                            >
+                              매입 취소
+                            </button>
                           </li>
                           <li className="select__option">
-                            <Link href="#">매입 삭제</Link>
+                            <button 
+                              type="button" 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handlePurchaseRemoveModalOpen(car);
+                              }}
+                              style={{ border: 'none', background: 'none', padding: 0, color: 'inherit', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                            >
+                              매입 삭제
+                            </button>
                           </li>
                         </ul>
                       </div>
@@ -1336,6 +1379,13 @@ export default function ListPage(props) {
             </tbody>
           </table>
         </div>
+
+        {/* 매입취소/삭제 모달 */}
+        <PurchaseRemoveModal
+          open={isPurchaseRemoveModalOpen}
+          onClose={handlePurchaseRemoveModalClose}
+          onConfirm={handlePurchaseRemoveConfirm}
+        />
       </main>
     )
 }
