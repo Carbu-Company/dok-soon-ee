@@ -1246,7 +1246,7 @@ export default function ListPage(props) {
                             <Link href="#">판매 처리</Link>
                           </li>
                           <li className="select__option">
-                            <Link href="/purchases/editor">매입 수정</Link>
+                            <Link href={`/purchases/edit/${car.CAR_REG_ID}`}>매입 수정</Link>
                           </li>
                           <li className="select__option">
                             <Link href="#">매입 취소</Link>
@@ -1277,15 +1277,13 @@ export default function ListPage(props) {
 
           {/* 페이지네이션 */}
           {currentPageData && currentPageData.length > 0 && (
-          <div className="pagination">
-            
+          <div>
             <PaginationComponent
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
                 show={totalPages > 1}
             />
-
           </div>
           )}
         </div>

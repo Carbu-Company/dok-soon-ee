@@ -4,18 +4,18 @@ import React, { useState, useEffect } from "react";
 import Image from 'next/image'
 export default function ExperienceRegistrationModal({ open = true, onClose, onPrint }) {
 
-  const [AgentNm, setAgentNm] = useState('우리상사사');
-  const [AgentRegNo, setAgentRegNo] = useState('012');
-  const [AgentRegNo2, setAgentRegNo2] = useState('34');
-  const [AgentRegNo3, setAgentRegNo3] = useState('56789');
-  const [CeoNm, setCeoNm] = useState('최대표표');
-  const [Email, setEmail] = useState('hgeol22@naver.com');
-  const [CombAgentCd, setCombAgentCd] = useState('302347');
-  const [UserId, setUserId] = useState('hgeol22');
-  const [UserPw, setUserPw] = useState('1234');
-  const [UsrNm, setUsrNm] = useState('홍길순');
-  const [UsrTel, setUsrTel] = useState('01012345678');
-  const [MailDomain, setMailDomain] = useState('gmail.com');
+  const [AgentNm, setAgentNm] = useState('');
+  const [AgentRegNo, setAgentRegNo] = useState('');
+  const [AgentRegNo2, setAgentRegNo2] = useState('');
+  const [AgentRegNo3, setAgentRegNo3] = useState('');
+  const [CeoNm, setCeoNm] = useState('');
+  const [Email, setEmail] = useState('');
+  const [CombAgentCd, setCombAgentCd] = useState('');
+  const [UserId, setUserId] = useState('');
+  const [UserPw, setUserPw] = useState('');
+  const [UsrNm, setUsrNm] = useState('');
+  const [UsrTel, setUsrTel] = useState('');
+  const [MailDomain, setMailDomain] = useState('naver.com');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [sangsaCodeCheck, setSangsaCodeCheck] = useState(false);

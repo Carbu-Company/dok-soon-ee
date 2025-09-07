@@ -50,62 +50,92 @@ const PaginationComponent = ({
 
   return (
     <div className="pagination">
-      <button
-        onClick={goToPreviousPage}
-        disabled={currentPage === 1}
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          goToPreviousPage();
+        }}
         className="pagination__btn pagination__btn--prev"
+        style={{ 
+          pointerEvents: currentPage === 1 ? 'none' : 'auto',
+          opacity: currentPage === 1 ? 0.5 : 1 
+        }}
       >
         이전
-      </button>
+      </a>
       
       {/* 첫 페이지 표시 (현재 범위에 포함되지 않은 경우) */}
       {pageNumbers[0] > 1 && (
         <>
-          <button
-            onClick={() => onPageChange(1)}
-            className={`pagination__btn ${currentPage === 1 ? 'pagination__btn--active' : ''}`}
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              onPageChange(1);
+            }}
+            className={`pagination__btn ${currentPage === 1 ? 'on' : ''}`}
           >
             1
-          </button>
+          </a>
           {pageNumbers[0] > 2 && (
-            <span className="pagination__ellipsis">...</span>
+            <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+              ...
+            </a>
           )}
         </>
       )}
 
       {/* 중간 페이지들 */}
       {pageNumbers.map((pageNumber) => (
-        <button
+        <a
           key={pageNumber}
-          onClick={() => onPageChange(pageNumber)}
-          className={`pagination__btn ${currentPage === pageNumber ? 'pagination__btn--active' : ''}`}
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            onPageChange(pageNumber);
+          }}
+          className={`pagination__btn ${currentPage === pageNumber ? 'on' : ''}`}
         >
           {pageNumber}
-        </button>
+        </a>
       ))}
 
       {/* 마지막 페이지 표시 (현재 범위에 포함되지 않은 경우) */}
       {pageNumbers[pageNumbers.length - 1] < totalPages && (
         <>
           {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && (
-            <span className="pagination__ellipsis">...</span>
+            <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+              ...
+            </a>
           )}
-          <button
-            onClick={() => onPageChange(totalPages)}
-            className={`pagination__btn ${currentPage === totalPages ? 'pagination__btn--active' : ''}`}
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              onPageChange(totalPages);
+            }}
+            className={`pagination__btn ${currentPage === totalPages ? 'on' : ''}`}
           >
             {totalPages}
-          </button>
+          </a>
         </>
       )}
 
-      <button
-        onClick={goToNextPage}
-        disabled={currentPage === totalPages}
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          goToNextPage();
+        }}
         className="pagination__btn pagination__btn--next"
+        style={{ 
+          pointerEvents: currentPage === totalPages ? 'none' : 'auto',
+          opacity: currentPage === totalPages ? 0.5 : 1 
+        }}
       >
         다음
-      </button>
+      </a>
     </div>
   );
 };
