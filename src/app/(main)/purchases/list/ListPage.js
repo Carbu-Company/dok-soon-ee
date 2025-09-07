@@ -18,7 +18,12 @@ export default function ListPage(props) {
       ? props.carList
       : (props.carList && Array.isArray(props.carList.data) ? props.carList.data : []);
 
+    const initialPurchasesSummary = Array.isArray(props.purchasesSummary)
+      ? props.purchasesSummary
+      : (props.purchasesSummary && Array.isArray(props.purchasesSummary.data) ? props.purchasesSummary.data : []);
+
     const [carList, setCarList] = useState(initialCarList);
+    const [purchasesSummary, setPurchasesSummary] = useState(initialPurchasesSummary);
     const [dealerList, setDealerList] = useState(props.dealerList || []);
     const [currentPage, setCurrentPage] = useState(props.page || 1);
     const [pageSize, setPageSize] = useState(props.pageSize || 10);
@@ -1233,7 +1238,7 @@ export default function ListPage(props) {
                   </td>
                   <td>
                     <button type="button" className="btn btn--light btn--sm" onClick={(e) => e.stopPropagation()}>
-                      <Link href={`/purchases/list/detail/${car.CAR_REG_ID}`} onClick={(e) => e.stopPropagation()}>상세보기</Link>
+                      <Link href={`/purchases/detail/${car.CAR_REG_ID}`} onClick={(e) => e.stopPropagation()}>상세보기</Link>
                     </button>
                   </td>
                 </tr>
@@ -1283,38 +1288,32 @@ export default function ListPage(props) {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>상사</td>
-                <td>100</td>
-                <td>1,000,000</td>
-                <td>100,000</td>
-                <td>1,100,000</td>
-                <td className="text-red">500,000</td>
-                <td>
-                  <span className="text-point">165,000</span>
-                </td>
-              </tr>
-              <tr>
-                <td>고객위탁</td>
-                <td>100</td>
-                <td>1,000,000</td>
-                <td>100,000</td>
-                <td>1,100,000</td>
-                <td>500,000</td>
-                <td>165,000</td>
-              </tr>
+              {purchasesSummary && purchasesSummary.length > 0 ? (
+                purchasesSummary.map((carSummary, index) => (
+                  <tr key={index}>
+                    <td>{carSummary.PRSN_SCT_CD}</td>
+                    <td>{carSummary.CNT.toLocaleString()}</td>
+                    <td>{carSummary.PUR_AMT.toLocaleString()}</td>
+                    <td>{carSummary.PUR_SUP_PRC.toLocaleString()}</td>
+                    <td>{carSummary.PUR_VAT.toLocaleString()}</td>
+                    <td className={carSummary.CAR_LOAN_AMT < 0 ? "text-red" : ""}>
+                      {carSummary.CAR_LOAN_AMT.toLocaleString()}
+                    </td>
+                    <td>
+                      <span className={carSummary.AGENT_PUR_CST < 0 ? "text-point" : ""}>
+                        {carSummary.AGENT_PUR_CST}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="text-center py-8 text-gray-500">
+                    데이터가 존재하지 않습니다.
+                  </td>
+                </tr>
+              )}
             </tbody>
-            <tfoot>
-              <tr>
-                <th>합계</th>
-                <th>100</th>
-                <th>1,000,000</th>
-                <th>100,000</th>
-                <th>1,100,000</th>
-                <th>500,000</th>
-                <th>165,000</th>
-              </tr>
-            </tfoot>
           </table>
         </div>
       </main>
