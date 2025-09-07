@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import EditPage from "@/app/(main)/purchases/edit/[id]/EditPage";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
-import { getSuggestOne } from "@/app/(main)/purchases/edit/[id]/api";
+import { getSuggestOne, updatePurchase } from "@/app/(main)/purchases/edit/[id]/api";
 
 export default async function EditorPage({ params }) {
   const cookieStore = await cookies();
@@ -37,14 +37,11 @@ export default async function EditorPage({ params }) {
       purchaseAmount: 100000000
     }
   }
-
-    console.log(id);
-
   return <EditPage session={session}
                    dealerList={dealerList.data}
+                   carKndList={carKndList.data}
                    evdcCdList={evdcCDList.data}
                    parkingLocationList={parkingLocationList.data}
-                   carKndList={carKndList.data}
-                   carPurDetail={carPurDetail.data}
+                   carPurDetail={carPurDetail}
    />;
 }
