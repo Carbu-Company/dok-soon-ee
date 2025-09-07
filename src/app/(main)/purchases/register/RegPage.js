@@ -2,6 +2,7 @@
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
 import { isValidResidentNumber, isValidBusinessNumber, isValidCorporateNumber } from '../../../../../public/js/util.js'
+import { openPostcodeSearch } from '@/components/modal/AddressModal'
 
 export default function RegPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = []}) {
 
@@ -147,6 +148,15 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
   // 입력 항목 체크 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // 주소 검색 핸들러
+  const handleAddressSearch = () => {
+    openPostcodeSearch((addressData) => {
+      setOwnrZip(addressData.zonecode);
+      setOwnrAddr1(addressData.address);
+      setOwnrAddr2(''); // 상세주소는 초기화
+    });
+  };
 
   // 주민(법인)등록번호 유효성 검사
   const validateResidentNumber = (value) => {
@@ -1089,7 +1099,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
                   </div>
-                  <button className="btn btn--dark" type="button">주소 검색</button>
+                  <button className="btn btn--dark" type="button" onClick={handleAddressSearch}>주소 검색</button>
                   <div className="input w400">
                     <input  
                       type="text" 
