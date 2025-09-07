@@ -147,7 +147,7 @@ export default function Header() {
         </div>
 
         <nav className="header__gnb">
-          <a href="/purchases/register" className="header__gnb-menu">
+          <a href="/purchases/list" className="header__gnb-menu">
             제시(매입)차량
           </a>
           <a href="m2.jsp" className="header__gnb-menu">

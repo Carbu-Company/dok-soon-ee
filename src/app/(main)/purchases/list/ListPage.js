@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PaginationComponent from '@/components/utils/PaginationComponent';
@@ -13,16 +13,10 @@ export default function ListPage(props) {
     // props 값 가져오기
     const [loading, setLoading] = useState(false);
 
-    // 개발용: 임의 데이터 (props.carList가 비어있을 경우 mock으로 대체)
-    const mockCarList = [
-      { CAR_REG_ID: '1', CAR_REG_DT: '2025-08-01', CAR_NO: '12가3456' },
-      { CAR_REG_ID: '2', CAR_REG_DT: '2025-08-02', CAR_NO: '34나7890' },
-      { CAR_REG_ID: '3', CAR_REG_DT: '2025-08-03', CAR_NO: '56다0123' }
-    ];
-
-    const initialCarList = (props.carList && Array.isArray(props.carList?.data) && props.carList.data.length > 0)
-      ? props.carList.data
-      : mockCarList;
+    // 초기 데이터: 서버에서 전달된 데이터가 배열이면 그대로 사용, 아니면 props.carList.data 형식도 지원
+    const initialCarList = Array.isArray(props.carList)
+      ? props.carList
+      : (props.carList && Array.isArray(props.carList.data) ? props.carList.data : []);
 
     const [carList, setCarList] = useState(initialCarList);
     const [dealerList, setDealerList] = useState(props.dealerList || []);
@@ -131,12 +125,12 @@ export default function ListPage(props) {
     // 검색 영역
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // 기본 파라미터
-    const defaultParams = {
+    // 기본 파라미터 (동적으로 생성)
+    const getDefaultParams = (pageNum = currentPage) => ({
       carAgent: props.session?.agentId,
-      page: currentPage,
+      page: pageNum,
       pageSize: pageSize
-    };
+    });
 
     // 검색 파라미터
     const searchParams = {
@@ -161,30 +155,68 @@ export default function ListPage(props) {
 
     // 검색 버튼 클릭 핸들러
     const handleSearch = async (pageNum = 1) => {
-      console.log('검색 버튼 클릭');
+      console.log('검색 버튼 클릭', { pageNum, pageSize });
 
       try {
         setLoading(true);
-        const searchParamsWithPage = {
-          ...defaultParams,
-          ...searchParams
-        };
-  
-        const result = await searchAction(searchParamsWithPage);
-        
-        if (result.success) {
-            setCarList(result.data || []);
-            setTotalPages(result.totalPages || 1);
+
+        if (typeof searchAction === 'function') {
+          const searchParamsWithPage = {
+            ...getDefaultParams(pageNum),
+            ...searchParams,
+          };
+
+          const result = await searchAction(searchParamsWithPage);
+
+          if (result && result.success) {
+            const data = result.data || [];
+            setCarList(data);
+            
+            // 페이지네이션 로직: 현재 페이지에 데이터가 pageSize만큼 있으면 다음 페이지가 있을 수 있음
+            if (data.length === pageSize) {
+              // 현재 페이지가 가득 찼으면 최소한 다음 페이지까지는 있다고 가정
+              setTotalPages(pageNum + 1);
+            } else {
+              // 현재 페이지가 가득 차지 않았으면 이것이 마지막 페이지
+              setTotalPages(pageNum);
+            }
+            
             setCurrentPage(pageNum);
+          } else if (result && Array.isArray(result)) {
+            // 일부 구현은 배열을 직접 반환할 수 있음
+            setCarList(result || []);
+            setTotalPages(Math.ceil(result.length / pageSize) || 1);
+            setCurrentPage(pageNum);
+          } else {
+            alert('검색 중 오류가 발생했습니다: ' + (result?.error || 'unknown'));
+          }
         } else {
-            alert('검색 중 오류가 발생했습니다: ' + result.error);
+          // searchAction이 없으면 /api/purchases 엔드포인트 호출 시도
+          const res = await fetch(`/api/purchases?page=${pageNum}&pageSize=${pageSize}`);
+          if (!res.ok) throw new Error('서버 응답 에러');
+          const json = await res.json();
+          const dataArr = Array.isArray(json) ? json : (json.data || []);
+          setCarList(dataArr);
+          setTotalPages(json.totalPages || Math.ceil(dataArr.length / pageSize) || 1);
+          setCurrentPage(pageNum);
         }
       } catch (error) {
-          alert('검색 중 오류가 발생했습니다.');
+        // eslint-disable-next-line no-console
+        console.error('검색 에러:', error);
+        alert('검색 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
       }
     };
+
+    // 컴포넌트 마운트 시: 서버에서 이미 데이터가 전달되었다면 그걸 우선 사용하고,
+    // 데이터가 없을 때만 검색을 수행합니다 (중복 호출 방지).
+    useEffect(() => {
+      if (!initialCarList || initialCarList.length === 0) {
+        handleSearch(1);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // 상세 검색 버튼 클릭 핸들러
     const handleDtlSearch = () => {
@@ -1172,7 +1204,7 @@ export default function ListPage(props) {
                   <td>
                     <div className="input-group input-group--sm input-group--center">
                       <div className="select select--utils">
-                        <button type="button" className="select__toggle">
+                        <button type="button" className="select__toggle" onClick={(e) => e.stopPropagation()}>
                           더보기
                         </button>
 
@@ -1200,8 +1232,8 @@ export default function ListPage(props) {
                     </div>
                   </td>
                   <td>
-                    <button type="button" className="btn btn--light btn--sm">
-                      <Link href={`/purchases/list/detail/${car.CAR_REG_ID}`}>상세보기</Link>
+                    <button type="button" className="btn btn--light btn--sm" onClick={(e) => e.stopPropagation()}>
+                      <Link href={`/purchases/list/detail/${car.CAR_REG_ID}`} onClick={(e) => e.stopPropagation()}>상세보기</Link>
                     </button>
                   </td>
                 </tr>
