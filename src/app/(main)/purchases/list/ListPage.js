@@ -77,9 +77,13 @@ export default function ListPage(props) {
     const [listCount, setListCount] = useState(10);
     const [isListCountSelectOpen, setIsListCountSelectOpen] = useState(false);
 
-    // listCount가 변경될 때만 pageSize 업데이트
+    // listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
     useEffect(() => {
-        setPageSize(listCount);
+        if (pageSize !== listCount) {
+            setPageSize(listCount);
+            // 페이지 크기가 변경되면 첫 페이지로 이동하고 새로 검색
+            setTimeout(() => handleSearch(1), 0);
+        }
     }, [listCount]);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,28 +178,25 @@ export default function ListPage(props) {
             ...searchParams,
           };
 
+          console.log('서버 액션 호출 파라미터:', searchParamsWithPage);
           const result = await searchAction(searchParamsWithPage);
+          console.log('서버 액션 응답:', result);
 
           if (result && result.success) {
             const responseData = result.data?.carlist || [];
             const paginationInfo = result.data?.pagination || {};
             
+            console.log('응답 데이터:', { 
+              responseDataLength: responseData.length, 
+              paginationInfo 
+            });
+            
             setCarList(responseData);
             setPagination(paginationInfo);
             
-            // 페이지네이션 정보가 있으면 사용, 없으면 기본 로직
-            if (paginationInfo.totalPages) {
-              setTotalPages(paginationInfo.totalPages);
-              setCurrentPage(paginationInfo.currentPage || pageNum);
-            } else {
-              // 페이지네이션 로직: 현재 페이지에 데이터가 pageSize만큼 있으면 다음 페이지가 있을 수 있음
-              if (responseData.length === pageSize) {
-                setTotalPages(pageNum + 1);
-              } else {
-                setTotalPages(pageNum);
-              }
-              setCurrentPage(pageNum);
-            }
+            // 서버에서 제공하는 페이지네이션 정보 사용
+            setTotalPages(paginationInfo.totalPages || 1);
+            setCurrentPage(paginationInfo.currentPage || pageNum);
           } else if (result && Array.isArray(result)) {
             // 일부 구현은 배열을 직접 반환할 수 있음
             setCarList(result || []);
@@ -352,7 +353,9 @@ export default function ListPage(props) {
                         defaultValue="제시(매입)일"
                       />
                       <button className="select__toggle" type="button" onClick={() => setIsDtGubunSelectOpen(!isDtGubunSelectOpen)}>
-                        <span className="select__text">선택</span>
+                        <span className="select__text">
+                          {dtGubun === '01' ? '제시(매입)일' : dtGubun === '02' ? '이전일' : dtGubun === '03' ? '똑순이등록일' : '선택'}
+                        </span>
                         <Image
                           className="select__arrow"
                           src="/images/ico-dropdown.svg"
@@ -639,7 +642,9 @@ export default function ListPage(props) {
                               defaultValue="제시(매입)일"
                             />
                             <button className="select__toggle" type="button" onClick={() => setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen)}>
-                              <span className="select__text">{dtlDtGubun || '선택'}</span>
+                              <span className="select__text">
+                                {dtlDtGubun === '01' ? '제시(매입)일' : dtlDtGubun === '02' ? '이전일' : dtlDtGubun === '03' ? '똑순이등록일' : '선택'}
+                              </span>
                               <Image
                                 className="select__arrow"
                                 src="/images/ico-dropdown.svg"
@@ -1041,6 +1046,7 @@ export default function ListPage(props) {
                     onClick={() => {
                       setOrdItem('제시일');
                       setIsOrdItemSelectOpen(false);
+                      handleSearch(1);
                     }}
                   >
                     제시일
@@ -1050,6 +1056,7 @@ export default function ListPage(props) {
                     onClick={() => {
                       setOrdItem('담당딜러');
                       setIsOrdItemSelectOpen(false);
+                      handleSearch(1);
                     }}
                   >
                     담당딜러
@@ -1059,6 +1066,7 @@ export default function ListPage(props) {
                     onClick={() => {
                       setOrdItem('제시구분');
                       setIsOrdItemSelectOpen(false);
+                      handleSearch(1);
                     }}
                   >
                     제시구분
@@ -1068,6 +1076,7 @@ export default function ListPage(props) {
                     onClick={() => {
                       setOrdItem('고객유형');
                       setIsOrdItemSelectOpen(false);
+                      handleSearch(1);
                     }}
                   >
                     고객유형
@@ -1100,6 +1109,7 @@ export default function ListPage(props) {
                     onClick={() => {
                       setOrdAscDesc('desc');
                       setIsOrdAscDescSelectOpen(false);
+                      handleSearch(1);
                     }}
                   >
                     내림차순
@@ -1109,6 +1119,7 @@ export default function ListPage(props) {
                     onClick={() => {
                       setOrdAscDesc('asc');
                       setIsOrdAscDescSelectOpen(false);
+                      handleSearch(1);
                     }}
                   >
                     오름차순
@@ -1140,7 +1151,6 @@ export default function ListPage(props) {
                     className={`select__option ${listCount === 10 ? 'select__option--selected' : ''}`}
                     onClick={() => {
                       setListCount(10);
-                      setPageSize(10);
                       setIsListCountSelectOpen(false);
                     }}
                   >
@@ -1150,7 +1160,6 @@ export default function ListPage(props) {
                     className={`select__option ${listCount === 30 ? 'select__option--selected' : ''}`}
                     onClick={() => {
                       setListCount(30);
-                      setPageSize(30);
                       setIsListCountSelectOpen(false);
                     }}
                   >
@@ -1160,7 +1169,6 @@ export default function ListPage(props) {
                     className={`select__option ${listCount === 50 ? 'select__option--selected' : ''}`}
                     onClick={() => {
                       setListCount(50);
-                      setPageSize(50);
                       setIsListCountSelectOpen(false);
                     }}
                   >

@@ -14,12 +14,13 @@ async function searchPurchasesList(searchParamsWithPage) {
     const result = await getPurchasesListNew(searchParamsWithPage);
 
     console.log('서버 액션 결과:', { 
-      dataLength: result?.length, 
+      carlistLength: result?.data?.carlist?.length, 
+      totalCount: result?.data?.pagination?.totalCount,
       page: searchParamsWithPage.page,
       pageSize: searchParamsWithPage.pageSize 
     });
 
-    return { success: true, data: result };
+    return result;
   } catch (error) {
     console.error('검색 중 오류 발생:', error);
     return { success: false, error: error.message };
