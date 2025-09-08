@@ -23,13 +23,20 @@ export async function POST(req) {
       });
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    const clearHeaders = clearCookiesHeaders();
+    const response = new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
-        "Set-Cookie": clearCookiesHeaders(),
         "Content-Type": "application/json",
       },
     });
+    
+    // 쿠키 클리어 헤더 설정
+    clearHeaders.forEach(cookie => {
+      response.headers.append("Set-Cookie", cookie);
+    });
+    
+    return response;
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message || "서버 오류" }), {
       status: 500,
@@ -53,13 +60,20 @@ export async function GET(req) {
       });
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    const clearHeaders = clearCookiesHeaders();
+    const response = new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
-        "Set-Cookie": clearCookiesHeaders(),
         "Content-Type": "application/json",
       },
     });
+    
+    // 쿠키 클리어 헤더 설정
+    clearHeaders.forEach(cookie => {
+      response.headers.append("Set-Cookie", cookie);
+    });
+    
+    return response;
   } catch (err) {
     return new Response(JSON.stringify({ error: err.message || "서버 오류" }), {
       status: 500,

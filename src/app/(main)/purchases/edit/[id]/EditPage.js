@@ -933,8 +933,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
       </div>
 
       <div className="container__btns">
-        <button className="btn btn--light" type="button" onClick={() => { window.location.href = 'm1.jsp'; }}>취소</button>
-        <button className="btn btn--primary" type="button" disabled>확인</button>
+        <button className="btn btn--light" type="button" onClick={() => { window.location.href = '/purchases/list'; }}>취소</button>
         <button className="btn btn--primary" type="button" onClick={handleSubmit}>확인</button>
       </div>
 

@@ -45,21 +45,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <td>
                     <div className="input-group">
                       <div className="input">
-                        <input type="number" className="input__field" placeholder="012" />
-                        <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
-                        </div>
-                      </div>
-                      <span className="input-group__dash">-</span>
-                      <div className="input">
-                        <input type="number" className="input__field" placeholder="34" />
-                        <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
-                        </div>
-                      </div>
-                      <span className="input-group__dash">-</span>
-                      <div className="input">
-                        <input type="number" className="input__field" placeholder="56789" />
+                        <input type="number" className="input__field" placeholder="- 없이 입력" />
                         <div className="input__utils">
                           <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                         </div>
@@ -117,8 +103,8 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                       <button className="btn btn--dark" type="button" disabled>확인</button>
                       <button className="btn btn--dark" type="button">확인</button>
 
-                      <span className="input-notice">등록 가능합니다</span>
-                      <span className="input-error">등록 불가능합니다</span>
+                      <span className="input-notice">등록 가능합니다. 신청을 계속 진행바랍니다.</span>
+                      <span className="input-error">등록 불가합니다. 고객센터로 문의바랍니다.</span>
                     </div>
                   </td>
                 </tr>
@@ -126,7 +112,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <th>희망 아이디</th>
                   <td>
                     <div className="input">
-                      <input type="text" className="input__field" placeholder="아이디" />
+                      <input type="text" className="input__field" placeholder="아이디(6~12자 이내)" />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
@@ -135,7 +121,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   <th>비밀번호</th>
                   <td>
                     <div className="input">
-                      <input type="text" className="input__field" placeholder="비밀번호" />
+                      <input type="text" className="input__field" placeholder="비밀번호(6~12자 이내)" />
                       <div className="input__utils">
                         <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>

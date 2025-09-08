@@ -36,38 +36,6 @@ export function isValidResidentNumber(registNum) {
   }
 
 
-export function isValidBusinessNumber(businessNumber) {
-    // 1. 입력값 정제 (하이픈 제거)
-    const cleanedNumber = businessNumber.replace(/-/g, '');
-  
-    // 2. 패턴 검사 (10자리 숫자인지 확인)
-    if (cleanedNumber.length !== 10) {
-      return false;
-    }
-  
-    // 3. 숫자가 아닌 문자가 포함되어 있는지 검사
-    if (!/^\d{10}$/.test(cleanedNumber)) {
-      return false;
-    }
-  
-    const numberArr = cleanedNumber.split('').map(Number);
-  
-    // 4. 검증 로직 구현 (국세청 공식)
-    const weights = [1, 3, 7, 1, 3, 7, 1, 3, 5]; // 앞 9자리에 대한 가중치
-  
-    // 앞 9자리에 가중치를 곱해서 합계 계산
-    let sum = 0;
-    for (let i = 0; i < 9; i++) {
-      sum += numberArr[i] * weights[i];
-    }
-    
-    // 계산된 합에 마지막 자리 숫자를 더함
-    sum += numberArr[9];
-    
-    // 총합을 10으로 나눈 나머지가 0이면 유효한 사업자등록번호
-    return sum % 10 === 0;
-  }
-  
 
 export function isValidCorporateNumber(corporateNumber) {
     // 1. 입력값 정제 (하이픈 제거)
@@ -101,4 +69,28 @@ export function isValidCorporateNumber(corporateNumber) {
   }
 
 
+
+
+export function checkBizID(bizID) {
+  // bizID는 숫자만 10자리로 해서 문자열로 넘김
+  const checkID = [1, 3, 7, 1, 3, 7, 1, 3, 5, 1];
+  let chkSum = 0;
   
+  // 하이픈 제거
+  bizID = bizID.replace(/-/gi,'');
+
+  // 앞 8자리 검증
+  for (let i = 0; i <= 7; i++) {
+    chkSum += checkID[i] * parseInt(bizID.charAt(i));
+  }
+
+  // 9번째 자리 검증
+  const c2 = String(checkID[8] * parseInt(bizID.charAt(8))).padStart(2, '0');
+  chkSum += parseInt(c2.charAt(0)) + parseInt(c2.charAt(1));
+
+  // 검증 결과 확인
+  const remainder = (10 - (chkSum % 10)) % 10;
+  
+  return parseInt(bizID.charAt(9)) === remainder;
+}
+

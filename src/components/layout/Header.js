@@ -2,12 +2,45 @@
 import Image from "next/image";
 
 export default function Header() {
+  // 쿠키에서 CSRF 토큰 가져오기
+  const getCsrfToken = () => {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      const [name, value] = cookie.trim().split('=');
+      if (name === 'csrf') {
+        return value;
+      }
+    }
+    return null;
+  };
+
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      const csrfToken = getCsrfToken();
+      
+      if (!csrfToken) {
+        console.warn('CSRF 토큰을 찾을 수 없습니다.');
+        // CSRF 토큰이 없어도 로그아웃 진행
+        window.location.href = '/login';
+        return;
+      }
+
+      const response = await fetch('/api/auth/logout', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-csrf-token': csrfToken
+        }
+      });
+
+      if (!response.ok) {
+        console.error('로그아웃 요청 실패:', response.status);
+      }
     } catch (e) {
-      // ignore
+      console.error('로그아웃 에러:', e);
     }
+    
+    // 성공/실패 여부와 관계없이 로그인 페이지로 이동
     window.location.href = '/login';
   };
 

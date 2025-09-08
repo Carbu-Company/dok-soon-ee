@@ -9,11 +9,11 @@ async function searchPurchasesList(searchParamsWithPage) {
   "use server";
   
   try {
-    console.log('서버 액션 호출됨:', searchParamsWithPage);
+    //console.log('서버 액션 호출됨******************:', searchParamsWithPage);
 
     const result = await getPurchasesListNew(searchParamsWithPage);
 
-    console.log('서버 액션 결과:', { 
+    console.log('서버 액션 결과*******************:', { 
       carlistLength: result?.data?.carlist?.length, 
       totalCount: result?.data?.pagination?.totalCount,
       page: searchParamsWithPage.page,
@@ -66,13 +66,12 @@ export default async function Purchases() {
     ordAscDesc: 'desc'
   };
 
-
   const purchasesList = await searchPurchasesList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const purchasesSummary = await getPurchasesSummary({ ...defaultParams, ...searchParams });
 
-  console.log(purchasesList.data);
+  //console.log(purchasesList.data);
   //console.log(dealerList.data);
 
   return <ListPage session={session}

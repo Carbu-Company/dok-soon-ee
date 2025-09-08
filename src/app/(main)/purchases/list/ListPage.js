@@ -1240,7 +1240,7 @@ export default function ListPage(props) {
             <tbody>
             {currentPageData && currentPageData.length > 0 ? (
               currentPageData.map((car, index) => (
-                <tr key={`${car.CAR_REG_ID}-${index}`} className="hover:bg-purple-900/10 cursor-pointer" onClick={() => window.location.href = `./edit/${car.CAR_REG_ID}`}>
+                <tr key={`${car.CAR_REG_ID}-${index}`} className="hover:bg-purple-900/10 cursor-pointer">
                   <td>{car.CAR_REG_DT}</td>
                   <td>상사</td>
                   <td>{car.CAR_NO}</td>
