@@ -17,20 +17,22 @@ export default function ListPage(props) {
     // 초기 데이터: 서버에서 전달된 데이터 구조 처리
     const initialCarListData = props.carList?.data?.carlist || [];
     const initialPagination = props.carList?.data?.pagination || {};
-    
+
     const initialPurchasesSummary = props.purchasesSummary?.data || [];
 
     const [carList, setCarList] = useState(initialCarListData);
     const [pagination, setPagination] = useState(initialPagination);
-    const [purchasesSummary, setPurchasesSummary] = useState(initialPurchasesSummary);
-    const [dealerList, setDealerList] = useState(props.dealerList || []);
-    const [evdcCdList, setEvdcCdList] = useState(props.evdcCdList || []);
-    const [currentPage, setCurrentPage] = useState(initialPagination.currentPage || 1);
-    const [pageSize, setPageSize] = useState(initialPagination.pageSize || 10);
-    const searchAction = props.searchAction;
     const [totalPages, setTotalPages] = useState(initialPagination.totalPages || 1);
 
-    //console.log(props.carList);
+    const [purchasesSummary, setPurchasesSummary] = useState(initialPurchasesSummary);
+
+    const [dealerList, setDealerList] = useState(props.dealerList || []);
+    const [evdcCdList, setEvdcCdList] = useState(props.evdcCdList || []);
+
+    const [currentPage, setCurrentPage] = useState(initialPagination.currentPage || 1);
+    const [pageSize, setPageSize] = useState(initialPagination.pageSize || 10);
+
+    const searchAction = props.searchAction;
 
     // 차량번호
     const [carNo, setCarNo] = useState('');
@@ -50,15 +52,6 @@ export default function ListPage(props) {
     // 매입취소/삭제 모달 관련 state
     const [isPurchaseRemoveModalOpen, setIsPurchaseRemoveModalOpen] = useState(false);
     const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
-
-    // 현재 페이지 데이터는 carList 상태값을 사용
-    const currentPageData = carList;
-
-    //console.log(currentPageData);
-    // currentPageData가 존재하면 map으로 데이터 로그 출력
-    //carList && carList.map((item, index) => {
-    //  console.log(`[${index}] 차량정보:`, item);
-    //});
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1033,7 +1026,7 @@ export default function ListPage(props) {
 
         <div className="table-wrap">
           <h2 className="table-wrap__title">
-            매입차량 리스트<span>Total {pagination?.totalCount || currentPageData?.length || 0}건</span>
+            매입차량 리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span>
           </h2>
           <div className="table-wrap__head table-wrap__title">
             <button
@@ -1238,8 +1231,8 @@ export default function ListPage(props) {
               </tr>
             </thead>
             <tbody>
-            {currentPageData && currentPageData.length > 0 ? (
-              currentPageData.map((car, index) => (
+            {carList && carList.length > 0 ? (
+              carList.map((car, index) => (
                 <tr key={`${car.CAR_REG_ID}-${index}`} className="hover:bg-purple-900/10 cursor-pointer">
                   <td>{car.CAR_REG_DT}</td>
                   <td>상사</td>
@@ -1319,7 +1312,7 @@ export default function ListPage(props) {
           </table>
 
           {/* 페이지네이션 */}
-          {currentPageData && currentPageData.length > 0 && (
+          {carList && carList.length > 0 && (
           <div>
             <PaginationComponent
                 currentPage={currentPage}
