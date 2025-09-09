@@ -339,7 +339,8 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
       parkKeyNo,                                                 // Key번호
       fctCndcYn,                                                 // 사실 확인서 여부
       txblRcvYn,                                                 // 매입수취여부
-      ctshNo                                                     // 계약서번호
+      ctshNo,                                                     // 계약서번호
+      carRegDt,                                                  // 이전일
     };
     
 
@@ -1114,7 +1115,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     <span className="select__text">
                       {txblRcvYn === 'Y' ? '수취' : 
                        txblRcvYn === 'N' ? '미수취' :
-                       txblRcvYn === 'NA' ? '해당없음' : '선택'}
+                       txblRcvYn === 'E' ? '해당없음' : '선택'}
                     </span>
                     <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                   </button>
@@ -1130,7 +1131,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     <li 
                       className={`select__option ${txblRcvYn === 'NA' ? 'select__option--selected' : ''}`}
                       onClick={() => {
-                        setTxblRcvYn('NA');
+                        setTxblRcvYn('E');
                         setIsTxblRcvYnOpen(false);
                       }}
                     >해당없음</li>
@@ -1180,7 +1181,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     type="button"
                     onClick={() => setIsFctCndcYnOpen(!isFctCndcYnOpen)}
                   >
-                    <span className="select__text">{fctCndcYn || '선택'}</span>
+                    <span className="select__text">{fctCndcYn === 'Y' ? '수취' : 
+                       fctCndcYn === 'N' ? '미수취' :
+                       fctCndcYn === 'E' ? '해당없음' : '선택'}</span>
                     <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                   </button>
 
@@ -1195,7 +1198,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     <li 
                       className={`select__option ${fctCndcYn === 'NA' ? 'select__option--selected' : ''}`}
                       onClick={() => {
-                        setFctCndcYn('');
+                        setFctCndcYn('E');
                         setIsFctCndcYnOpen(false);
                       }}
                     >해당없음</li>

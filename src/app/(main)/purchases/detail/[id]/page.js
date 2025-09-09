@@ -24,8 +24,9 @@ export default async function Detail({ params }) {
   const carPurDetail = await getSuggestOne(id);
 
   //console.log(id);
+  console.log('carPurDetail', carPurDetail);
 
   return <DetailPage session={session}
-                     carPurDetail={carPurDetail.data}
+                     carPurDetail={carPurDetail}
    />;
 }

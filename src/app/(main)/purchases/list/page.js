@@ -25,6 +25,25 @@ async function searchPurchasesList(searchParamsWithPage) {
   }
 }
 
+
+// Server Action 정의
+async function searchPurchasesSummary(searchParamsWithPage) {
+  "use server";
+  
+  try {
+    const result = await getPurchasesSummary(searchParamsWithPage);
+
+    console.log('서버 액션 결과*******************:', { 
+      totalCount: result?.data?.totalCount,
+    });
+
+    return result;
+  } catch (error) {
+    console.error('검색 중 오류 발생:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 export default async function Purchases() {
   /* 쿠키에서 세션 정보 가져오기
   {
@@ -68,7 +87,7 @@ export default async function Purchases() {
 
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
-  const purchasesSummary = await getPurchasesSummary({ ...defaultParams, ...searchParams });
+  const purchasesSummary = await searchPurchasesSummary({ ...defaultParams, ...searchParams });
 
   return <ListPage session={session}
                    carList={purchasesList}

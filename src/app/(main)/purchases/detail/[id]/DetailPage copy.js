@@ -1,15 +1,6 @@
 import DetailModalTrigger from "./DetailModalTrigger";
 
-export default function DetailPage(props) {
-
-
-    const carPurDetail = props.carPurDetail.data;
-    console.log('carPurDetail', carPurDetail);
-
-
-    const prsnSctCd = carPurDetail?.PRSN_SCT_CD;
-    console.log('prsnSctCd', prsnSctCd);
-
+export default function DetailPage({ params }) {
     return (
         <main className="container container--page">
       <div className="container__head">
@@ -73,19 +64,19 @@ export default function DetailPage(props) {
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>{carPurDetail?.PRSN_SCT_CD === '0' ? '상사매입' : '고객위탁'}</td>
+              <td>상사매입</td>
 
               <th>차량명</th>
-              <td>{carPurDetail.CAR_NM} ({carPurDetail.CAR_KND_CD})</td>
+              <td>그랜저(승용)</td>
 
               <th>차량번호</th>
-              <td>{carPurDetail.CAR_NO} ({carPurDetail.PUR_BEF_CAR_NO})</td>  
+              <td>123가1234 (123허1234)</td>
 
               <th>매입딜러</th>
-              <td>{carPurDetail.DLR_NM}</td>
+              <td>홍길동</td>
 
               <th>매입일</th>
-              <td>{carPurDetail.CAR_PUR_DT}</td>
+              <td>2025-08-01</td>
             </tr>
           </tbody>
         </table>
@@ -110,43 +101,39 @@ export default function DetailPage(props) {
           <tbody>
             <tr>
               <th>매입금액</th>
-              <td>{carPurDetail.PUR_AMT.toLocaleString()}원</td>
+              <td>100,000,000원</td>
               <th>상사매입비</th>
-              <td>{carPurDetail.AGENT_PUR_CST.toLocaleString()}원 (입금일 : {carPurDetail.AGENT_PUR_CST_PAY_DT})</td>
+              <td>165,000원 (입금일 : 2025-08-01)</td>
               <th>취득세</th>
-              <td>{carPurDetail.GAIN_TAX.toLocaleString()}원</td>
+              <td>300,000원</td>
               <th>계약서번호</th>
-              <td>{carPurDetail.CTSH_NO}</td>
+              <td>343543543543</td>
             </tr>
             <tr>
               <th>이전일</th>
-              <td>{carPurDetail.CAR_REG_DT}</td>
+              <td>2025-07-25</td>
               <th>매도자(전소유자)</th>
-              <td>{carPurDetail.OWNR_TP_CD === '0' ? '개인' : '법인'} - {carPurDetail.OWNR_NM}</td>
+              <td>개인-홍길순</td>
               <th>주민(법인)등록번호</th>
-              <td>{carPurDetail.OWNR_SSN}</td>
+              <td></td>
               <th>사업자등록번호</th>
-              <td>{carPurDetail.OWNR_BRNO}</td>  
+              <td></td>
             </tr>
             <tr>
               <th>연락처</th>
-              <td>{carPurDetail.OWNR_PHON}</td>
+              <td></td>
               <th>e메일주소</th>
-              <td>{carPurDetail.OWNR_EMAIL}</td>
+              <td></td>
               <th>주소</th>
-              <td colSpan={3}>{carPurDetail.OWNR_ADDR1} {carPurDetail.OWNR_ADDR2}</td>
+              <td colSpan={3}>경기 수원시</td>
             </tr>
             <tr>
               <th>매입(세금)계산서</th>
-              <td>{carPurDetail.TXBL_RCV_YN === 'E' ? '해당없음' : 
-                   carPurDetail.TXBL_RCV_YN === 'Y' ? '수취' :
-                   carPurDetail.TXBL_RCV_YN === 'N' ? '미수취' : ''}</td>
+              <td></td>
               <th>매입계산서발행일</th>
-              <td>{carPurDetail.TXBL_ISSU_DT}</td>
+              <td></td>
               <th>사실확인서</th>
-              <td>{carPurDetail.FCT_CNDC_YN === 'E' ? '해당없음' : 
-                   carPurDetail.FCT_CNDC_YN === 'Y' ? '수취' :
-                   carPurDetail.FCT_CNDC_YN === 'N' ? '미수취' : ''}</td>
+              <td></td>
               <th></th>
               <td></td>
             </tr>
@@ -156,17 +143,17 @@ export default function DetailPage(props) {
             </tr>
             <tr>
               <th>조합제시메모</th>
-              <td colSpan={7}>{carPurDetail.CMBT_PRSN_MEMO}</td>
+              <td colSpan={7}></td>
             </tr>
             <tr>
               <th>특이사항</th>
-              <td colSpan={7}>{carPurDetail.PUR_DESC}</td>
+              <td colSpan={7}></td>
             </tr>
             <tr>
               <th>주차위치</th>
-              <td>{carPurDetail.PARK_ZON_CD}-{carPurDetail.PARK_ZON_DESC}</td>
+              <td>위치코드-위치내용</td>
               <th>Key번호</th>
-              <td>{carPurDetail.PARK_KEY_NO}</td>
+              <td>1256</td>
               <th></th>
               <td></td>
               <th></th>
