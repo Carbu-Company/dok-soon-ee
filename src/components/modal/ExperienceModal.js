@@ -7,7 +7,7 @@ import { checkBizID } from '../../../public/js/util.js'
 
 export default function ExperienceRegistrationModal({ open = true, onClose, onPrint }) {
 
-  /** test 
+
 
   const [AgentNm, setAgentNm] = useState('테스트상사사');
   const [AgentRegNo, setAgentRegNo] = useState('8218701635');
@@ -18,9 +18,16 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
   const [UserPw, setUserPw] = useState('testuser'); 
   const [UsrNm, setUsrNm] = useState('테스트신청자');
   const [UsrTel, setUsrTel] = useState('01033500564');
-  
-  */
+  const [MailDomain, setMailDomain] = useState('naver.com');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [sangsaCodeCheck, setSangsaCodeCheck] = useState(false);
+  const [sangsaCodeCheckMsg, setSangsaCodeCheckMsg] = useState(null);
+  const [sangsaCodeCheckCss, setSangsaCodeCheckCss] = useState(null);
+  const [allinputCheck, setAllinputCheck] = useState(false);
 
+
+/*
   const [AgentNm, setAgentNm] = useState('');
   const [AgentRegNo, setAgentRegNo] = useState('');
   const [CeoNm, setCeoNm] = useState('');
@@ -37,7 +44,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
   const [sangsaCodeCheckMsg, setSangsaCodeCheckMsg] = useState(null);
   const [sangsaCodeCheckCss, setSangsaCodeCheckCss] = useState(null);
   const [allinputCheck, setAllinputCheck] = useState(false);
-
+*/
   // 전체 입력 항목 체크
   useEffect(() => {
     const allFieldsFilled = 

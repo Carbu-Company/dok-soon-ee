@@ -2,11 +2,12 @@
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
 import { updatePurchase } from "@/app/(main)/purchases/edit/[id]/api";
-import { isValidResidentNumber, isValidBusinessNumber, isValidCorporateNumber } from '../../../../../../public/js/util.js'
+import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '../../../../../../public/js/util.js'
+import { openPostcodeSearch } from '@/components/modal/AddressModal'
 
 export default function EditPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = [], carPurDetail = []}) {
 
-  //console.log('carPurDetail', carPurDetail);
+  console.log('carPurDetail', carPurDetail);
   
   // 매입딜러 선택 상태 관리 (콤보 박스)
   const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
@@ -163,63 +164,13 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 주민(법인)등록번호 유효성 검사
-  const validateResidentNumber = (value) => {
-      if (!value.trim()) {
-          return '';
-      }
-
-      let isValid = false;
-      if (customerType === '개인') {
-          isValid = isValidResidentNumber(value);
-      } else if (customerType === '법인') {
-          isValid = isValidCorporateNumber(value);
-      }
-
-      return isValid ? '' : `유효하지 않은 ${customerType === '개인' ? '주민등록번호' : '법인등록번호'}입니다.`;
-  };
-
-  // 사업자등록번호 유효성 검사
-  const validateBusinessNumber = (value) => {
-      if (!value.trim()) {
-          return '';
-      }
-      return isValidBusinessNumber(value) ? '' : '유효하지 않은 사업자등록번호입니다.';
-  };
-
-  // 입력값 변경 핸들러
-  const handleResidentNumberChange = (e) => {
-      const value = e.target.value;
-      setResidentNumber(value);
-      
-      const error = validateResidentNumber(value);
-      setValidationErrors(prev => ({
-          ...prev,
-          residentNumber: error
-      }));
-  };
-
-  const handleBusinessNumberChange = (e) => {
-      const value = e.target.value;
-      setBusinessNumber(value);
-      
-      const error = validateBusinessNumber(value);
-      setValidationErrors(prev => ({
-          ...prev,
-          businessNumber: error
-      }));
-  };
-
-  const handleCustomerTypeChange = (type) => {
-      setCustomerType(type);
-      // 고객구분이 변경되면 주민(법인)등록번호 재검증
-      if (residentNumber) {
-          const error = validateResidentNumber(residentNumber);
-          setValidationErrors(prev => ({
-              ...prev,
-              residentNumber: error
-          }));
-      }
+  // 주소 검색 핸들러
+  const handleAddressSearch = () => {
+    openPostcodeSearch((addressData) => {
+      setOwnrZip(addressData.zonecode);
+      setOwnrAddr1(addressData.address);
+      setOwnrAddr2(''); // 상세주소는 초기화
+    });
   };
 
   const handleSubmit = async () => {
@@ -252,6 +203,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
     console.log('ownrPhon', ownrPhon);    // 연락처
     console.log('ownrEmail', ownrEmail);    // e메일 주소
     console.log('emailDomain', emailDomain);    // e메일 도메인
+    console.log('ownrZip', ownrZip);    // 우편번호
     console.log('ownrAddr1', ownrAddr1);    // 주소1
     console.log('ownrAddr2', ownrAddr2);    // 주소2
     console.log('ownrBrno', ownrBrno);    // 사업자등록번호
@@ -345,7 +297,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
 
     // 사업자번호
     if(ownrBrno) {
-      if(!isValidBusinessNumber(ownrBrno)) {
+      if(!checkBizID(ownrBrno)) {
         alert('사업자등록번호를 확인해주세요.');
         return;
       }
@@ -1106,7 +1058,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
                   </div>
-                  <button className="btn btn--dark" type="button">주소 검색</button>
+                  <button className="btn btn--dark" type="button" onClick={handleAddressSearch}>주소 검색</button>
                   <div className="input w400">
                     <input  
                       type="text" 

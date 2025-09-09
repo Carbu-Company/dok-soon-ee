@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import EditPage from "@/app/(main)/purchases/edit/[id]/EditPage";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
-import { getSuggestOne, updatePurchase } from "@/app/(main)/purchases/edit/[id]/api";
+import { getSuggestOne } from "@/app/(main)/purchases/edit/[id]/api";
 
 export default async function EditorPage({ params }) {
   const cookieStore = await cookies();
@@ -24,8 +24,11 @@ export default async function EditorPage({ params }) {
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록
   const carKndList = await getCDList('92');   // 차량 종류 코드 목록
 
-  // 차량 등록 번호
   const { id } = await params;
+  const carPurDetail = await getSuggestOne(id);
+
+  // 차량 등록 번호
+  /** 
   const carPurDetail = {
     data: {
       id: id,
@@ -37,6 +40,8 @@ export default async function EditorPage({ params }) {
       purchaseAmount: 100000000
     }
   }
+  */
+
   return <EditPage session={session}
                    dealerList={dealerList.data}
                    carKndList={carKndList.data}
