@@ -17,7 +17,8 @@ export default function ListPage(props) {
     // 초기 데이터: 서버에서 전달된 데이터 구조 처리
     const initialCarListData = props.carList?.data?.carlist || [];
     const initialPagination = props.carList?.data?.pagination || {};
-
+    
+    // Summary 데이터
     const initialPurchasesSummary = props.purchasesSummary?.data || [];
 
     const [carList, setCarList] = useState(initialCarListData);
@@ -55,6 +56,7 @@ export default function ListPage(props) {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    console.log(carList);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 페이지네이션 영역
@@ -75,11 +77,12 @@ export default function ListPage(props) {
     const [isListCountSelectOpen, setIsListCountSelectOpen] = useState(false);
 
     // listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
+    // 자동 검색 비활성화
     useEffect(() => {
         if (pageSize !== listCount) {
             setPageSize(listCount);
             // 페이지 크기가 변경되면 첫 페이지로 이동하고 새로 검색
-            setTimeout(() => handleSearch(1), 0);
+            setTimeout(() => handleSearch(1), 0); // 자동 검색 비활성화
         }
     }, [listCount]);
 
@@ -223,12 +226,15 @@ export default function ListPage(props) {
 
     // 컴포넌트 마운트 시: 서버에서 이미 데이터가 전달되었다면 그걸 우선 사용하고,
     // 데이터가 없을 때만 검색을 수행합니다 (중복 호출 방지).
+    // 초기 자동 검색 비활성화
+    /*
     useEffect(() => {
       if (!initialCarListData || initialCarListData.length === 0) {
         handleSearch(1);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    */
 
     // 상세 검색 버튼 클릭 핸들러
     const handleDtlSearch = () => {

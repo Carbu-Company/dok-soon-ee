@@ -9,8 +9,6 @@ async function searchPurchasesList(searchParamsWithPage) {
   "use server";
   
   try {
-    //console.log('서버 액션 호출됨******************:', searchParamsWithPage);
-
     const result = await getPurchasesListNew(searchParamsWithPage);
 
     console.log('서버 액션 결과*******************:', { 
@@ -67,15 +65,13 @@ export default async function Purchases() {
   };
 
   const purchasesList = await searchPurchasesList({ ...defaultParams, ...searchParams });
+
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const purchasesSummary = await getPurchasesSummary({ ...defaultParams, ...searchParams });
 
-  //console.log(purchasesList.data);
-  //console.log(dealerList.data);
-
   return <ListPage session={session}
-                   carList={purchasesList.data}
+                   carList={purchasesList}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
                    searchAction={searchPurchasesList}
