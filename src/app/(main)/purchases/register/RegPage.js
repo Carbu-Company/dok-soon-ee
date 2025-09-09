@@ -149,23 +149,6 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 이미지 업로드 처리 래퍼 함수
-  const onImageUpload = async (e, idx) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    // apiCall.js의 handleImageUpload 함수 호출
-    await handleImageUpload(
-        file, 
-        idx, 
-        saveData.imageUrls, 
-        (newImageUrls) => {
-            setSaveData({...saveData, imageUrls: newImageUrls});
-        }
-    );
-}
-
-
   // 주소 검색 핸들러
   const handleAddressSearch = () => {
     openPostcodeSearch((addressData) => {
@@ -179,6 +162,43 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
 
     setLoading(true);
     setError(null);
+
+    // 첨부파일 올리기
+    for(let i = 0; i < attachedFiles.length; i++) {
+
+      console.log('attachedFiles[i]', attachedFiles[i]);
+
+      // 이미 업로드된 파일은 건너뛰기
+      if (attachedFiles[i].uploaded) continue;
+      
+      // apiCall.js의 handleImageUpload 함수 호출
+      try {
+        const imageUrl = await handleImageUpload(
+            attachedFiles[i].file, 
+            i, 
+            [], // 빈 배열 전달 (URL 배열은 사용하지 않음)
+            () => {} // 콜백은 사용하지 않음
+        );
+        
+        // 업로드 성공 시 파일 정보 업데이트
+        const updatedFiles = [...attachedFiles];
+        updatedFiles[i].url = imageUrl;
+        updatedFiles[i].uploaded = true;
+        setAttachedFiles(updatedFiles);
+      } catch (error) {
+        console.error('파일 업로드 실패:', error);
+        // 업로드 실패 시 해당 파일 제거
+        const filteredFiles = attachedFiles.filter((_, index) => index !== i);
+        setAttachedFiles(filteredFiles);
+      }
+
+    }
+
+    
+
+
+    return;
+
 
     console.log('dealerId', dealerId);    // 매입딜러 ID
     console.log('carKndCd', carKndCd);    // 차량 종류 코드
@@ -213,6 +233,8 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
     console.log('fctCndcYn', fctCndcYn);    // 사실확인서
     console.log('attachedFiles', attachedFiles);    // 관련 서류 첨부
     console.log('parkKeyNo', parkKeyNo);    // Key번호
+
+
 
     // 매입딜러
     if(!dealerId) {
@@ -329,7 +351,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
       purDesc,                                                   // 매입설명
       ownrAddr1,                                                 // 주소
       ownrAddr2,                                                 // 상세주소
-      attachedFiles,                                             // 관련 서류 첨부
+      attachedFiles: attachedFiles.filter(f => f.uploaded).map(f => f.url), // 관련 서류 첨부 (업로드된 URL만)
       usrId: session?.usrId,                                     // 사용자 ID
       dealerId,                                                  // 딜러 코드
       parkingCd,                                                 // 주차위치 코드
@@ -1258,7 +1280,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                         type="text" 
                         className="input__field input__field--file" 
                         placeholder="파일을 선택하세요" 
-                        value={file.name} 
+                        value={file.name || ''} 
                         disabled 
                       />
                       <div className="input__utils">
@@ -1285,7 +1307,13 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                       input.type = 'file';
                       input.onchange = (e) => {
                         if (e.target.files?.[0]) {
-                          setAttachedFiles([...attachedFiles, e.target.files[0]]);
+                          const file = e.target.files[0];
+                          setAttachedFiles([...attachedFiles, {
+                            file: file,
+                            name: file.name,
+                            url: null,
+                            uploaded: false
+                          }]);
                         }
                       };
                       input.click();

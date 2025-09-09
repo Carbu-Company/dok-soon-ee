@@ -95,12 +95,45 @@ export function checkBizID(bizID) {
 }
 
 
+import imageCompression from 'browser-image-compression';
+
 // 이미지 업로드 함수
 export const handleImageUpload = async (file, idx, currentImageUrls, onUpdateImageUrls) => {
     try {
         if (!file) return;
         
-        const filename = encodeURIComponent(file.name);
+        let processedFile = file;
+        
+        // 이미지 파일인 경우 압축 시도
+        if (file.type.startsWith('image/')) {
+            try {
+                const options = {
+                    maxSizeMB: 10, // 최대 10MB로 압축
+                    maxWidthOrHeight: 1920, // 최대 해상도 1920px
+                    useWebWorker: true
+                };
+                
+                console.log('원본 파일 크기:', (file.size / 1024 / 1024).toFixed(2), 'MB');
+                processedFile = await imageCompression(file, options);
+                console.log('압축 후 파일 크기:', (processedFile.size / 1024 / 1024).toFixed(2), 'MB');
+                
+                if (processedFile.size < file.size) {
+                    alert(`이미지가 압축되었습니다. (${(file.size / 1024 / 1024).toFixed(2)}MB → ${(processedFile.size / 1024 / 1024).toFixed(2)}MB)`);
+                }
+            } catch (compressionError) {
+                console.warn('이미지 압축 실패, 원본 파일 사용:', compressionError);
+                processedFile = file;
+            }
+        }
+        
+        // 파일 크기 체크 (50MB = 52428800 bytes)
+        const maxSize = 50 * 1024 * 1024; // 50MB
+        if (processedFile.size > maxSize) {
+            alert(`파일 크기가 너무 큽니다. 최대 50MB까지 업로드 가능합니다. (현재: ${(processedFile.size / 1024 / 1024).toFixed(2)}MB)`);
+            return;
+        }
+        
+        const filename = encodeURIComponent(processedFile.name || file.name);
         
         // 1. Presigned URL 가져오기
         let res = await fetch('/api/imageUpload?file=' + filename, {
@@ -119,7 +152,7 @@ export const handleImageUpload = async (file, idx, currentImageUrls, onUpdateIma
         Object.entries(uploadData.fields).forEach(([key, value]) => {
             formData.append(key, value);
         });
-        formData.append('file', file);
+        formData.append('file', processedFile);
         
         console.log('Uploading to S3 with form data:', formData);
         
