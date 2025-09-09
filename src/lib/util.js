@@ -181,7 +181,7 @@ export const handleImageUpload = async (file, idx, currentImageUrls, onUpdateIma
             newImageUrls[idx] = imageUrl;
             onUpdateImageUrls(newImageUrls);
             
-            alert('이미지 업로드가 완료되었습니다.');
+            //alert('이미지 업로드가 완료되었습니다.');
             return imageUrl;
         } else {
             const errorText = await uploadRes.text();
@@ -190,7 +190,7 @@ export const handleImageUpload = async (file, idx, currentImageUrls, onUpdateIma
         }
     } catch (error) {
         console.error('Image upload error:', error);
-        alert('이미지 업로드에 실패했습니다.');
+        //alert('이미지 업로드에 실패했습니다.');
         throw error;
     }
 };

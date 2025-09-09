@@ -194,11 +194,14 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
 
     }
 
-    
+    attachedFiles.forEach(file => {
+      console.log('file', file);
 
+      //두개의 파일 정보
 
-    return;
-
+      // file {file: File, name: 'ku.sql', url: 'https://aibizimpage.s3.ap-northeast-2.amazonaws.com/ku.sql', uploaded: true}
+      // file {file: File, name: 'ku.zip', url: 'https://aibizimpage.s3.ap-northeast-2.amazonaws.com/ku.zip', uploaded: true}
+    });
 
     console.log('dealerId', dealerId);    // 매입딜러 ID
     console.log('carKndCd', carKndCd);    // 차량 종류 코드
@@ -351,7 +354,10 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
       purDesc,                                                   // 매입설명
       ownrAddr1,                                                 // 주소
       ownrAddr2,                                                 // 상세주소
-      attachedFiles: attachedFiles.filter(f => f.uploaded).map(f => f.url), // 관련 서류 첨부 (업로드된 URL만)
+      attachedFiles: attachedFiles.map(file => ({
+        name: file.name,
+        url: file.url
+      })), // 관련 서류 첨부 (파일명과 URL)
       usrId: session?.usrId,                                     // 사용자 ID
       dealerId,                                                  // 딜러 코드
       parkingCd,                                                 // 주차위치 코드
