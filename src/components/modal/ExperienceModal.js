@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from 'next/image'
-import { checkBizID } from '../../../public/js/util.js'
+import { checkBizID } from '../../lib/util.js'
 
 
 export default function ExperienceRegistrationModal({ open = true, onClose, onPrint }) {

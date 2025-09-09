@@ -2,7 +2,7 @@
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
 import { updatePurchase } from "@/app/(main)/purchases/edit/[id]/api";
-import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '../../../../../../public/js/util.js'
+import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '../../../../../lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 
 export default function EditPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = [], carPurDetail = []}) {

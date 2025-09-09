@@ -1,14 +1,6 @@
 import DetailModalTrigger from "./DetailModalTrigger";
 
-export default function DetailPage(props) {
-
-
-    const carPurDetail = props.carPurDetail.data;
-    console.log('carPurDetail', carPurDetail);
-
-
-    const prsnSctCd = carPurDetail?.PRSN_SCT_CD;
-    console.log('prsnSctCd', prsnSctCd);
+export default function DetailPage({ session = null, carPurDetail = []}) {
 
     return (
         <main className="container container--page">
@@ -73,7 +65,7 @@ export default function DetailPage(props) {
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>{carPurDetail?.PRSN_SCT_CD === '0' ? '상사매입' : '고객위탁'}</td>
+              <td>{carPurDetail.PRSN_SCT_CD === '0' ? '상사매입' : '고객위탁'}</td>
 
               <th>차량명</th>
               <td>{carPurDetail.CAR_NM} ({carPurDetail.CAR_KND_CD})</td>

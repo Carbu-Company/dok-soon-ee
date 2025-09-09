@@ -1,7 +1,7 @@
 "use client";
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
-import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '../../../../../public/js/util.js'
+import { isValidResidentNumber, checkBizID, isValidCorporateNumber, handleImageUpload } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 
 export default function RegPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = []}) {
@@ -148,6 +148,23 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
   // 입력 항목 체크 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // 이미지 업로드 처리 래퍼 함수
+  const onImageUpload = async (e, idx) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // apiCall.js의 handleImageUpload 함수 호출
+    await handleImageUpload(
+        file, 
+        idx, 
+        saveData.imageUrls, 
+        (newImageUrls) => {
+            setSaveData({...saveData, imageUrls: newImageUrls});
+        }
+    );
+}
+
 
   // 주소 검색 핸들러
   const handleAddressSearch = () => {

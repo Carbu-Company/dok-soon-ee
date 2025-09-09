@@ -94,3 +94,71 @@ export function checkBizID(bizID) {
   return parseInt(bizID.charAt(9)) === remainder;
 }
 
+
+// 이미지 업로드 함수
+export const handleImageUpload = async (file, idx, currentImageUrls, onUpdateImageUrls) => {
+    try {
+        if (!file) return;
+        
+        const filename = encodeURIComponent(file.name);
+        
+        // 1. Presigned URL 가져오기
+        let res = await fetch('/api/imageUpload?file=' + filename, {
+            method: 'POST'
+        });
+        
+        if (!res.ok) {
+            throw new Error('Failed to get upload URL');
+        }
+        
+        const uploadData = await res.json();
+        console.log('Upload Data:', uploadData);
+        
+        // 2. S3에 파일 업로드
+        const formData = new FormData();
+        Object.entries(uploadData.fields).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
+        formData.append('file', file);
+        
+        console.log('Uploading to S3 with form data:', formData);
+        
+        const uploadRes = await fetch(uploadData.url, {
+            method: 'POST',
+            body: formData,
+        });
+        
+        console.log('Upload response status:', uploadRes.status);
+        
+        if (uploadRes.ok) {
+            // S3 업로드 후 실제 파일 URL 구성
+            const bucketName = 'aibizimpage'; // 임시 하드코딩
+            const region = 'ap-northeast-2';
+            // AWS SDK v3에서는 key가 fields에 없을 수 있음
+            const key = uploadData.fields.key || uploadData.key || filename;
+            
+            console.log('Bucket:', bucketName, 'Region:', region, 'Key:', key);
+            
+            const imageUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${key}`;
+            
+            console.log('Final image URL:', imageUrl);
+            
+            // 이미지 URL 업데이트 (콜백 함수 호출)
+            const newImageUrls = [...currentImageUrls];
+            newImageUrls[idx] = imageUrl;
+            onUpdateImageUrls(newImageUrls);
+            
+            alert('이미지 업로드가 완료되었습니다.');
+            return imageUrl;
+        } else {
+            const errorText = await uploadRes.text();
+            console.error('Upload failed:', errorText);
+            throw new Error('Failed to upload image');
+        }
+    } catch (error) {
+        console.error('Image upload error:', error);
+        alert('이미지 업로드에 실패했습니다.');
+        throw error;
+    }
+};
+

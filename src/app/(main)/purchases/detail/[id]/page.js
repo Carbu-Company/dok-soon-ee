@@ -25,6 +25,7 @@ export default async function Detail({ params }) {
 
   //console.log(id);
   console.log('carPurDetail', carPurDetail);
+  console.log('carPurDetail.data-------------dfsfsf-----------------------------------------');
 
   return <DetailPage session={session}
                      carPurDetail={carPurDetail}
