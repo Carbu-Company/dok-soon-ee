@@ -53,10 +53,11 @@ export default function ListPage(props) {
     // 매입취소/삭제 모달 관련 state
     const [isPurchaseRemoveModalOpen, setIsPurchaseRemoveModalOpen] = useState(false);
     const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
+    const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    console.log(carList);
+    //console.log(carList);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 페이지네이션 영역
@@ -243,8 +244,9 @@ export default function ListPage(props) {
     };
 
     // 매입취소/삭제 모달 관련 핸들러
-    const handlePurchaseRemoveModalOpen = (car) => {
+    const handlePurchaseRemoveModalOpen = (car, type) => {
       setSelectedCarForRemove(car);
+      setSelectedCarTypeForRemove(type);
       setIsPurchaseRemoveModalOpen(true);
     };
 
@@ -1276,7 +1278,7 @@ export default function ListPage(props) {
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                handlePurchaseRemoveModalOpen(car);
+                                handlePurchaseRemoveModalOpen(car, 'cancel');
                               }}
                               style={{ border: 'none', background: 'none', padding: 0, color: 'inherit', cursor: 'pointer', width: '100%', textAlign: 'left' }}
                             >
@@ -1289,7 +1291,7 @@ export default function ListPage(props) {
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                handlePurchaseRemoveModalOpen(car);
+                                handlePurchaseRemoveModalOpen(car, 'delete');
                               }}
                               style={{ border: 'none', background: 'none', padding: 0, color: 'inherit', cursor: 'pointer', width: '100%', textAlign: 'left' }}
                             >
@@ -1381,6 +1383,8 @@ export default function ListPage(props) {
 
         {/* 매입취소/삭제 모달 */}
         <PurchaseRemoveModal
+          car={selectedCarForRemove}
+          flagType={selectedCarTypeForRemove}
           open={isPurchaseRemoveModalOpen}
           onClose={handlePurchaseRemoveModalClose}
           onConfirm={handlePurchaseRemoveConfirm}

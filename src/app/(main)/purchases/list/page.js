@@ -33,10 +33,6 @@ async function searchPurchasesSummary(searchParamsWithPage) {
   try {
     const result = await getPurchasesSummary(searchParamsWithPage);
 
-    console.log('서버 액션 결과*******************:', { 
-      totalCount: result?.data?.totalCount,
-    });
-
     return result;
   } catch (error) {
     console.error('검색 중 오류 발생:', error);

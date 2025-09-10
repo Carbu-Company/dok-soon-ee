@@ -1,6 +1,7 @@
 "use client";
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber, handleImageUpload } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 
@@ -149,6 +150,8 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const router = useRouter();
+
   // 주소 검색 핸들러
   const handleAddressSearch = () => {
     openPostcodeSearch((addressData) => {
@@ -236,8 +239,6 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
     console.log('fctCndcYn', fctCndcYn);    // 사실확인서
     console.log('attachedFiles', attachedFiles);    // 관련 서류 첨부
     console.log('parkKeyNo', parkKeyNo);    // Key번호
-
-
 
     // 매입딜러
     if(!dealerId) {
@@ -378,12 +379,17 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
       });
       const res = await response.json();
       
-      alert('신청 승인 되었습니다.'); // 테스트용 알림
+      alert('매입차량 등록 되었습니다.'); // 테스트용 알림
       setLoading(false);
-      return { success: true, res, error: null };
+      if (res.success) {
+        router.push('/purchases/list');
+        return { success: true, res, error: null };
+      } else {
+        throw new Error(res.message || '매입차량 등록에 실패했습니다');
+      }
     } catch (error) {
       setError(error.message);
-      alert('신청 승인 등록 중 오류가 발생했습니다.'); // 테스트용 알림
+      alert('매입차량 등록 중 오류가 발생했습니다.'); // 테스트용 알림
       setLoading(false);
       return { success: false, res: [], error: error.message };
     }
