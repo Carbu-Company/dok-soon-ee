@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import DetailPage from "@/app/(main)/purchases/detail/[id]/DetailPage";
-import { getSuggestOne } from "@/app/(main)/purchases/detail/[id]/api";
+import { getSuggestOne, getInventoryFinanceStatus } from "@/app/(main)/purchases/detail/[id]/api";
 
 export default async function Detail({ params }) {
   const cookieStore = await cookies();
@@ -21,13 +21,18 @@ export default async function Detail({ params }) {
 
   // 차량 등록 번호
   const { id } = await params;
+  // 매입차량 정보
   const carPurDetail = await getSuggestOne(id);
+  // 재고금융 이용 현황
+  const inventoryFinanceStatus = await getInventoryFinanceStatus(session.agentId);
+
 
   //console.log(id);
-  console.log('carPurDetail', carPurDetail);
-  console.log('carPurDetail.data-------------dfsfsf-----------------------------------------');
+  //console.log('carPurDetail', carPurDetail);
+  //console.log('carPurDetail.data-------------dfsfsf-----------------------------------------');
 
   return <DetailPage session={session}
                      carPurDetail={carPurDetail}
+                     inventoryFinanceStatus={inventoryFinanceStatus}
    />;
 }

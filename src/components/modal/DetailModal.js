@@ -2,7 +2,9 @@
 import Image from 'next/image';
 import React from 'react';
 
-export default function DetailModal({ open = true, onClose = () => {}, onPrint = () => {} }) {
+export default function DetailModal(props) {
+  const {car : carData, open = true, onClose = () => {}, onPrint = () => {}} = props;
+
   return (
     <div className={`modal ${open ? "modal--open" : ""}`} role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
       <div className="modal__container">
@@ -45,19 +47,19 @@ export default function DetailModal({ open = true, onClose = () => {}, onPrint =
               <tbody>
                 <tr>
                   <th>제시구분</th>
-                  <td>상사매입</td>
+                  <td>{carData?.PRSN_SCT_CD === '0' ? '상사매입' : '고객위탁'}</td>
                   <th>차량명</th>
-                  <td>그랜저</td>
+                  <td>{carData?.CAR_NM || '-'}</td>
                   <th>차량번호(매입후)</th>
-                  <td>123가1234</td>
+                  <td>{carData?.CAR_NO || '-'}</td>
                 </tr>
                 <tr>
                   <th>매입딜러</th>
-                  <td>홍길동</td>
+                  <td>{carData?.DLR_NM || '-'}</td>
                   <th>매입일</th>
-                  <td>2025-08-01</td>
+                  <td>{carData?.CAR_PUR_DT || '-'}</td>
                   <th>차량번호(매입전)</th>
-                  <td>123허1234</td>
+                  <td>{carData?.PUR_BEF_CAR_NO || '-'}</td>
                 </tr>
               </tbody>
             </table>
@@ -77,57 +79,57 @@ export default function DetailModal({ open = true, onClose = () => {}, onPrint =
               <tbody>
                 <tr>
                   <th>매입금액</th>
-                  <td>100,000,000원</td>
+                  <td>{carData?.PUR_AMT.toLocaleString() || '-'}원</td>
                   <th>상사매입비</th>
-                  <td>165,000원 / 2025-08-01</td>
+                  <td>{carData?.AGENT_PUR_CST.toLocaleString() || '-'}원 / {carData?.AGENT_PUR_CST_PAY_DT || '-'}</td>
                   <th>취득세</th>
-                  <td>300,000원</td>
+                  <td>{carData?.GAIN_TAX.toLocaleString() || '-'}원</td>
                 </tr>
                 <tr>
                   <th>계약서번호</th>
-                  <td>343543543543</td>
+                  <td>{carData?.CTSH_NO || '-'}</td>
                   <th>이전일</th>
-                  <td>2025-07-25</td>
+                  <td>{carData?.CAR_REG_DT || '-'}</td>
                   <th>매도자(전소유자)</th>
-                  <td>개인-홍길순</td>
+                  <td>[{carData?.OWNR_TP_CD === '0' ? '개인' : '법인'}] {carData?.OWNR_NM}</td>
                 </tr>
                 <tr>
                   <th>주민(법인)등록번호</th>
-                  <td>999999-2******</td>
+                  <td>{carData?.OWNR_SSN?.slice(0, -6) + '******'}</td>
                   <th>사업자등록번호</th>
-                  <td>111-11-11111</td>
+                  <td>{carData?.OWNR_BRNO || '-'}</td>
                   <th>연락처</th>
-                  <td>010-12**-**78</td>
+                  <td>{carData?.OWNR_PHON || '-'}</td>
                 </tr>
                 <tr>
                   <th>주소</th>
-                  <td>경기 수원시 팔달구</td>
-                  <th></th>
-                  <td></td>
-                  <th></th>
-                  <td></td>
+                  <td colSpan={5} style={{ textAlign: 'left', paddingLeft: '42px' }}>({carData?.OWNR_ZIP}) {carData?.OWNR_ADDR1} {carData?.OWNR_ADDR2}</td>
                 </tr>
                 <tr>
                   <th>매입(세금)계산서</th>
-                  <td></td>
+                  <td>{carData?.TXBL_RCV_YN === 'E' ? '해당없음' : 
+                   carData?.TXBL_RCV_YN === 'Y' ? '수취' :
+                   carData?.TXBL_RCV_YN === 'N' ? '미수취' : ''}</td>
                   <th>매입계산서발행일</th>
-                  <td></td>
+                  <td>{carData?.TXBL_ISSU_DT || '-'}</td>
                   <th>사실확인서</th>
-                  <td></td>
+                  <td>{carData?.FCT_CNDC_YN === 'E' ? '해당없음' : 
+                   carData?.FCT_CNDC_YN === 'Y' ? '수취' :
+                   carData?.FCT_CNDC_YN === 'N' ? '미수취' : ''}</td>
                 </tr>
                 <tr>
                   <th>조합제시메모</th>
-                  <td colSpan={5}></td>
+                  <td colSpan={5}>{carData?.COMB_PRSN_MEMO || '-'}</td>
                 </tr>
                 <tr>
                   <th>특이사항</th>
-                  <td colSpan={5}></td>
+                  <td colSpan={5}>{carData?.PUR_DESC || '-'}</td>
                 </tr>
                 <tr>
                   <th>주차위치</th>
-                  <td>위치코드-위치내용</td>
+                  <td>{carData?.PARK_ZON_NM || '-'} - {carData?.PARK_ZON_DESC || '-'}</td>
                   <th>Key번호</th>
-                  <td>1256</td>
+                  <td>{carData?.PARK_KEY_NO || '-'}</td>
                   <th></th>
                   <td></td>
                 </tr>

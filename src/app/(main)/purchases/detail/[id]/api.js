@@ -1,6 +1,6 @@
-export const getSuggestOne = async (mgtKey) => {
+export const getSuggestOne = async (car_regid) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getSuggestDetailNew?car_regid=${mgtKey}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getSuggestDetailNew?car_regid=${car_regid}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -19,3 +19,15 @@ export const getSuggestOne = async (mgtKey) => {
         throw error;
     }
 };
+
+
+/* 재고금융 이용 현황 */
+export const getInventoryFinanceStatus = async (agent_id) => {
+    try {
+      const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getInventoryFinanceStatus?agent_id=${agent_id}`).then(res => res.json());
+      return { success: true, data, error: null };
+    } catch (error) {
+      console.error("재고금융 조회 오류:", error);
+      return { success: false, data: [], error: error.message };
+    }
+  };

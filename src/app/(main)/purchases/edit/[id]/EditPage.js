@@ -397,8 +397,8 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                       <input 
                         type="radio" 
                         name="prsnSctCd" 
-                        value="0" 
-                        defaultChecked
+                        value="0"
+                        checked={prsnSctCd === '0'}
                         onChange={(e) => setPrsnSctCd(e.target.value)}
                       />
                       <span className="form-option__title">상사매입</span>
@@ -410,6 +410,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                         type="radio" 
                         name="prsnSctCd" 
                         value="1"
+                        checked={prsnSctCd === '1'}
                         onChange={(e) => setPrsnSctCd(e.target.value)}
                       />
                       <span className="form-option__title">고객위탁</span>

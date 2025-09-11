@@ -2,6 +2,8 @@ import DetailModalTrigger from "./DetailModalTrigger";
 
 export default function DetailPage({ session = null, carPurDetail = []}) {
 
+    console.log('carPurDetail', carPurDetail);
+
     return (
         <main className="container container--page">
       <div className="container__head">
@@ -68,10 +70,13 @@ export default function DetailPage({ session = null, carPurDetail = []}) {
               <td>{carPurDetail.PRSN_SCT_CD === '0' ? '상사매입' : '고객위탁'}</td>
 
               <th>차량명</th>
-              <td>{carPurDetail.CAR_NM} ({carPurDetail.CAR_KND_CD})</td>
+              <td>{carPurDetail.CAR_NM} ({carPurDetail.CAR_KND_NM})</td>
 
               <th>차량번호</th>
-              <td>{carPurDetail.CAR_NO} ({carPurDetail.PUR_BEF_CAR_NO})</td>  
+              <td>
+                {carPurDetail.CAR_NO} <br />
+                (매입전 : {carPurDetail.PUR_BEF_CAR_NO})
+              </td>  
 
               <th>매입딜러</th>
               <td>{carPurDetail.DLR_NM}</td>
@@ -104,7 +109,8 @@ export default function DetailPage({ session = null, carPurDetail = []}) {
               <th>매입금액</th>
               <td>{carPurDetail.PUR_AMT.toLocaleString()}원</td>
               <th>상사매입비</th>
-              <td>{carPurDetail.AGENT_PUR_CST.toLocaleString()}원 (입금일 : {carPurDetail.AGENT_PUR_CST_PAY_DT})</td>
+              <td>{carPurDetail.AGENT_PUR_CST.toLocaleString()}원 <br />
+              (입금일 : {carPurDetail.AGENT_PUR_CST_PAY_DT})</td>
               <th>취득세</th>
               <td>{carPurDetail.GAIN_TAX.toLocaleString()}원</td>
               <th>계약서번호</th>
@@ -114,9 +120,9 @@ export default function DetailPage({ session = null, carPurDetail = []}) {
               <th>이전일</th>
               <td>{carPurDetail.CAR_REG_DT}</td>
               <th>매도자(전소유자)</th>
-              <td>{carPurDetail.OWNR_TP_CD === '0' ? '개인' : '법인'} - {carPurDetail.OWNR_NM}</td>
+              <td>[{carPurDetail.OWNR_TP_CD === '0' ? '개인' : '법인'}] {carPurDetail.OWNR_NM}</td>
               <th>주민(법인)등록번호</th>
-              <td>{carPurDetail.OWNR_SSN}</td>
+              <td>{carPurDetail.OWNR_SSN?.slice(0, -6) + '******'}</td>
               <th>사업자등록번호</th>
               <td>{carPurDetail.OWNR_BRNO}</td>  
             </tr>
@@ -126,7 +132,7 @@ export default function DetailPage({ session = null, carPurDetail = []}) {
               <th>e메일주소</th>
               <td>{carPurDetail.OWNR_EMAIL}</td>
               <th>주소</th>
-              <td colSpan={3}>{carPurDetail.OWNR_ADDR1} {carPurDetail.OWNR_ADDR2}</td>
+              <td colSpan={3} style={{ textAlign: 'left' }}>({carPurDetail.OWNR_ZIP}) {carPurDetail.OWNR_ADDR1} {carPurDetail.OWNR_ADDR2}</td>
             </tr>
             <tr>
               <th>매입(세금)계산서</th>
@@ -156,7 +162,7 @@ export default function DetailPage({ session = null, carPurDetail = []}) {
             </tr>
             <tr>
               <th>주차위치</th>
-              <td>{carPurDetail.PARK_ZON_CD}-{carPurDetail.PARK_ZON_DESC}</td>
+              <td>{carPurDetail.PARK_ZON_NM}-{carPurDetail.PARK_ZON_DESC}</td>
               <th>Key번호</th>
               <td>{carPurDetail.PARK_KEY_NO}</td>
               <th></th>
@@ -167,7 +173,7 @@ export default function DetailPage({ session = null, carPurDetail = []}) {
           </tbody>
         </table>
         <div className="table-wrap__utils">
-          <DetailModalTrigger />
+          <DetailModalTrigger car={carPurDetail} />
         </div>
       </div>
 
