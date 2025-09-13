@@ -1,11 +1,12 @@
 import DetailModalTrigger from "./DetailModalTrigger";
 
-export default function DetailPage({ session = null, carPurDetail = []}) {
+export default function DetailPage({ session = null, carPurDetail = [], carLoanInfo = [] }) {
 
-    console.log('carPurDetail', carPurDetail);
+    //console.log('carPurDetail', carPurDetail);
+    console.log('carLoanInfo', carLoanInfo);
 
     return (
-        <main className="container container--page">
+        <main className="container container--page"> 
       <div className="container__head">
         <h2 className="container__title">매입차량 상세보기</h2>
 

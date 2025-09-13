@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber, handleImageUpload } from '@/lib/util.js'
+import { getAcqTax } from '@/app/(main)/common/script.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 
 export default function RegPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = []}) {
@@ -25,6 +26,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
 
   // 제시구분 선택 상태 관리 (옵션버튼)
   const [prsnSctCd, setPrsnSctCd] = useState('0');
+
 
   // 매입금액 선택 상태 관리
   const [purAmt, setPurAmt] = useState('0');
@@ -149,6 +151,24 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
   // 입력 항목 체크 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // 제시구분 변경시 취득세 계산
+  useEffect(() => {
+    if (prsnSctCd === '0') {
+      if (purAmt !== '0' && carKndCd !== '') {
+        const taxAmount = getAcqTax(purAmt, carKndCd);
+        setGainTax(taxAmount);
+
+        console.log('taxAmount', taxAmount);
+      }
+      else {
+        setGainTax('0');
+      }
+    }
+    else {
+      setGainTax('0');
+    }
+  }, [prsnSctCd, purAmt, carKndCd]);
 
   const router = useRouter();
 

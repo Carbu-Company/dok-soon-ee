@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import DetailPage from "@/app/(main)/purchases/detail/[id]/DetailPage";
-import { getSuggestOne, getInventoryFinanceStatus } from "@/app/(main)/purchases/detail/[id]/api";
+import { getSuggestOne, getCarLoanInfo } from "@/app/(main)/purchases/detail/[id]/api";
 
 export default async function Detail({ params }) {
   const cookieStore = await cookies();
@@ -23,8 +23,11 @@ export default async function Detail({ params }) {
   const { id } = await params;
   // 매입차량 정보
   const carPurDetail = await getSuggestOne(id);
-  // 재고금융 이용 현황
-  const inventoryFinanceStatus = await getInventoryFinanceStatus(session.agentId);
+  // 재고금융 대출 현황 (에러 발생 시 빈 배열 반환)
+  const carLoanInfo = await getCarLoanInfo(id).catch(error => {
+    console.error('재고금융 정보 조회 실패:', error);
+    return { success: false, data: [], error: error.message };
+  }); 
 
 
   //console.log(id);
@@ -33,6 +36,9 @@ export default async function Detail({ params }) {
 
   return <DetailPage session={session}
                      carPurDetail={carPurDetail}
-                     inventoryFinanceStatus={inventoryFinanceStatus}
+                     carLoanInfo={carLoanInfo}
+
+
+
    />;
 }
