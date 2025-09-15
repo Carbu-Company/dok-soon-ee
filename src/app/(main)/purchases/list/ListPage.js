@@ -80,12 +80,11 @@ export default function ListPage(props) {
     // listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
     // 자동 검색 비활성화
     useEffect(() => {
-        if (pageSize !== listCount) {
-            setPageSize(listCount);
-            // 페이지 크기가 변경되면 첫 페이지로 이동하고 새로 검색
-            setTimeout(() => handleSearch(1), 0); // 자동 검색 비활성화
-        }
-    }, [listCount]);
+        setPageSize(listCount);
+        handleSearch(1);
+        console.log('pageSize', pageSize);
+        console.log('listCount', listCount);
+    }, [ordItem, ordAscDesc, listCount]);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 상세 검색 영역
@@ -140,7 +139,7 @@ export default function ListPage(props) {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // 기본 파라미터 (동적으로 생성)
-    const getDefaultParams = (pageNum = currentPage) => ({
+    const getDefaultParams = (pageNum = currentPage, pageSize = listCount) => ({
       carAgent: props.session?.agentId,
       page: pageNum,
       pageSize: pageSize
@@ -179,30 +178,31 @@ export default function ListPage(props) {
             ...searchParams,
           };
 
-          console.log('서버 액션 호출 파라미터:', searchParamsWithPage);
+          //console.log('서버 액션 호출 파라미터:', searchParamsWithPage);
           const result = await searchAction(searchParamsWithPage);
-          console.log('서버 액션 응답:', result);
+          //console.log('서버 액션 응답:', result);
 
           if (result && result.success) {
-            const responseData = result.data?.carlist || [];
-            const paginationInfo = result.data?.pagination || {};
+
+
+            //console.log('result.data', result.data);
+            const responseData = result.data?.list?.carlist || [];
+            const paginationInfo = result.data?.list?.pagination || {};
+            const summaryData = result.data?.summary || [];
             
-            console.log('응답 데이터:', { 
-              responseDataLength: responseData.length, 
-              paginationInfo 
-            });
+            // console.log('응답 데이터:', { 
+            //   responseDataLength: responseData.length, 
+            //   paginationInfo,
+            //   summaryData
+            // });
             
             setCarList(responseData);
             setPagination(paginationInfo);
+            setPurchasesSummary(summaryData);
             
             // 서버에서 제공하는 페이지네이션 정보 사용
             setTotalPages(paginationInfo.totalPages || 1);
             setCurrentPage(paginationInfo.currentPage || pageNum);
-          } else if (result && Array.isArray(result)) {
-            // 일부 구현은 배열을 직접 반환할 수 있음
-            setCarList(result || []);
-            setTotalPages(Math.ceil(result.length / pageSize) || 1);
-            setCurrentPage(pageNum);
           } else {
             alert('검색 중 오류가 발생했습니다: ' + (result?.error || 'unknown'));
           }
@@ -1242,8 +1242,8 @@ export default function ListPage(props) {
             {carList && carList.length > 0 ? (
               carList.map((car, index) => (
                 <tr key={`${car.CAR_REG_ID}-${index}`} className="hover:bg-purple-900/10 cursor-pointer">
-                  <td>{car.CAR_REG_DT}</td>
-                  <td>상사</td>
+                  <td>{car.CAR_PUR_DT}</td>
+                <td>{car.PRSN_SCT_CD === '0' ? '상사' : <span style={{color: 'red'}}>고객</span>}</td>
                   <td>{car.CAR_NO}</td>
                   <td>{car.CAR_NM}</td>
                   <td>{car.PUR_AMT.toLocaleString()}</td>

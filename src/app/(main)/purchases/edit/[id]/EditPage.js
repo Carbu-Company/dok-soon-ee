@@ -1,37 +1,68 @@
 "use client";
 import Image from 'next/image'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { updatePurchase } from "@/app/(main)/purchases/edit/[id]/api";
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '../../../../../lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
+import { getAcqTax } from '@/app/(main)/common/script.js'
 
-export default function EditPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = [], carPurDetail = []}) {
+// ===== 상수 정의 =====
+const OWNER_TYPE = {
+  INDIVIDUAL: '001', // 개인
+  CORPORATION: '002' // 법인
+};
 
-  console.log('carPurDetail', carPurDetail);
+const PRESENTATION_TYPE = {
+  COMPANY_PURCHASE: '0', // 상사매입
+  CUSTOMER_CONSIGNMENT: '1' // 고객위탁
+};
+
+const EMAIL_DOMAINS = [
+  'gmail.com',
+  'daum.net', 
+  'nate.com'
+];
+
+const TAX_RECEIPT_STATUS = {
+  RECEIVED: 'Y',      // 수취
+  NOT_RECEIVED: 'N',  // 미수취
+  NOT_APPLICABLE: 'E' // 해당없음
+};
+
+// ===== 메인 컴포넌트 =====
+export default function EditPage({ 
+  session = null, 
+  dealerList = [], 
+  carKndList = [], 
+  evdcCdList = [], 
+  parkingLocationList = [], 
+  carPurDetail = [] 
+}) {
+  console.log('carPurDetail**********', carPurDetail);
   
-  // 매입딜러 선택 상태 관리 (콤보 박스)
+  // ===== 드롭다운 열림/닫힘 상태 =====
   const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
-  const [dealerId, setDealerId] = useState(carPurDetail.DLR_ID || '');
-
-  // 차량 종류 선택 상태 관리 (콤보 박스)
   const [isCarKndSelectOpen, setIsCarKndSelectOpen] = useState(false);
-  const [carKndCd, setCarKndCd] = useState(carPurDetail.CAR_KND_CD || '');
-
-  // 증빙종류 선택 상태 관리 (콤보 박스)
   const [isEvdcCdSelectOpen, setIsEvdcCdSelectOpen] = useState(false);
-  const [evdcCd, setEvdcCd] = useState(carPurDetail.PUR_EVDC_CD || '');
-
-  // 주차위치 선택 상태 관리 (콤보 박스)
   const [isParkingCdSelectOpen, setIsParkingCdSelectOpen] = useState(false);
+  const [isOwnrTpCdOpen, setIsOwnrTpCdOpen] = useState(false);
+  const [isEmailDomainOpen, setIsEmailDomainOpen] = useState(false);
+  const [isTxblRcvYnOpen, setIsTxblRcvYnOpen] = useState(false);
+  const [isFctCndcYnOpen, setIsFctCndcYnOpen] = useState(false);
+
+  // ===== 기본 정보 상태 =====
+  const [dealerId, setDealerId] = useState(carPurDetail.DLR_ID || '');
+  const [carKndCd, setCarKndCd] = useState(carPurDetail.CAR_KND_CD || '');
+  const [evdcCd, setEvdcCd] = useState(carPurDetail.PUR_EVDC_CD || '');
   const [parkingCd, setParkingCd] = useState(carPurDetail.PARK_ZON_CD || '');
+  const [prsnSctCd, setPrsnSctCd] = useState(carPurDetail.PRSN_SCT_CD || PRESENTATION_TYPE.COMPANY_PURCHASE);
 
-  // 제시구분 선택 상태 관리 (옵션버튼)
-  const [prsnSctCd, setPrsnSctCd] = useState(carPurDetail.PRSN_SCT_CD || '0'); 
-
-  // 매입금액 선택 상태 관리
+  // ===== 금액 관련 상태 =====
   const [purAmt, setPurAmt] = useState(carPurDetail?.PUR_AMT ? carPurDetail.PUR_AMT.toString() : '0');
   const [purSupPrc, setPurSupPrc] = useState(carPurDetail.PUR_SUP_PRC || 0);
   const [purVat, setPurVat] = useState(carPurDetail.PUR_VAT || 0);
+  const [agentPurCst, setAgentPurCst] = useState(carPurDetail.AGENT_PUR_CST || '0');
+  const [gainTax, setGainTax] = useState(carPurDetail.GAIN_TAX || '0');
 
   // 매입금액이 변경될 때 공급가액과 부가세 계산
   useEffect(() => {
@@ -62,121 +93,131 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
         setPurVat(0);
       }
     }
-  }, [purAmt, purSupPrc, purVat]);
+  }, [purAmt]); // purSupPrc, purVat 제거하여 무한 루프 방지
 
-  // 상사매입비 
-  const [agentPurCst, setAgentPurCst] = useState(carPurDetail.AGENT_PUR_CST || '0');
-
-  // 매입일 선택 상태 관리
+  // ===== 날짜 관련 상태 =====
   const [carPurDt, setCarPurDt] = useState(carPurDetail.CAR_PUR_DT || '');
-
-  // jQuery datepicker와 React state 연동을 위한 전역 콜백 등록
-  useEffect(() => {
-    // 전역 콜백 함수 등록
-    // dateText는 jQuery datepicker의 onSelect 이벤트에서 전달되는 선택된 날짜 값입니다.
-    // public/js/main.js 파일의 datepicker 초기화 코드에서 onSelect 콜백을 통해 전달됩니다.
-    window.updateCarPurDt = (dateText) => {
-      setCarPurDt(dateText);
-    };
-
-    // 컴포넌트 언마운트 시 정리
-    return () => {
-      delete window.updateCarPurDt;
-    };
-  }, []);
-
-  // 취득세 선택 상태 관리
-  const [gainTax, setGainTax] = useState(carPurDetail.GAIN_TAX || '0');
-
-  // 상사매입비 입금일 선택 상태 관리
   const [brokerageDate, setBrokerageDate] = useState(carPurDetail.AGENT_PUR_CST_PAY_DT || '');
-
-  // 이전일 선택 상태 관리
   const [carRegDt, setCarRegDt] = useState(carPurDetail.CAR_REG_DT || '');
-
-  // 발행일 선택 상태 관리
   const [txblIssuDt, setTxblIssuDt] = useState(carPurDetail.TXBL_ISSU_DT || '');
 
-  // 차량명 
+  // ===== 차량 정보 상태 =====
   const [carNm, setCarNm] = useState(carPurDetail.CAR_NM || '');
-
-  // 차량번호(매입후) 선택 상태 관리
   const [carNo, setCarNo] = useState(carPurDetail.CAR_NO || '');
-
-  // 차량번호(매입전) 선택 상태 관리
   const [purBefCarNo, setPurBefCarNo] = useState(carPurDetail.PUR_BEF_CAR_NO || '');
 
-  // 고객명 선택 상태 관리
+  // ===== 고객 정보 상태 =====
   const [ownrNm, setOwnrNm] = useState(carPurDetail.OWNR_NM || '');
-
-  // 고객구분 선택 상태 관리
-  const [ownrTpCd, setOwnrTpCd] = useState(carPurDetail.OWNR_TP_CD || '001');
-  const [isOwnrTpCdOpen, setIsOwnrTpCdOpen] = useState(false);
-
-  // 계약서번호 선택 상태 관리
+  const [ownrTpCd, setOwnrTpCd] = useState(carPurDetail.OWNR_TP_CD || OWNER_TYPE.INDIVIDUAL);
   const [ctshNo, setCtshNo] = useState(carPurDetail.CTSH_NO || '');
-
-  // 주민(법인)등록번호 선택 상태 관리
   const [ownrSsn, setOwnrSsn] = useState(carPurDetail.OWNR_SSN || '');
-
-  // 연락처 선택 상태 관리
   const [ownrPhon, setOwnrPhon] = useState(carPurDetail.OWNR_PHON || '');
-
-  // e메일 주소 선택 상태 관리
-  const [ownrEmail, setOwnrEmail] = useState(carPurDetail.OWNR_EMAIL || '');
-
-  // e메일 도메인 선택 상태 관리
-  const [emailDomain, setEmailDomain] = useState(carPurDetail.OWNR_EMAIL_DOMAIN || '');
-  const [isEmailDomainOpen, setIsEmailDomainOpen] = useState(false);
-
-  // 우편번호
-  const [ownrZip, setOwnrZip] = useState(carPurDetail.OWNR_ZIP || '');
-
-  // 주소1 값 저장
-  const [ownrAddr1, setOwnrAddr1] = useState(carPurDetail.OWNR_ADDR1 || '');
-  // 주소2 값 저장
-  const [ownrAddr2, setOwnrAddr2] = useState(carPurDetail.OWNR_ADDR2 || '');
-
-  // 사업자등록번호 값 저장
   const [ownrBrno, setOwnrBrno] = useState(carPurDetail.OWNR_BRNO || '');
 
-  // 세금 납부일 값 저장
+  // ===== 이메일 정보 상태 =====
+  const [ownrEmail, setOwnrEmail] = useState(carPurDetail.OWNR_EMAIL || '');
+  const [emailDomain, setEmailDomain] = useState(carPurDetail.OWNR_EMAIL_DOMAIN || '');
+
+  // ===== 주소 정보 상태 =====
+  const [ownrZip, setOwnrZip] = useState(carPurDetail.OWNR_ZIP || '');
+  const [ownrAddr1, setOwnrAddr1] = useState(carPurDetail.OWNR_ADDR1 || '');
+  const [ownrAddr2, setOwnrAddr2] = useState(carPurDetail.OWNR_ADDR2 || '');
+
+  // ===== 세금 및 서류 관련 상태 =====
   const [txblRcvYn, setTxblRcvYn] = useState(carPurDetail.TXBL_RCV_YN || '');
-  const [isTxblRcvYnOpen, setIsTxblRcvYnOpen] = useState(false);
-
-  // 특이사항 선택 상태 관리
-  const [purDesc, setPurDesc] = useState(carPurDetail.PUR_DESC || '');
-
-  // 주차위치 설명 선택 상태 관리
-  const [parkingLocationDesc, setParkingLocationDesc] = useState(carPurDetail.PARK_ZON_DESC || '');
-
-  // Key번호 선택 상태 관리
-  const [parkKeyNo, setParkKeyNo] = useState(carPurDetail.PARK_KEY_NO || '');
-
-  // 사실확인서 선택 상태 관리
   const [fctCndcYn, setFctCndcYn] = useState(carPurDetail.FCT_CNDC_YN || '');
-  const [isFctCndcYnOpen, setIsFctCndcYnOpen] = useState(false);
 
-  // 관련 서류 첨부 상태 관리
+  // ===== 기타 정보 상태 =====
+  const [purDesc, setPurDesc] = useState(carPurDetail.PUR_DESC || '');
+  const [parkingLocationDesc, setParkingLocationDesc] = useState(carPurDetail.PARK_ZON_DESC || '');
+  const [parkKeyNo, setParkKeyNo] = useState(carPurDetail.PARK_KEY_NO || '');
   const [attachedFiles, setAttachedFiles] = useState([]);
 
-  // 입력 항목 체크 
+  // ===== UI 상태 =====
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // ===== 계산 로직 (useEffect) =====
+  // 제시구분과 차량 종류 변경시 상사매입비 설정
+  useEffect(() => {
+    if (prsnSctCd === PRESENTATION_TYPE.COMPANY_PURCHASE) {
+      // 상사매입이면...
+      if (carKndCd !== '') {        
+        const carKndValue = carKndCd.split('|')[1];
+        setAgentPurCst(carKndValue);
+      } else {
+        setAgentPurCst('0');
+      }
+    } else {
+      // 고객위탁이면...
+      setAgentPurCst('0');
+    }
+  }, [prsnSctCd, carKndCd]);
+
+  // 매입금액과 차량 종류 변경시 취득세 계산 (상사매입일 때만)
+  useEffect(() => {
+    if (prsnSctCd === PRESENTATION_TYPE.COMPANY_PURCHASE && carKndCd !== '') {
+      const carKndCdValue = carKndCd.split('|')[0];
+      const taxAmount = getAcqTax(purAmt, carKndCdValue);
+      setGainTax(taxAmount);
+    } else {
+      setGainTax('0');
+    }
+  }, [prsnSctCd, purAmt, carKndCd]);
+
+  // ===== 이벤트 핸들러 =====
   // 주소 검색 핸들러
-  const handleAddressSearch = () => {
+  const handleAddressSearch = useCallback(() => {
     openPostcodeSearch((addressData) => {
       setOwnrZip(addressData.zonecode);
       setOwnrAddr1(addressData.address);
       setOwnrAddr2(''); // 상세주소는 초기화
     });
-  };
+  }, []);
+
+  // 드롭다운 선택 핸들러들
+  const handleDealerSelect = useCallback((dealerId) => {
+    setDealerId(dealerId);
+    setIsDealerSelectOpen(false);
+  }, []);
+
+  const handleCarKindSelect = useCallback((carKndCd) => {
+    setCarKndCd(carKndCd);
+    setIsCarKndSelectOpen(false);
+  }, []);
+
+  const handleOwnerTypeSelect = useCallback((ownrTpCd) => {
+    setOwnrTpCd(ownrTpCd);
+    setIsOwnrTpCdOpen(false);
+  }, []);
+
+  const handleEvidenceSelect = useCallback((evdcCd) => {
+    setEvdcCd(evdcCd);
+    setIsEvdcCdSelectOpen(false);
+  }, []);
+
+  const handleEmailDomainSelect = useCallback((domain) => {
+    setEmailDomain(domain);
+    setIsEmailDomainOpen(false);
+  }, []);
+
+  const handleTaxReceiptSelect = useCallback((status) => {
+    setTxblRcvYn(status);
+    setIsTxblRcvYnOpen(false);
+  }, []);
+
+  const handleFactConfirmSelect = useCallback((status) => {
+    setFctCndcYn(status);
+    setIsFctCndcYnOpen(false);
+  }, []);
+
+  const handleParkingSelect = useCallback((parkingCd) => {
+    setParkingCd(parkingCd);
+    setIsParkingCdSelectOpen(false);
+  }, []);
 
   const handleSubmit = async () => {
-    console.log('formValues============================');
-    
-    
+
     setLoading(true);
     setError(null);
 
@@ -250,7 +291,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
       alert('차량 유형을 선택해주세요.');
       return;
     }
-
+    
     // 차량명
     if(!carNm) {
       alert('차량명을 입력해주세요.');
@@ -285,10 +326,10 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
     if(ownrSsn) {
 
       // 주민번호 체크 
-      if(!isValidResidentNumber(ownrSsn) && ownrTpCd === '001') {
+      if(!isValidResidentNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.INDIVIDUAL) {
         alert('주민등록번호를 확인해주세요.');
         return;
-      } else if(!isValidCorporateNumber(ownrSsn) && ownrTpCd === '002') {
+      } else if(!isValidCorporateNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.CORPORATION) {
         alert('법인등록번호를 확인해주세요.');
         return;
       }
@@ -342,7 +383,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
       ctshNo,                                                     // 계약서번호
       carRegDt,                                                  // 이전일
     };
-    
+
+
+    console.log('formValues', formValues);
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updatePurchase`, {
@@ -397,8 +440,8 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                       <input 
                         type="radio" 
                         name="prsnSctCd" 
-                        value="0"
-                        checked={prsnSctCd === '0'}
+                        value={PRESENTATION_TYPE.COMPANY_PURCHASE}
+                        checked={prsnSctCd === PRESENTATION_TYPE.COMPANY_PURCHASE}
                         onChange={(e) => setPrsnSctCd(e.target.value)}
                       />
                       <span className="form-option__title">상사매입</span>
@@ -409,8 +452,8 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                       <input 
                         type="radio" 
                         name="prsnSctCd" 
-                        value="1"
-                        checked={prsnSctCd === '1'}
+                        value={PRESENTATION_TYPE.CUSTOMER_CONSIGNMENT}
+                        checked={prsnSctCd === PRESENTATION_TYPE.CUSTOMER_CONSIGNMENT}
                         onChange={(e) => setPrsnSctCd(e.target.value)}
                       />
                       <span className="form-option__title">고객위탁</span>
@@ -438,14 +481,14 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                   </button>
 
-                  <ul className="select__menu" style={{ display: isDealerSelectOpen ? 'block' : 'none' }}>
+                  <ul className={`select__menu ${isDealerSelectOpen ? 'active' : ''}`}>
                     <li 
                       key="default-dealer"
                       className={`select__option ${!dealerId ? 'select__option--selected' : ''}`}
                       data-value=""
-                      onClick={() => {
-                        setDealerId('');
-                        setIsDealerSelectOpen(false);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDealerSelect('');
                       }}
                     >선택</li>
                     {dealerList && dealerList.map((dealer) => (
@@ -453,9 +496,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                         key={`dealer-${dealer.USR_ID}`}
                         className={`select__option ${dealerId === dealer.USR_ID ? 'select__option--selected' : ''}`}
                         data-value={dealer.USR_ID}
-                        onClick={() => {
-                          setDealerId(dealer.USR_ID);
-                          setIsDealerSelectOpen(false);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDealerSelect(dealer.USR_ID);
                         }}
                       >{dealer.USR_NM}</li>
                     ))}
@@ -571,7 +614,7 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                       className="select__input" 
                       type="hidden" 
                       name="carKndCd" 
-                      value={carKndCd || ''} 
+                      value={carKndCd ? `${carKndCd}|0` : ''} 
                     />
                     <button 
                       className="select__toggle" 
@@ -579,28 +622,28 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                       onClick={() => setIsCarKndSelectOpen(!isCarKndSelectOpen)}
                     >
                       <span className="select__text">
-                        {carKndCd ? carKndList.find(c => c.CD === carKndCd)?.CD_NM || '선택' : '선택'}
+                        {carKndCd ? carKndList.find(c => c.CD === carKndCd.split('|')[0])?.CD_NM || '선택' : '선택'}
                       </span>
                       <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                     </button>
-                    <ul className="select__menu" style={{ display: isCarKndSelectOpen ? 'block' : 'none' }}>
+                    <ul className={`select__menu ${isCarKndSelectOpen ? 'active' : ''}`}>
                       <li 
                         key="default-carKnd"
                         className={`select__option ${!carKndCd ? 'select__option--selected' : ''}`}
                         data-value=""
-                        onClick={() => {
-                          setCarKndCd('');
-                          setIsCarKndSelectOpen(false);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCarKindSelect('');
                         }}
                       >선택</li>
                       {carKndList && carKndList.map((carKnd) => (
                         <li 
                           key={`carKnd-${carKnd.CD}`}
-                          className={`select__option ${carKndCd === carKnd.CD ? 'select__option--selected' : ''}`}
-                          data-value={carKnd.CD}
-                          onClick={() => {
-                            setCarKndCd(carKnd.CD);
-                            setIsCarKndSelectOpen(false);
+                          className={`select__option ${carKndCd === `${carKnd.CD}|${carKnd.CD_NM2}` ? 'select__option--selected' : ''}`}
+                          data-value={`${carKnd.CD}|${carKnd.CD_NM2}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCarKindSelect(`${carKnd.CD}|${carKnd.CD_NM2}`);
                           }}
                         >{carKnd.CD_NM}</li>
                       ))}
@@ -682,26 +725,26 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     onClick={() => setIsOwnrTpCdOpen(!isOwnrTpCdOpen)}
                   >
                     <span className="select__text">
-                      {ownrTpCd === '002' ? '법인' : '개인'}
+                      {ownrTpCd === OWNER_TYPE.CORPORATION ? '법인' : '개인'}
                     </span>
                     <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                   </button>
 
                   <ul className={`select__menu ${isOwnrTpCdOpen ? 'active' : ''}`}>
                     <li 
-                      className={`select__option ${ownrTpCd === '001' ? 'select__option--selected' : ''}`}
-                      onClick={() => {
-                        setOwnrTpCd('001');
-                        setIsOwnrTpCdOpen(false);
+                      className={`select__option ${ownrTpCd === OWNER_TYPE.INDIVIDUAL ? 'select__option--selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOwnerTypeSelect(OWNER_TYPE.INDIVIDUAL);
                       }}
                     >
                       개인
                     </li>
                     <li 
-                      className={`select__option ${ownrTpCd === '002' ? 'select__option--selected' : ''}`}
-                      onClick={() => {
-                        setOwnrTpCd('002');
-                        setIsOwnrTpCdOpen(false);
+                      className={`select__option ${ownrTpCd === OWNER_TYPE.CORPORATION ? 'select__option--selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOwnerTypeSelect(OWNER_TYPE.CORPORATION);
                       }}
                     >
                       법인
@@ -732,9 +775,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                   <ul className={`select__menu ${isEvdcCdSelectOpen ? 'active' : ''}`}>
                     <li 
                       className="select__option select__option--selected" 
-                      onClick={() => {
-                        setEvdcCd('');
-                        setIsEvdcCdSelectOpen(false);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEvidenceSelect('');
                       }}
                     >
                       선택
@@ -743,9 +786,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                       <li 
                         key={item.CD}
                         className={`select__option ${evdcCd === item.CD ? 'select__option--selected' : ''}`}
-                        onClick={() => {
-                          setEvdcCd(item.CD);
-                          setIsEvdcCdSelectOpen(false);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEvidenceSelect(item.CD);
                         }}
                       >
                         {item.CD_NM}
@@ -1009,32 +1052,21 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     <ul className={`select__menu ${isEmailDomainOpen ? 'active' : ''}`}>
                       <li 
                         className={`select__option ${!emailDomain ? 'select__option--selected' : ''}`}
-                        onClick={() => {
-                          setEmailDomain('');
-                          setIsEmailDomainOpen(false);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEmailDomainSelect('');
                         }}
                       >직접입력</li>
-                      <li 
-                        className={`select__option ${emailDomain === 'gmail.com' ? 'select__option--selected' : ''}`}
-                        onClick={() => {
-                          setEmailDomain('gmail.com');
-                          setIsEmailDomainOpen(false);
-                        }}
-                      >gmail.com</li>
-                      <li 
-                        className={`select__option ${emailDomain === 'daum.net' ? 'select__option--selected' : ''}`}
-                        onClick={() => {
-                          setEmailDomain('daum.net');
-                          setIsEmailDomainOpen(false);
-                        }}
-                      >daum.net</li>
-                      <li 
-                        className={`select__option ${emailDomain === 'nate.com' ? 'select__option--selected' : ''}`}
-                        onClick={() => {
-                          setEmailDomain('nate.com');
-                          setIsEmailDomainOpen(false);
-                        }}
-                      >nate.com</li>
+                      {EMAIL_DOMAINS.map((domain) => (
+                        <li 
+                          key={domain}
+                          className={`select__option ${emailDomain === domain ? 'select__option--selected' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEmailDomainSelect(domain);
+                          }}
+                        >{domain}</li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -1114,9 +1146,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     onClick={() => setIsTxblRcvYnOpen(!isTxblRcvYnOpen)}
                   >
                     <span className="select__text">
-                      {txblRcvYn === 'Y' ? '수취' : 
-                       txblRcvYn === 'N' ? '미수취' :
-                       txblRcvYn === 'E' ? '해당없음' : '선택'}
+                      {txblRcvYn === TAX_RECEIPT_STATUS.RECEIVED ? '수취' : 
+                       txblRcvYn === TAX_RECEIPT_STATUS.NOT_RECEIVED ? '미수취' :
+                       txblRcvYn === TAX_RECEIPT_STATUS.NOT_APPLICABLE ? '해당없음' : '선택'}
                     </span>
                     <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                   </button>
@@ -1124,30 +1156,30 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                   <ul className={`select__menu ${isTxblRcvYnOpen ? 'active' : ''}`}>
                     <li 
                       className={`select__option ${!txblRcvYn ? 'select__option--selected' : ''}`} 
-                      onClick={() => {
-                        setTxblRcvYn('');
-                        setIsTxblRcvYnOpen(false);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTaxReceiptSelect('');
                       }}
                     >선택</li>
                     <li 
-                      className={`select__option ${txblRcvYn === 'NA' ? 'select__option--selected' : ''}`}
-                      onClick={() => {
-                        setTxblRcvYn('E');
-                        setIsTxblRcvYnOpen(false);
+                      className={`select__option ${txblRcvYn === TAX_RECEIPT_STATUS.NOT_APPLICABLE ? 'select__option--selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTaxReceiptSelect(TAX_RECEIPT_STATUS.NOT_APPLICABLE);
                       }}
                     >해당없음</li>
                     <li 
-                      className={`select__option ${txblRcvYn === 'Y' ? 'select__option--selected' : ''}`}
-                      onClick={() => {
-                        setTxblRcvYn('Y');
-                        setIsTxblRcvYnOpen(false);
+                      className={`select__option ${txblRcvYn === TAX_RECEIPT_STATUS.RECEIVED ? 'select__option--selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTaxReceiptSelect(TAX_RECEIPT_STATUS.RECEIVED);
                       }}
                     >수취</li>
                     <li 
-                      className={`select__option ${txblRcvYn === 'N' ? 'select__option--selected' : ''}`}
-                      onClick={() => {
-                        setTxblRcvYn('N');
-                        setIsTxblRcvYnOpen(false);
+                      className={`select__option ${txblRcvYn === TAX_RECEIPT_STATUS.NOT_RECEIVED ? 'select__option--selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTaxReceiptSelect(TAX_RECEIPT_STATUS.NOT_RECEIVED);
                       }}
                     >미수취</li>
                   </ul>
@@ -1182,39 +1214,39 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     type="button"
                     onClick={() => setIsFctCndcYnOpen(!isFctCndcYnOpen)}
                   >
-                    <span className="select__text">{fctCndcYn === 'Y' ? '수취' : 
-                       fctCndcYn === 'N' ? '미수취' :
-                       fctCndcYn === 'E' ? '해당없음' : '선택'}</span>
+                    <span className="select__text">{fctCndcYn === TAX_RECEIPT_STATUS.RECEIVED ? '수취' : 
+                       fctCndcYn === TAX_RECEIPT_STATUS.NOT_RECEIVED ? '미수취' :
+                       fctCndcYn === TAX_RECEIPT_STATUS.NOT_APPLICABLE ? '해당없음' : '선택'}</span>
                     <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                   </button>
 
                   <ul className={`select__menu ${isFctCndcYnOpen ? 'active' : ''}`}>
                     <li 
                       className={`select__option ${!fctCndcYn ? 'select__option--selected' : ''}`}
-                      onClick={() => {
-                        setFctCndcYn('');
-                        setIsFctCndcYnOpen(false);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFactConfirmSelect('');
                       }}
                     >선택</li>
                     <li 
-                      className={`select__option ${fctCndcYn === 'NA' ? 'select__option--selected' : ''}`}
-                      onClick={() => {
-                        setFctCndcYn('E');
-                        setIsFctCndcYnOpen(false);
+                      className={`select__option ${fctCndcYn === TAX_RECEIPT_STATUS.NOT_APPLICABLE ? 'select__option--selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFactConfirmSelect(TAX_RECEIPT_STATUS.NOT_APPLICABLE);
                       }}
                     >해당없음</li>
                     <li 
-                      className={`select__option ${fctCndcYn === 'Y' ? 'select__option--selected' : ''}`}
-                      onClick={() => {
-                        setFctCndcYn('Y');
-                        setIsFctCndcYnOpen(false);
+                      className={`select__option ${fctCndcYn === TAX_RECEIPT_STATUS.RECEIVED ? 'select__option--selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFactConfirmSelect(TAX_RECEIPT_STATUS.RECEIVED);
                       }}
                     >수취</li>
                     <li 
-                      className={`select__option ${fctCndcYn === 'N' ? 'select__option--selected' : ''}`}
-                      onClick={() => {
-                        setFctCndcYn('N');
-                        setIsFctCndcYnOpen(false);
+                      className={`select__option ${fctCndcYn === TAX_RECEIPT_STATUS.NOT_RECEIVED ? 'select__option--selected' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFactConfirmSelect(TAX_RECEIPT_STATUS.NOT_RECEIVED);
                       }}
                     >미수취</li>
                   </ul>
@@ -1329,9 +1361,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                     <ul className={`select__menu ${isParkingCdSelectOpen ? 'active' : ''}`}>
                       <li 
                         className="select__option select__option--selected" 
-                        onClick={() => {
-                          setParkingCd('');
-                          setIsParkingCdSelectOpen(false);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleParkingSelect('');
                         }}
                       >
                         선택
@@ -1340,9 +1372,9 @@ export default function EditPage({ session = null, dealerList = [], carKndList =
                         <li 
                           key={item.CD}
                           className={`select__option ${parkingCd === item.CD ? 'select__option--selected' : ''}`}
-                          onClick={() => {
-                            setParkingCd(item.CD);
-                            setIsParkingCdSelectOpen(false);
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleParkingSelect(item.CD);
                           }}
                         >
                           {item.CD_NM}

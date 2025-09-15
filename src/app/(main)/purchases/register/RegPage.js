@@ -152,20 +152,28 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 제시구분 변경시 취득세 계산
+  // 제시구분 변경시 취득세 계산, 차량 종류 변경시 상사매입비 계산 
   useEffect(() => {
     if (prsnSctCd === '0') {
-      if (purAmt !== '0' && carKndCd !== '') {
-        const taxAmount = getAcqTax(purAmt, carKndCd);
+
+      // 상사매입이면...
+      if (carKndCd !== '') {
+        const carKndCdValue = carKndCd.split('|')[0];
+        const taxAmount = getAcqTax(purAmt, carKndCdValue);
         setGainTax(taxAmount);
 
-        console.log('taxAmount', taxAmount);
+        const carKndValue = carKndCd.split('|')[1];
+        setAgentPurCst(carKndValue);
       }
       else {
+        setAgentPurCst('0');
         setGainTax('0');
       }
     }
     else {
+
+      // 고객위탁이면...
+      setAgentPurCst('0');
       setGainTax('0');
     }
   }, [prsnSctCd, purAmt, carKndCd]);
@@ -647,9 +655,9 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
                         <li 
                           key={`carKnd-${carKnd.CD}`}
                           className={`select__option ${carKndCd === carKnd.CD ? 'select__option--selected' : ''}`}
-                          data-value={carKnd.CD}
+                          data-value={`${carKnd.CD}|${carKnd.CD_NM2}`}
                           onClick={() => {
-                            setCarKndCd(carKnd.CD);
+                            setCarKndCd(`${carKnd.CD}|${carKnd.CD_NM2}`);
                             setIsCarKndSelectOpen(false);
                           }}
                         >{carKnd.CD_NM}</li>

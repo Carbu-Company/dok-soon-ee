@@ -40,6 +40,32 @@ async function searchPurchasesSummary(searchParamsWithPage) {
   }
 }
 
+
+// Server Action 정의
+async function searchPurchasesListAndSummary(searchParamsWithPage) {
+  "use server";
+  
+  try {
+    const [listResult, summaryResult] = await Promise.all([
+      getPurchasesListNew(searchParamsWithPage),
+      getPurchasesSummary(searchParamsWithPage)
+    ]);
+
+    return {
+      success: listResult.success && summaryResult.success,
+      data: {
+        list: listResult.data,
+        summary: summaryResult.data
+      },
+      error: listResult.error || summaryResult.error
+    };
+  } catch (error) {
+    console.error('검색 중 오류 발생:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+
 export default async function Purchases() {
   /* 쿠키에서 세션 정보 가져오기
   {
@@ -80,7 +106,6 @@ export default async function Purchases() {
   };
 
   const purchasesList = await searchPurchasesList({ ...defaultParams, ...searchParams });
-
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const purchasesSummary = await searchPurchasesSummary({ ...defaultParams, ...searchParams });
@@ -89,7 +114,7 @@ export default async function Purchases() {
                    carList={purchasesList}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
-                   searchAction={searchPurchasesList}
+                   searchAction={searchPurchasesListAndSummary}
                    purchasesSummary={purchasesSummary}
    />;
 }
