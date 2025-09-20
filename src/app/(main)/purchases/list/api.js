@@ -14,9 +14,9 @@ export const getDealerList = async (carAgent) => {
 };
 
 
-export const getPurchasesListNew = async (params) => {
+export const getCarPurList = async (params) => {
     try {
-      const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getSuggestListNew`, {
+      const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarPurList`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,15 +25,15 @@ export const getPurchasesListNew = async (params) => {
       }).then(res => res.json());
       return { success: true, data, error: null };
     } catch (error) {
-      console.error("getPurchasesListNew Error:", error);
+      console.error("getCarPurList Error:", error); 
       return { success: false, data: [], error: error.message };
     }
   };
 
 
-export const getPurchasesSummary = async (params) => {
+export const getCarPurSummary = async (params) => {
   try {
-    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getSuggestSummary`, {
+    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarPurSummary`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ export const getPurchasesSummary = async (params) => {
     }).then(res => res.json());
     return { success: true, data, error: null };
   } catch (error) {
-    console.error("getPurchasesSummary Error:", error);
+    console.error("getCarPurSummary Error:", error);
     return { success: false, data: [], error: error.message };
   }
 };

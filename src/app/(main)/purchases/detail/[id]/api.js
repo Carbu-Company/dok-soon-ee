@@ -1,6 +1,6 @@
 export const getSuggestOne = async (car_regid) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getSuggestDetailNew?car_regid=${car_regid}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarPurDetail?car_regid=${car_regid}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

@@ -1,6 +1,6 @@
   export const getSuggestOne = async (mgtKey) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getSuggestDetailNew?car_regid=${mgtKey}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarPurDetail?car_regid=${mgtKey}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -22,7 +22,7 @@
 
 export const updatePurchase = async (data) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updatePurchase`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarPur`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

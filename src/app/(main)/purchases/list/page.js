@@ -1,15 +1,15 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import ListPage from "@/app/(main)/purchases/list/ListPage";
-import { getPurchasesListNew, getPurchasesSummary } from "./api";
+import { getCarPurList, getCarPurSummary } from "./api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
 // Server Action 정의
-async function searchPurchasesList(searchParamsWithPage) {
+async function searchCarPurList(searchParamsWithPage) {
   "use server";
   
   try {
-    const result = await getPurchasesListNew(searchParamsWithPage);
+    const result = await getCarPurList(searchParamsWithPage);
 
     console.log('서버 액션 결과*******************:', { 
       carlistLength: result?.data?.carlist?.length, 
@@ -27,11 +27,11 @@ async function searchPurchasesList(searchParamsWithPage) {
 
 
 // Server Action 정의
-async function searchPurchasesSummary(searchParamsWithPage) {
+async function searchCarPurSummary(searchParamsWithPage) {
   "use server";
   
   try {
-    const result = await getPurchasesSummary(searchParamsWithPage);
+    const result = await getCarPurSummary(searchParamsWithPage);
 
     return result;
   } catch (error) {
@@ -42,13 +42,13 @@ async function searchPurchasesSummary(searchParamsWithPage) {
 
 
 // Server Action 정의
-async function searchPurchasesListAndSummary(searchParamsWithPage) {
+async function searchCarPurListAndSummary(searchParamsWithPage) {
   "use server";
   
   try {
     const [listResult, summaryResult] = await Promise.all([
-      getPurchasesListNew(searchParamsWithPage),
-      getPurchasesSummary(searchParamsWithPage)
+      getCarPurList(searchParamsWithPage),
+      getCarPurSummary(searchParamsWithPage)
     ]);
 
     return {
@@ -65,8 +65,7 @@ async function searchPurchasesListAndSummary(searchParamsWithPage) {
   }
 }
 
-
-export default async function Purchases() {
+export default async function CarPurList() {
   /* 쿠키에서 세션 정보 가져오기
   {
   usrId: '005110001',
@@ -105,16 +104,16 @@ export default async function Purchases() {
     ordAscDesc: 'desc'
   };
 
-  const purchasesList = await searchPurchasesList({ ...defaultParams, ...searchParams });
+  const carPurList = await searchCarPurList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
-  const purchasesSummary = await searchPurchasesSummary({ ...defaultParams, ...searchParams });
+  const carPurSummary = await searchCarPurSummary({ ...defaultParams, ...searchParams });
 
   return <ListPage session={session}
-                   carList={purchasesList}
+                   carList={carPurList}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
-                   searchAction={searchPurchasesListAndSummary}
-                   purchasesSummary={purchasesSummary}
+                   searchAction={searchCarPurListAndSummary}
+                   purchasesSummary={carPurSummary}
    />;
 }

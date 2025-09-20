@@ -398,7 +398,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
     };
     
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertSuggest`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertCarPur`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
