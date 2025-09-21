@@ -4,9 +4,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import PaginationComponent from '@/components/utils/PaginationComponent';
 import PurchaseRemoveModal from '@/components/modal/PurchaseRemoveModal';
+import { useRouter } from 'next/navigation';
 
 export default function ListPage(props) {
-
+    const router = useRouter();
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 기본 검색 영역
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,6 +55,7 @@ export default function ListPage(props) {
     const [isPurchaseRemoveModalOpen, setIsPurchaseRemoveModalOpen] = useState(false);
     const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
     const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -263,6 +265,7 @@ export default function ListPage(props) {
       // handleSearch(currentPage); // 목록 새로고침
     };
     
+
 
     /**
      * 페이지 처리
@@ -1261,7 +1264,17 @@ export default function ListPage(props) {
 
                         <ul className="select__menu">
                           <li className="select__option">
-                            <Link href="#">상품화비용 등록</Link>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                router.push(`/car-goods/register?carId=${car.CAR_REG_ID}&openModal=true`);
+                              }}
+                              style={{ border: 'none', background: 'none', padding: 0, color: 'inherit', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                            >
+                              상품화비용 등록
+                            </button>
                           </li>
                           <li className="select__option">
                             <Link href="#">재고금융 등록</Link>
@@ -1380,6 +1393,7 @@ export default function ListPage(props) {
             </tbody>
           </table>
         </div>
+
 
         {/* 매입취소/삭제 모달 */}
         <PurchaseRemoveModal

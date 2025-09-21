@@ -207,10 +207,10 @@ export default function Header() {
             </button>
             <ul className="select__menu">
               <li className="select__option select__option--selected">
-                <Link href="/car-goods/car-list" className="select__option-link">차량별 리스트</Link>
+                <Link href="/car-goods/list" className="select__option-link">차량별 리스트</Link>
               </li>
               <li className="select__option">
-                <Link href="/car-goods/cost-list" className="select__option-link">상품화비용 리스트</Link>
+                <Link href="/car-goods/cost" className="select__option-link">상품화비용 리스트</Link>
               </li>
             </ul>
           </div>
