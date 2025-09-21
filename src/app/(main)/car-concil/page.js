@@ -697,9 +697,7 @@ export default function OtherDealerMediationSalesPage() {
                 <button
                   type="button"
                   className="btn btn--light btn--sm"
-                  onClick={() => {
-                    if (typeof window !== "undefined") window.location.href = "m7_v.jsp";
-                  }}
+                  onClick={() => router.push("/detail/car-concil/1")}
                 >
                   상세보기
                 </button>

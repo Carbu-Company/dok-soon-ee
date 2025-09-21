@@ -1,6 +1,8 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 export default function CashReceiptList() {
+  const router = useRouter();
   const openModal = (id) => {
     if (typeof window !== "undefined" && window.openModal) {
       window.openModal(id);
@@ -645,9 +647,7 @@ export default function CashReceiptList() {
                 <button
                   type="button"
                   className="btn btn--light btn--sm"
-                  onClick={() => {
-                    window.location.href = "m1_v.jsp";
-                  }}
+                  onClick={() => router.push("/detail/cash-receipts/1")}
                 >
                   상세보기
                 </button>

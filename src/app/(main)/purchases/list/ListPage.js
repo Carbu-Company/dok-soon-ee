@@ -1408,7 +1408,7 @@ export default function ListPage(props) {
                       onClick={e => e.stopPropagation()}
                     >
                       <Link
-                        href={`/purchases/detail/${car.CAR_REG_ID}`}
+                        href={`/detail/purchases/${car.CAR_REG_ID}`}
                         onClick={e => e.stopPropagation()}
                       >
                         상세보기

@@ -1,7 +1,11 @@
 "use client";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function InventoryFinanceInterestList() {
-  const openModal = (id) => {
+  const router = useRouter();
+  const openModal = id => {
     if (typeof window !== "undefined" && window.openModal) {
       window.openModal(id);
     } else {
@@ -16,7 +20,9 @@ export default function InventoryFinanceInterestList() {
 
         <div className="guidebox">
           <p className="guidebox__title">재고금융 : 이자납입 = 1 : N</p>
-          <p className="guidebox__title">하나의 재고금융 등록시 자동으로 이자테이블 1row 추가(최소 1row~N)</p>
+          <p className="guidebox__title">
+            하나의 재고금융 등록시 자동으로 이자테이블 1row 추가(최소 1row~N)
+          </p>
           {/*<p className="guidebox__desc">※ 이자계산, 신규/연장/추가처리</p>*/}
         </div>
       </div>
@@ -39,7 +45,10 @@ export default function InventoryFinanceInterestList() {
                 <div className="input">
                   <input type="text" className="input__field" placeholder="" />
                   <div className="input__utils">
-                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                    <button
+                      type="button"
+                      className="jsInputClear input__clear ico ico--input-delete"
+                    >
                       삭제
                     </button>
                   </div>
@@ -48,7 +57,12 @@ export default function InventoryFinanceInterestList() {
               <th>담당딜러</th>
               <td>
                 <div className="select">
-                  <input className="select__input" type="hidden" name="dealer" defaultValue="선택" />
+                  <input
+                    className="select__input"
+                    type="hidden"
+                    name="dealer"
+                    defaultValue="선택"
+                  />
                   <button className="select__toggle" type="button">
                     <span className="select__text">선택</span>
                     <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
@@ -77,7 +91,13 @@ export default function InventoryFinanceInterestList() {
                     <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                     <button className="select__toggle" type="button">
                       <span className="select__text">이자납입일</span>
-                      <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                      <Image
+                        className="select__arrow"
+                        src="/images/ico-dropdown.svg"
+                        width={10}
+                        height={10}
+                        alt=""
+                      />
                     </button>
 
                     <ul className="select__menu">
@@ -139,7 +159,13 @@ export default function InventoryFinanceInterestList() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">이자납입일</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
                 </button>
 
                 <ul className="select__menu">
@@ -157,7 +183,13 @@ export default function InventoryFinanceInterestList() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">내림차순</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
                 </button>
 
                 <ul className="select__menu">
@@ -175,7 +207,13 @@ export default function InventoryFinanceInterestList() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">10건씩</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
                 </button>
 
                 <ul className="select__menu">
@@ -211,7 +249,10 @@ export default function InventoryFinanceInterestList() {
                       <div className="input">
                         <input type="text" className="input__field" placeholder="" />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -220,10 +261,21 @@ export default function InventoryFinanceInterestList() {
                     <th>담당딜러</th>
                     <td>
                       <div className="select">
-                        <input className="select__input" type="hidden" name="dealer" defaultValue="" />
+                        <input
+                          className="select__input"
+                          type="hidden"
+                          name="dealer"
+                          defaultValue=""
+                        />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <Image
+                            className="select__arrow"
+                            src="/images/ico-dropdown.svg"
+                            width={10}
+                            height={10}
+                            alt=""
+                          />
                         </button>
 
                         <ul className="select__menu">
@@ -249,10 +301,21 @@ export default function InventoryFinanceInterestList() {
                     <td>
                       <div className="input-group">
                         <div className="select w140">
-                          <input className="select__input" type="hidden" name="dealer" defaultValue="" />
+                          <input
+                            className="select__input"
+                            type="hidden"
+                            name="dealer"
+                            defaultValue=""
+                          />
                           <button className="select__toggle" type="button">
                             <span className="select__text">이자납입일</span>
-                            <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                            <Image
+                              className="select__arrow"
+                              src="/images/ico-dropdown.svg"
+                              width={10}
+                              height={10}
+                              alt=""
+                            />
                           </button>
 
                           <ul className="select__menu">
@@ -294,7 +357,10 @@ export default function InventoryFinanceInterestList() {
                       <div className="input">
                         <input type="text" className="input__field" placeholder="" />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -303,10 +369,21 @@ export default function InventoryFinanceInterestList() {
                     <th>캐피탈사</th>
                     <td>
                       <div className="select">
-                        <input className="select__input" type="hidden" name="dealer" defaultValue="선택" />
+                        <input
+                          className="select__input"
+                          type="hidden"
+                          name="dealer"
+                          defaultValue="선택"
+                        />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <Image
+                            className="select__arrow"
+                            src="/images/ico-dropdown.svg"
+                            width={10}
+                            height={10}
+                            alt=""
+                          />
                         </button>
 
                         <ul className="select__menu">
@@ -327,7 +404,10 @@ export default function InventoryFinanceInterestList() {
                       <div className="input">
                         <input type="text" className="input__field" placeholder="" />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -358,9 +438,7 @@ export default function InventoryFinanceInterestList() {
           <button
             type="button"
             className="btn btn--red btn--padding--r30"
-            onClick={() => {
-              window.location.href = "m3_w.jsp";
-            }}
+            onClick={() => router.push("/inventory-finance/register?showModal=true")}
           >
             <span className="ico ico--add"></span>재고금융 등록
           </button>
@@ -370,7 +448,13 @@ export default function InventoryFinanceInterestList() {
               <input className="select__input" type="hidden" name="dealer" defaultValue="" />
               <button className="select__toggle" type="button">
                 <span className="select__text">이자납입일</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
               <ul className="select__menu">
@@ -391,7 +475,13 @@ export default function InventoryFinanceInterestList() {
               <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
               <button className="select__toggle" type="button">
                 <span className="select__text">내림차순</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
               <ul className="select__menu">
@@ -409,7 +499,13 @@ export default function InventoryFinanceInterestList() {
               <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
               <button className="select__toggle" type="button">
                 <span className="select__text">10건씩</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
               <ul className="select__menu">
@@ -451,7 +547,7 @@ export default function InventoryFinanceInterestList() {
             <col style={{ width: "80px" }} />
             <col style={{ width: "100px" }} />
           </colgroup>
-        <thead>
+          <thead>
             <tr>
               <th>
                 차량정보
@@ -500,7 +596,9 @@ export default function InventoryFinanceInterestList() {
               <td>
                 <div className="input-group input-group--sm input-group--center">
                   <div className="select select--utils">
-                    <button type="button" className="select__toggle">더보기</button>
+                    <button type="button" className="select__toggle">
+                      더보기
+                    </button>
 
                     <ul className="select__menu">
                       <li className="select__option">
@@ -509,7 +607,7 @@ export default function InventoryFinanceInterestList() {
                       <li className="select__option">
                         <a
                           href="#"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.preventDefault();
                             openModal("2");
                           }}
@@ -525,9 +623,7 @@ export default function InventoryFinanceInterestList() {
                 <button
                   type="button"
                   className="btn btn--light btn--sm"
-                  onClick={() => {
-                    window.location.href = "m1_v.jsp";
-                  }}
+                  onClick={() => router.push("/detail/inventory-finance/1")}
                 >
                   상세보기
                 </button>

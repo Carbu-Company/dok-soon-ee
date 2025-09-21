@@ -1,6 +1,8 @@
 'use client'
+import { useRouter } from "next/navigation";
 
 export default function ElectronicTaxInvoicePage() {
+  const router = useRouter();
     return (
       <main className="container container--page">
         <div className="container__head">
@@ -531,7 +533,7 @@ export default function ElectronicTaxInvoicePage() {
                   <button
                     type="button"
                     className="btn btn--light btn--sm"
-                    onClick={() => (window.location.href = 'm1_v.jsp')}
+                    onClick={() => router.push("/detail/electronic-tax-invoice/1")}
                   >
                     상세보기
                   </button>

@@ -1,26 +1,11 @@
 {
-    "compilerOptions": {
-      "baseUrl": ".",
-      "paths": {
-        "@/*": ["src/*"]
-      },
-      "checkJs": false
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
     },
-    "include": [
-      "next-env.d.ts",
-      "**/*.ts",
-      "**/*.tsx",
-      "**/*.js",
-      "**/*.jsx"
-    ],
-    "exclude": [
-      "node_modules",
-      ".next",
-      "dist",
-      "build",
-      ".turbo",
-      "**/coverage",
-      "**/.cache"
-    ]
-  }
-  
+    "checkJs": false
+  },
+  "include": ["**/*.js"],
+  "exclude": ["node_modules", ".next", "dist", "build", ".turbo", "**/coverage", "**/.cache"]
+}

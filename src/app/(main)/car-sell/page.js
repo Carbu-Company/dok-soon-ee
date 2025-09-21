@@ -683,9 +683,7 @@ export default function SalesVehicleList() {
                 <button
                   type="button"
                   className="btn btn--light btn--sm"
-                  onClick={() => {
-                    window.location.href = "m1_v.jsp";
-                  }}
+                  onClick={() => router.push("/detail/car-sell/1")}
                 >
                   상세보기
                 </button>
