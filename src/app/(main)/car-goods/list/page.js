@@ -1,6 +1,9 @@
 "use client";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function ProductCostList() {
+    const router = useRouter();
     return (
       <main className="container container--page">
         <div className="container__head">
@@ -388,7 +391,12 @@ export default function ProductCostList() {
         <div className="table-wrap">
           <h2 className="table-wrap__title">리스트<span>Total 100건</span></h2>
           <div className="table-wrap__head table-wrap__title">
-            <button type="button" className="btn btn--red btn--padding--r30" onClick={() => (window.location.href = 'm2_w.jsp')}>
+            <button type="button"   className="btn btn--red btn--padding--r30" 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              router.push("/car-goods/register");
+            }}>
               <span className="ico ico--add"></span>상품화비용 등록
             </button>
             <div className="input-group">

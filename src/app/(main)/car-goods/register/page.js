@@ -155,8 +155,10 @@ export default function ProductCostRegisterPage() {
                     <span className="select__text">선택</span>
                     <Image
                       className="select__arrow"
-                      src="../assets/images/ico-dropdown.svg"
+                      src="/images/ico-dropdown.svg"
                       alt=""
+                      width={16}
+                      height={16}
                     />
                   </button>
 
@@ -249,8 +251,10 @@ export default function ProductCostRegisterPage() {
                     <span className="select__text">선택</span>
                     <Image
                       className="select__arrow"
-                      src="../assets/images/ico-dropdown.svg"
+                      src="/images/ico-dropdown.svg"
                       alt=""
+                      width={16}
+                      height={16}
                     />
                   </button>
 

@@ -478,18 +478,17 @@ export default function BankCashLedgerPage() {
         </div>
 
         <table className="table">
-          <colgroup>
-            <col style={{ width: '250px' }} /> {/*거래일시*/}
-            <col style={{ width: '100px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: 'auto' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: 'auto' }} /> {/*품목명*/}
-            <col style={{ width: '100px' }} />
+          <colgroup><col style={{ width: '250px' }}/>
+          <col style={{ width: '100px' }}/>
+          <col style={{ width: '150px' }}/>
+          <col style={{ width: 'auto' }}/>
+          <col style={{ width: '150px' }}/>
+          <col style={{ width: '150px' }}/>
+          <col style={{ width: '150px' }}/>
+          <col style={{ width: '150px' }}/>
+          <col style={{ width: '150px' }}/>
+          <col style={{ width: 'auto' }}/>
+          <col style={{ width: '100px' }}/>
           </colgroup>
           <thead>
             <tr>

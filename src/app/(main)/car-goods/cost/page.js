@@ -1,6 +1,10 @@
 'use client';
 
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+
 export default function CostListByExpense() {
+  const router = useRouter();
   return (
     <main className="container container--page">
       <div className="container__head">
@@ -43,7 +47,7 @@ export default function CostListByExpense() {
                   <input className="select__input" type="hidden" name="dealer" defaultValue="선택1" />
                   <button className="select__toggle" type="button">
                     <span className="select__text">선택</span>
-                    <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                    <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                   </button>
 
                   <ul className="select__menu">
@@ -61,7 +65,7 @@ export default function CostListByExpense() {
                     <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                     <button className="select__toggle" type="button">
                       <span className="select__text">제시(매입)일</span>
-                      <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                      <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                     </button>
 
                     <ul className="select__menu">
@@ -101,7 +105,7 @@ export default function CostListByExpense() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">제시(매입)일</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                 </button>
 
                 <ul className="select__menu">
@@ -116,7 +120,7 @@ export default function CostListByExpense() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">내림차순</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                 </button>
 
                 <ul className="select__menu">
@@ -130,7 +134,7 @@ export default function CostListByExpense() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">10건씩</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                 </button>
 
                 <ul className="select__menu">
@@ -170,7 +174,7 @@ export default function CostListByExpense() {
                         <input className="select__input" type="hidden" name="dealer" defaultValue="선택1" />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                         </button>
 
                         <ul className="select__menu">
@@ -188,7 +192,7 @@ export default function CostListByExpense() {
                           <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                           <button className="select__toggle" type="button">
                             <span className="select__text">제시(매입)일</span>
-                            <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                            <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                           </button>
 
                           <ul className="select__menu">
@@ -225,7 +229,7 @@ export default function CostListByExpense() {
                         <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                         </button>
 
                         <ul className="select__menu">
@@ -291,7 +295,7 @@ export default function CostListByExpense() {
                         <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                         </button>
 
                         <ul className="select__menu">
@@ -351,7 +355,7 @@ export default function CostListByExpense() {
                           <input className="select__input" type="hidden" name="dealer" defaultValue="1" />
                           <button className="select__toggle" type="button">
                             <span className="select__text">선택</span>
-                            <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                            <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
                           </button>
 
                           <ul className="select__menu">
@@ -389,7 +393,11 @@ export default function CostListByExpense() {
           <button
             type="button"
             className="btn btn--red btn--padding--r30"
-            onClick={() => { window.location.href = "m2_w.jsp"; }}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              router.push("/car-goods/register");
+            }}
           >
             <span className="ico ico--add"></span>상품화비용 등록
           </button>
@@ -399,7 +407,7 @@ export default function CostListByExpense() {
               <input className="select__input" type="hidden" name="dealer" defaultValue="" />
               <button className="select__toggle" type="button">
                 <span className="select__text">등록일</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
               </button>
 
               <ul className="select__menu">
@@ -415,7 +423,7 @@ export default function CostListByExpense() {
               <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
               <button className="select__toggle" type="button">
                 <span className="select__text">내림차순</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
               </button>
 
               <ul className="select__menu">
@@ -429,7 +437,7 @@ export default function CostListByExpense() {
               <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
               <button className="select__toggle" type="button">
                 <span className="select__text">10건씩</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={16} height={16} />
               </button>
 
               <ul className="select__menu">
