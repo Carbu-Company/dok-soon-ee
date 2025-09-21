@@ -207,10 +207,10 @@ export default function Header() {
             </button>
             <ul className="select__menu">
               <li className="select__option select__option--selected">
-                <Link href="/car_goods/car_list" className="select__option-link">차량별 리스트</Link>
+                <Link href="/car-goods/car-list" className="select__option-link">차량별 리스트</Link>
               </li>
               <li className="select__option">
-                <Link href="/car_goods/cost_list" className="select__option-link">상품화비용 리스트</Link>
+                <Link href="/car-goods/cost-list" className="select__option-link">상품화비용 리스트</Link>
               </li>
             </ul>
           </div>
@@ -229,27 +229,27 @@ export default function Header() {
             </button>
             <ul className="select__menu">
               <li className="select__option select__option--selected">
-                <a href="m3.jsp">재고금융 리스트</a>
+                <Link href="/inventory-finance/inventory-list" className="select__option-link">재고금융 리스트</Link>
               </li>
               <li className="select__option">
-                <a href="m3_2.jsp">이자납입 리스트</a>
+                <Link href="/inventory-finance/interest-list" className="select__option-link">이자납입 리스트</Link>
               </li>
             </ul>
           </div>
 
-          <a href="m4.jsp" className="header__gnb-menu">
+          <Link href="/car-sell" className="header__gnb-menu">
             매도(판매)/정산
-          </a>
-          <a href="m5.jsp" className="header__gnb-menu">
+          </Link>
+          <Link href="/cash-receipts" className="header__gnb-menu">
             현금영수증
-          </a>
-          <a href="m6.jsp" className="header__gnb-menu">
+          </Link>
+          <Link href="/electronic-tax-invoice" className="header__gnb-menu">
             전자세금계산서
-          </a>
-          <a href="m7.jsp" className="header__gnb-menu">
+          </Link>
+          <Link href="/car-concil" className="header__gnb-menu">
             타상사알선판매
-          </a>
-          <a href="m8.jsp" className="header__gnb-menu">
+          </Link>
+          <a href="/bank-account" className="header__gnb-menu">
             통장입출금내역
           </a>
 
