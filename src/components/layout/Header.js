@@ -1,5 +1,6 @@
 "use client";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Header() {
   // 쿠키에서 CSRF 토큰 가져오기
@@ -48,44 +49,47 @@ export default function Header() {
     <header className="header">
       <div className="header__inner">
         <h1 className="header__title">자동차매매상사관리프로그램</h1>
+
+        {/* 긴급 공지 */}
+        <div className="header__msg">
+          긴급 공지 내용 안내입니다. 긴급 공지 내용 안내입니다. 긴급 공지 내용 안내입니다.
+        </div>
+
         <nav className="header__nav">
+          {/* MEMO: <a>에 .on 추가 시 selected 상태 */}
           <a className="header__nav-menu user" href="#">
             <span>로그인상사명</span>
           </a>
-          <a className="header__nav-menu setting" href="/settings">
+          <Link className="header__nav-menu setting" href="/settings">
             <span>환경설정</span>
-          </a>
+          </Link>
           <a className="header__nav-menu remote" href="#">
             <span>원격지원</span>
           </a>
-          <a
-            type="button"
-            className="header__nav-menu logout"
-            onClick={handleLogout}
-          >
+          {/* JSP로 이동하는 하드링크 대신, 기존 로그아웃 로직 유지 */}
+          <a className="header__nav-menu logout" href="/login" onClick={handleLogout}>
             <span>로그아웃</span>
           </a>
+          {/* <a className="header__nav-menu login on" href="#"><span>로그인</span></a> */}
         </nav>
       </div>
 
       <div className="header__main-wrap">
         <div className="header__main">
-          <h2 className=" header__logo">
+          <h2 className="header__logo">
             <Image src="/images/logo_155100.png" alt="똑순이 2.0" width={155} height={100} />
           </h2>
 
+          {/* 검색바 */}
           <div className="header-search">
             <div className="header-search__inner">
-              <span className="header-search__icon"></span>
+              <span className="header-search__icon" />
               <input
                 type="text"
                 className="header-search__field"
                 placeholder="차량 번호로 검색하세요."
               />
-              <button
-                type="button"
-                className="header-search__clear ico ico--input-delete"
-              >
+              <button type="button" className="header-search__clear ico ico--input-delete">
                 삭제
               </button>
               <button type="button" className="header-search__toggle on">
@@ -99,6 +103,7 @@ export default function Header() {
               </button>
             </div>
 
+            {/* 드롭다운 (자동완성/검색결과) */}
             <div className="header-search__dropdown">
               <ul className="header-search__list">
                 <li className="header-search__option header-search__option--selected">
@@ -125,9 +130,7 @@ export default function Header() {
                   <div className="form-option">
                     <label className="form-option__label">
                       <input type="radio" name="searchgroup" />
-                      <span className="form-option__title">
-                        235나5678 | G80 | 박길동 딜러
-                      </span>
+                      <span className="form-option__title">235나5678 | G80 | 박길동 딜러</span>
                     </label>
                   </div>
                 </li>
@@ -135,29 +138,33 @@ export default function Header() {
                   <div className="form-option">
                     <label className="form-option__label">
                       <input type="radio" name="searchgroup" />
-                      <span className="form-option__title">
-                        434라5678 | 쏘나타 | 백두산 딜러
-                      </span>
+                      <span className="form-option__title">434라5678 | 쏘나타 | 백두산 딜러</span>
                     </label>
                   </div>
                 </li>
               </ul>
 
+              {/* 하단 액션 버튼 */}
               <div className="header-search__actions">
                 <button className="btn btn--info" type="button">
-                  <span className="ico ico--pay"></span>상품화비 등록
+                  <span className="ico ico--pay" />
+                  상품화비 등록
                 </button>
                 <button className="btn btn--info" type="button">
-                  <span className="ico ico--shopping"></span>판매 처리
+                  <span className="ico ico--shopping" />
+                  판매 처리
                 </button>
                 <button className="btn btn--info" type="button">
-                  <span className="ico ico--receipt"></span>현금 영수증
+                  <span className="ico ico--receipt" />
+                  현금 영수증
                 </button>
                 <button className="btn btn--info" type="button">
-                  <span className="ico ico--invoice"></span>세금 계산서
+                  <span className="ico ico--invoice" />
+                  세금 계산서
                 </button>
                 <button className="btn btn--info" type="button">
-                  <span className="ico ico--wallet"></span>정산 처리
+                  <span className="ico ico--wallet" />
+                  정산 처리
                 </button>
               </div>
             </div>
@@ -179,31 +186,74 @@ export default function Header() {
           </nav>
         </div>
 
+        {/* GNB */}
         <nav className="header__gnb">
-          <a href="/purchases/list" className="header__gnb-menu">
+          {/* 제시(매입)차량: 기존엔 /purchases/list였으나 마크업에선 m1.jsp */}
+          <Link href="/purchases/list" className="header__gnb-menu">
             제시(매입)차량
-          </a>
-          <a href="m2.jsp" className="header__gnb-menu">
-            상품화비용
-          </a>
-          <a href="m3.jsp" className="header__gnb-menu">
-            재고금융
-          </a>
+          </Link>
+
+          {/* 상품화비용관리 드롭다운 */}
+          <div className="select">
+            <button className="select__toggle" type="button">
+              <span className="header__gnb-menu">상품화비용관리</span>
+              <Image
+                className="select__arrow"
+                src="/images/ico-dropdown.svg"
+                alt=""
+                width={10}
+                height={10}
+              />
+            </button>
+            <ul className="select__menu">
+              <li className="select__option select__option--selected">
+                <Link href="/car_goods/car_list">차량별 리스트</Link>
+              </li>
+              <li className="select__option">
+                <Link href="/car_goods/cost_list">상품화비용 리스트</Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* 재고금융관리 드롭다운 */}
+          <div className="select">
+            <button className="select__toggle" type="button">
+              <span className="header__gnb-menu">재고금융관리</span>
+              <Image
+                className="select__arrow"
+                src="/images/ico-dropdown.svg"
+                alt=""
+                width={10}
+                height={10}
+              />
+            </button>
+            <ul className="select__menu">
+              <li className="select__option select__option--selected">
+                <a href="m3.jsp">재고금융 리스트</a>
+              </li>
+              <li className="select__option">
+                <a href="m3_2.jsp">이자납입 리스트</a>
+              </li>
+            </ul>
+          </div>
+
           <a href="m4.jsp" className="header__gnb-menu">
             매도(판매)/정산
           </a>
           <a href="m5.jsp" className="header__gnb-menu">
-            현금영수증발행
+            현금영수증
           </a>
           <a href="m6.jsp" className="header__gnb-menu">
-            세금계산서발행
+            전자세금계산서
           </a>
           <a href="m7.jsp" className="header__gnb-menu">
             타상사알선판매
           </a>
           <a href="m8.jsp" className="header__gnb-menu">
-            통장시재관리
+            통장입출금내역
           </a>
+
+          {/* 종합업무현황 드롭다운 */}
           <div className="select">
             <button className="select__toggle" type="button">
               <span className="header__gnb-menu">종합업무현황</span>
@@ -215,19 +265,18 @@ export default function Header() {
                 height={10}
               />
             </button>
-
             <ul className="select__menu">
               <li className="select__option select__option--selected">
-                <a href="m9.jsp">보고서1</a>
+                <a href="m9.jsp">원천징수</a>
               </li>
               <li className="select__option">
-                <a href="#">보고서2</a>
+                <a href="#">정산내역</a>
               </li>
               <li className="select__option">
-                <a href="#">보고서3</a>
+                <a href="#">매출자료</a>
               </li>
               <li className="select__option">
-                <a href="#">보고서4</a>
+                <a href="#">매입자료</a>
               </li>
               <li className="select__option">
                 <a href="#">보고서5</a>

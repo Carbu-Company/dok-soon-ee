@@ -1,4 +1,4 @@
-/* Pretendard 폰트 불러오기 */
+/* Pretendard �壱�� 覿����り鍵 */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 
 html, body, div, span, applet, object, iframe,
@@ -39,7 +39,7 @@ footer, header, hgroup, main, menu, nav, section {
 html {
 	text-size-adjust: 100%;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-	-webkit-text-size-adjust: none; /* 뷰포트 변환시 폰트크기 자동확대 방지 */
+	-webkit-text-size-adjust: none; /* 觀壱��� 覲����� �壱�誤��鍵 �������� 覦�� */
 }
 
 body {

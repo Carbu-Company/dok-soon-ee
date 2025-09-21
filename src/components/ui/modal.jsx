@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { X } from "lucide-react"; // 닫기 아이콘 (lucide-react 설치 필요)
 
