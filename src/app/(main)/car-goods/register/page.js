@@ -1,26 +1,27 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import CarGoodsRegisterModal from '@/components/modal/carGoodsRegister';
 
 export default function ProductCostRegisterPage() {
-  const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCarId, setSelectedCarId] = useState(null);
 
   // URL 파라미터를 확인해서 모달을 자동으로 열기
   useEffect(() => {
-    const openModal = searchParams.get('openModal');
-    const carId = searchParams.get('carId');
-    
-    if (openModal === 'true') {
-      setIsModalOpen(true);
-      if (carId) {
-        setSelectedCarId(carId);
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const openModal = urlParams.get('openModal');
+      const carId = urlParams.get('carId');
+      
+      if (openModal === 'true') {
+        setIsModalOpen(true);
+        if (carId) {
+          setSelectedCarId(carId);
+        }
       }
     }
-  }, [searchParams]);
+  }, []);
 
   const handleModalClose = () => {
     setIsModalOpen(false);

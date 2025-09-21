@@ -1,6 +1,11 @@
-'use client';
+"use client";
+
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function OtherDealerMediationSalesPage() {
+  const router = useRouter();
   return (
     <main className="container container--page">
       <div className="container__head">
@@ -19,12 +24,12 @@ export default function OtherDealerMediationSalesPage() {
         <h2 className="table-wrap__title">검색</h2>
         <table className="table table--lg">
           <colgroup>
-            <col style={{ width: '10%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '10%' }} />
-            <col style={{ width: '12%' }} />
-            <col style={{ width: '10%' }} />
-            <col style={{ width: 'auto' }} />
+            <col style={{ width: "10%" }} />
+            <col style={{ width: "12%" }} />
+            <col style={{ width: "10%" }} />
+            <col style={{ width: "12%" }} />
+            <col style={{ width: "10%" }} />
+            <col style={{ width: "auto" }} />
           </colgroup>
           <tbody>
             <tr>
@@ -33,7 +38,10 @@ export default function OtherDealerMediationSalesPage() {
                 <div className="input">
                   <input type="text" className="input__field" placeholder="" />
                   <div className="input__utils">
-                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                    <button
+                      type="button"
+                      className="jsInputClear input__clear ico ico--input-delete"
+                    >
                       삭제
                     </button>
                   </div>
@@ -45,7 +53,13 @@ export default function OtherDealerMediationSalesPage() {
                   <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                   <button className="select__toggle" type="button">
                     <span className="select__text">선택</span>
-                    <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                    <Image
+                      className="select__arrow"
+                      src="/images/ico-dropdown.svg"
+                      alt=""
+                      width={10}
+                      height={10}
+                    />
                   </button>
 
                   <ul className="select__menu">
@@ -79,14 +93,15 @@ export default function OtherDealerMediationSalesPage() {
                     />
                     <button className="select__toggle" type="button">
                       <span className="select__text">알선판매일</span>
-                      <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                      <img
+                        className="select__arrow"
+                        src="../assets/images/ico-dropdown.svg"
+                        alt=""
+                      />
                     </button>
 
                     <ul className="select__menu">
-                      <li
-                        className="select__option select__option--selected"
-                        data-value="거래일"
-                      >
+                      <li className="select__option select__option--selected" data-value="거래일">
                         알선판매일
                       </li>
                       <li className="select__option" data-value="">
@@ -207,12 +222,12 @@ export default function OtherDealerMediationSalesPage() {
             <form action="">
               <table className="table table--lg">
                 <colgroup>
-                  <col style={{ width: '8%' }} />
-                  <col style={{ width: 'auto' }} />
-                  <col style={{ width: '8%' }} />
-                  <col style={{ width: 'auto' }} />
-                  <col style={{ width: '8%' }} />
-                  <col style={{ width: 'auto' }} />
+                  <col style={{ width: "8%" }} />
+                  <col style={{ width: "auto" }} />
+                  <col style={{ width: "8%" }} />
+                  <col style={{ width: "auto" }} />
+                  <col style={{ width: "8%" }} />
+                  <col style={{ width: "auto" }} />
                 </colgroup>
                 <tbody>
                   <tr>
@@ -221,7 +236,10 @@ export default function OtherDealerMediationSalesPage() {
                       <div className="input">
                         <input type="text" className="input__field" placeholder="" />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -238,11 +256,18 @@ export default function OtherDealerMediationSalesPage() {
                         />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <img
+                            className="select__arrow"
+                            src="../assets/images/ico-dropdown.svg"
+                            alt=""
+                          />
                         </button>
 
                         <ul className="select__menu">
-                          <li className="select__option select__option--selected" data-value="선택1">
+                          <li
+                            className="select__option select__option--selected"
+                            data-value="선택1"
+                          >
                             선택1
                           </li>
                           <li className="select__option" data-value="선택2">
@@ -269,7 +294,11 @@ export default function OtherDealerMediationSalesPage() {
                           />
                           <button className="select__toggle" type="button">
                             <span className="select__text">알선판매일</span>
-                            <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                            <img
+                              className="select__arrow"
+                              src="../assets/images/ico-dropdown.svg"
+                              alt=""
+                            />
                           </button>
 
                           <ul className="select__menu">
@@ -306,10 +335,19 @@ export default function OtherDealerMediationSalesPage() {
                     <th>거래항목</th>
                     <td>
                       <div className="select">
-                        <input className="select__input" type="hidden" name="dealer" defaultValue="선택" />
+                        <input
+                          className="select__input"
+                          type="hidden"
+                          name="dealer"
+                          defaultValue="선택"
+                        />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <img
+                            className="select__arrow"
+                            src="../assets/images/ico-dropdown.svg"
+                            alt=""
+                          />
                         </button>
 
                         <ul className="select__menu">
@@ -330,7 +368,10 @@ export default function OtherDealerMediationSalesPage() {
                       <div className="input">
                         <input type="text" className="input__field" placeholder="" />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -341,7 +382,10 @@ export default function OtherDealerMediationSalesPage() {
                       <div className="input">
                         <input type="text" className="input__field" placeholder="" />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -354,7 +398,10 @@ export default function OtherDealerMediationSalesPage() {
                       <div className="input">
                         <input type="text" className="input__field" placeholder="" />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -363,10 +410,19 @@ export default function OtherDealerMediationSalesPage() {
                     <th>매출증빙</th>
                     <td>
                       <div className="select">
-                        <input className="select__input" type="hidden" name="dealer" defaultValue="" />
+                        <input
+                          className="select__input"
+                          type="hidden"
+                          name="dealer"
+                          defaultValue=""
+                        />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <img
+                            className="select__arrow"
+                            src="../assets/images/ico-dropdown.svg"
+                            alt=""
+                          />
                         </button>
 
                         <ul className="select__menu">
@@ -390,7 +446,10 @@ export default function OtherDealerMediationSalesPage() {
                       <div className="input">
                         <input type="text" className="input__field" placeholder="" />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -422,7 +481,7 @@ export default function OtherDealerMediationSalesPage() {
             type="button"
             className="btn btn--red btn--padding--r30"
             onClick={() => {
-              if (typeof window !== 'undefined') window.location.href = 'm7_w.jsp';
+              router.push("/car-concil/register");
             }}
           >
             <span className="ico ico--add"></span>알선매출 등록
@@ -498,20 +557,20 @@ export default function OtherDealerMediationSalesPage() {
 
         <table className="table">
           <colgroup>
-            <col style={{ width: 'auto' }} />
+            <col style={{ width: "auto" }} />
             {/*거래처명*/}
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: '150px' }} />
-            <col style={{ width: 'auto' }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "auto" }} />
             {/*품목명*/}
-            <col style={{ width: '100px' }} />
-            <col style={{ width: '100px' }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "100px" }} />
           </colgroup>
           <thead>
             <tr>
@@ -554,7 +613,7 @@ export default function OtherDealerMediationSalesPage() {
                   type="button"
                   className="btn btn--light btn--sm"
                   onClick={() => {
-                    if (typeof window !== 'undefined') window.location.href = 'm7_v.jsp';
+                    if (typeof window !== "undefined") window.location.href = "m7_v.jsp";
                   }}
                 >
                   발행등록
@@ -569,22 +628,15 @@ export default function OtherDealerMediationSalesPage() {
                     </button>
                     <ul className="select__menu">
                       <li className="select__option">
-                        <a
-                          href="m7_m.jsp"
-                          onClick={(e) => {
-                            // 네비게이션 유지: 필요 시 Next.js Link로 교체 가능
-                          }}
-                        >
-                          알선매출 수정
-                        </a>
+                        <Link href="/car-concil/modify">알선매출 수정</Link>
                       </li>
                       <li className="select__option">
                         <a
                           href="#"
-                          onClick={(e) => {
+                          onClick={e => {
                             e.preventDefault();
-                            if (typeof window !== 'undefined' && window.openModal) {
-                              window.openModal('1');
+                            if (typeof window !== "undefined" && window.openModal) {
+                              window.openModal("1");
                             }
                           }}
                         >
@@ -600,7 +652,7 @@ export default function OtherDealerMediationSalesPage() {
                   type="button"
                   className="btn btn--light btn--sm"
                   onClick={() => {
-                    if (typeof window !== 'undefined') window.location.href = 'm7_v.jsp';
+                    if (typeof window !== "undefined") window.location.href = "m7_v.jsp";
                   }}
                 >
                   상세보기
@@ -611,39 +663,31 @@ export default function OtherDealerMediationSalesPage() {
         </table>
 
         <div className="pagination">
-          <a
-            href="#"
-            className="pagination__btn pagination__btn--prev"
-            onClick={(e) => e.preventDefault()}
-          >
+          <button type="button" className="pagination__btn pagination__btn--prev">
             이전
-          </a>
-          {/* MEMO: <a> 태그에 .on 추가 시, selected 상태 적용 */}
-          <a href="#" className="pagination__btn on" onClick={(e) => e.preventDefault()}>
+          </button>
+          {/* MEMO: button 태그에 .on 추가 시, selected 상태 적용 */}
+          <button type="button" className="pagination__btn on">
             1
-          </a>
-          <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+          </button>
+          <button type="button" className="pagination__btn">
             2
-          </a>
-          <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+          </button>
+          <button type="button" className="pagination__btn">
             3
-          </a>
-          <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+          </button>
+          <button type="button" className="pagination__btn">
             ...
-          </a>
-          <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+          </button>
+          <button type="button" className="pagination__btn">
             9
-          </a>
-          <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+          </button>
+          <button type="button" className="pagination__btn">
             10
-          </a>
-          <a
-            href="#"
-            className="pagination__btn pagination__btn--next"
-            onClick={(e) => e.preventDefault()}
-          >
+          </button>
+          <button type="button" className="pagination__btn pagination__btn--next">
             다음
-          </a>
+          </button>
         </div>
       </div>
 

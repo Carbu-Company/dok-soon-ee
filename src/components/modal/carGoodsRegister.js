@@ -16,7 +16,7 @@ export default function CarGoodsRegisterModal({ open, onClose }) {
           <div className="modal__utils">
             {/* 
             <button className="modal__btn print" type="button">
-              <img src="../assets/images/ico-print.svg" alt="프린트" />
+              <Image src="/images/ico-print.svg" alt="프린트" width={16} height={16} />
             </button>
             */}
             <button className="modal__btn close" type="button" onClick={handleClose} aria-label="닫기">
@@ -67,7 +67,7 @@ export default function CarGoodsRegisterModal({ open, onClose }) {
                       <input className="select__input" type="hidden" name="dealer" defaultValue="딜러1" />
                       <button className="select__toggle" type="button">
                         <span className="select__text">딜러1</span>
-                        <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                        <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                       </button>
 
                       <ul className="select__menu">
@@ -110,7 +110,7 @@ export default function CarGoodsRegisterModal({ open, onClose }) {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="딜러명1" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">딜러명1</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                 </button>
 
                 <ul className="select__menu">
@@ -134,7 +134,7 @@ export default function CarGoodsRegisterModal({ open, onClose }) {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">내림차순</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                 </button>
 
                 <ul className="select__menu">
@@ -152,7 +152,7 @@ export default function CarGoodsRegisterModal({ open, onClose }) {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">10건씩</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                 </button>
 
                 <ul className="select__menu">
@@ -277,39 +277,37 @@ export default function CarGoodsRegisterModal({ open, onClose }) {
           </table>
 
           <div className="pagination">
-            <a
-              href="#"
+            <button
+              type="button"
               className="pagination__btn pagination__btn--prev"
-              onClick={(e) => e.preventDefault()}
             >
               이전
-            </a>
-            {/* MEMO: <a> 태그에 .on 추가 시, selected 상태 적용 */}
-            <a href="#" className="pagination__btn on" onClick={(e) => e.preventDefault()}>
+            </button>
+            {/* MEMO: button 태그에 .on 추가 시, selected 상태 적용 */}
+            <button type="button" className="pagination__btn on">
               1
-            </a>
-            <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+            </button>
+            <button type="button" className="pagination__btn">
               2
-            </a>
-            <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+            </button>
+            <button type="button" className="pagination__btn">
               3
-            </a>
-            <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+            </button>
+            <button type="button" className="pagination__btn">
               ...
-            </a>
-            <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+            </button>
+            <button type="button" className="pagination__btn">
               9
-            </a>
-            <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+            </button>
+            <button type="button" className="pagination__btn">
               10
-            </a>
-            <a
-              href="#"
+            </button>
+            <button
+              type="button"
               className="pagination__btn pagination__btn--next"
-              onClick={(e) => e.preventDefault()}
             >
               다음
-            </a>
+            </button>
           </div>
         </div>
 

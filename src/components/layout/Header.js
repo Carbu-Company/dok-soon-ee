@@ -67,7 +67,7 @@ export default function Header() {
             <span>원격지원</span>
           </a>
           {/* JSP로 이동하는 하드링크 대신, 기존 로그아웃 로직 유지 */}
-          <a className="header__nav-menu logout" href="/login" onClick={handleLogout}>
+          <a className="header__nav-menu logout" href="/login" onClick={(e) => { e.preventDefault(); handleLogout(); }}>
             <span>로그아웃</span>
           </a>
           {/* <a className="header__nav-menu login on" href="#"><span>로그인</span></a> */}

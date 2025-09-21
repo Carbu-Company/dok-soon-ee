@@ -1277,7 +1277,7 @@ export default function ListPage(props) {
                             </button>
                           </li>
                           <li className="select__option">
-                            <Link href="#">재고금융 등록</Link>
+                            <Link href="/inventory-finance/inventory-list">재고금융 등록</Link>
                           </li>
                           <li className="select__option">
                             <Link href="#">판매 처리</Link>

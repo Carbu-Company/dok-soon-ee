@@ -1,6 +1,8 @@
 "use client";
-
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 export default function SalesVehicleList() {
+  const router = useRouter();
   const openModal = (id) => {
     if (typeof window !== "undefined" && window.openModal) {
       window.openModal(id);
@@ -51,7 +53,7 @@ export default function SalesVehicleList() {
                   <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                   <button className="select__toggle" type="button">
                     <span className="select__text">선택</span>
-                    <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                    <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                   </button>
 
                   <ul className="select__menu">
@@ -77,7 +79,7 @@ export default function SalesVehicleList() {
                     <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                     <button className="select__toggle" type="button">
                       <span className="select__text">매도(판매)일</span>
-                      <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                      <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                     </button>
 
                     <ul className="select__menu">
@@ -142,7 +144,7 @@ export default function SalesVehicleList() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">매도(판매)일</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                 </button>
 
                 <ul className="select__menu">
@@ -163,7 +165,7 @@ export default function SalesVehicleList() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">내림차순</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                 </button>
 
                 <ul className="select__menu">
@@ -181,7 +183,7 @@ export default function SalesVehicleList() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">10건씩</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                 </button>
 
                 <ul className="select__menu">
@@ -229,7 +231,7 @@ export default function SalesVehicleList() {
                         <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                         </button>
 
                         <ul className="select__menu">
@@ -258,7 +260,7 @@ export default function SalesVehicleList() {
                           <input className="select__input" type="hidden" name="dealer" defaultValue="" />
                           <button className="select__toggle" type="button">
                             <span className="select__text">매도(판매)일</span>
-                            <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                            <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                           </button>
 
                           <ul className="select__menu">
@@ -501,7 +503,7 @@ export default function SalesVehicleList() {
             type="button"
             className="btn btn--red btn--padding--r30"
             onClick={() => {
-              window.location.href = "m4_w.jsp";
+                router.push('/car-sell/register');
             }}
           >
             <span className="ico ico--add"></span>판매차량 등록
@@ -512,7 +514,7 @@ export default function SalesVehicleList() {
               <input className="select__input" type="hidden" name="dealer" defaultValue="" />
               <button className="select__toggle" type="button">
                 <span className="select__text">매출발행일</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
               </button>
 
               <ul className="select__menu">

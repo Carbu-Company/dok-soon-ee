@@ -50,12 +50,9 @@ const PaginationComponent = ({
 
   return (
     <div className="pagination">
-      <a
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          goToPreviousPage();
-        }}
+      <button
+        type="button"
+        onClick={goToPreviousPage}
         className="pagination__btn pagination__btn--prev"
         style={{ 
           pointerEvents: currentPage === 1 ? 'none' : 'auto',
@@ -63,71 +60,59 @@ const PaginationComponent = ({
         }}
       >
         이전
-      </a>
+      </button>
       
       {/* 첫 페이지 표시 (현재 범위에 포함되지 않은 경우) */}
       {pageNumbers[0] > 1 && (
         <>
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              onPageChange(1);
-            }}
+          <button
+            type="button"
+            onClick={() => onPageChange(1)}
             className={`pagination__btn ${currentPage === 1 ? 'on' : ''}`}
           >
             1
-          </a>
+          </button>
           {pageNumbers[0] > 2 && (
-            <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+            <button type="button" className="pagination__btn">
               ...
-            </a>
+            </button>
           )}
         </>
       )}
 
       {/* 중간 페이지들 */}
       {pageNumbers.map((pageNumber) => (
-        <a
+        <button
           key={pageNumber}
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            onPageChange(pageNumber);
-          }}
+          type="button"
+          onClick={() => onPageChange(pageNumber)}
           className={`pagination__btn ${currentPage === pageNumber ? 'on' : ''}`}
         >
           {pageNumber}
-        </a>
+        </button>
       ))}
 
       {/* 마지막 페이지 표시 (현재 범위에 포함되지 않은 경우) */}
       {pageNumbers[pageNumbers.length - 1] < totalPages && (
         <>
           {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && (
-            <a href="#" className="pagination__btn" onClick={(e) => e.preventDefault()}>
+            <button type="button" className="pagination__btn">
               ...
-            </a>
+            </button>
           )}
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              onPageChange(totalPages);
-            }}
+          <button
+            type="button"
+            onClick={() => onPageChange(totalPages)}
             className={`pagination__btn ${currentPage === totalPages ? 'on' : ''}`}
           >
             {totalPages}
-          </a>
+          </button>
         </>
       )}
 
-      <a
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          goToNextPage();
-        }}
+      <button
+        type="button"
+        onClick={goToNextPage}
         className="pagination__btn pagination__btn--next"
         style={{ 
           pointerEvents: currentPage === totalPages ? 'none' : 'auto',
@@ -135,7 +120,7 @@ const PaginationComponent = ({
         }}
       >
         다음
-      </a>
+      </button>
     </div>
   );
 };
