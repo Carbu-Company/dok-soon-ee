@@ -3,12 +3,7 @@ const MAX_VISIBLE_PAGES = 10; // 한 번에 보여질 최대 페이지 수
 /**
  * 페이지네이션 컴포넌트
  */
-const PaginationComponent = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-  show = true
-}) => {
+const PaginationComponent = ({ currentPage, totalPages, onPageChange, show = true }) => {
   if (!show) return null;
 
   /**
@@ -54,21 +49,21 @@ const PaginationComponent = ({
         type="button"
         onClick={goToPreviousPage}
         className="pagination__btn pagination__btn--prev"
-        style={{ 
-          pointerEvents: currentPage === 1 ? 'none' : 'auto',
-          opacity: currentPage === 1 ? 0.5 : 1 
+        style={{
+          pointerEvents: currentPage === 1 ? "none" : "auto",
+          opacity: currentPage === 1 ? 0.5 : 1,
         }}
       >
         이전
       </button>
-      
+
       {/* 첫 페이지 표시 (현재 범위에 포함되지 않은 경우) */}
       {pageNumbers[0] > 1 && (
         <>
           <button
             type="button"
             onClick={() => onPageChange(1)}
-            className={`pagination__btn ${currentPage === 1 ? 'on' : ''}`}
+            className={`pagination__btn ${currentPage === 1 ? "on" : ""}`}
           >
             1
           </button>
@@ -81,12 +76,12 @@ const PaginationComponent = ({
       )}
 
       {/* 중간 페이지들 */}
-      {pageNumbers.map((pageNumber) => (
+      {pageNumbers.map(pageNumber => (
         <button
           key={pageNumber}
           type="button"
           onClick={() => onPageChange(pageNumber)}
-          className={`pagination__btn ${currentPage === pageNumber ? 'on' : ''}`}
+          className={`pagination__btn ${currentPage === pageNumber ? "on" : ""}`}
         >
           {pageNumber}
         </button>
@@ -103,7 +98,7 @@ const PaginationComponent = ({
           <button
             type="button"
             onClick={() => onPageChange(totalPages)}
-            className={`pagination__btn ${currentPage === totalPages ? 'on' : ''}`}
+            className={`pagination__btn ${currentPage === totalPages ? "on" : ""}`}
           >
             {totalPages}
           </button>
@@ -114,9 +109,9 @@ const PaginationComponent = ({
         type="button"
         onClick={goToNextPage}
         className="pagination__btn pagination__btn--next"
-        style={{ 
-          pointerEvents: currentPage === totalPages ? 'none' : 'auto',
-          opacity: currentPage === totalPages ? 0.5 : 1 
+        style={{
+          pointerEvents: currentPage === totalPages ? "none" : "auto",
+          opacity: currentPage === totalPages ? 0.5 : 1,
         }}
       >
         다음
@@ -125,4 +120,4 @@ const PaginationComponent = ({
   );
 };
 
-export default PaginationComponent; 
+export default PaginationComponent;

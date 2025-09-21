@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import CarGoodsRegisterModal from '@/components/modal/carGoodsRegister';
+import { useState, useEffect } from "react";
+import CarGoodsRegisterModal from "@/components/modal/carGoodsRegister";
+import Image from "next/image";
 
 export default function ProductCostRegisterPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -9,12 +10,12 @@ export default function ProductCostRegisterPage() {
 
   // URL 파라미터를 확인해서 모달을 자동으로 열기
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
-      const openModal = urlParams.get('openModal');
-      const carId = urlParams.get('carId');
-      
-      if (openModal === 'true') {
+      const openModal = urlParams.get("openModal");
+      const carId = urlParams.get("carId");
+
+      if (openModal === "true") {
         setIsModalOpen(true);
         if (carId) {
           setSelectedCarId(carId);
@@ -61,16 +62,16 @@ export default function ProductCostRegisterPage() {
         </div>
         <table className="table">
           <colgroup>
-            <col style={{ width: '100px' }} />
-            <col style={{ width: 'auto' }} />
-            <col style={{ width: '100px' }} />
-            <col style={{ width: 'auto' }} />
-            <col style={{ width: '100px' }} />
-            <col style={{ width: 'auto' }} />
-            <col style={{ width: '100px' }} />
-            <col style={{ width: 'auto' }} />
-            <col style={{ width: '100px' }} />
-            <col style={{ width: 'auto' }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
           </colgroup>
           <tbody>
             <tr>
@@ -98,17 +99,17 @@ export default function ProductCostRegisterPage() {
         </div>
         <table className="table table--xl" id="myTable">
           <colgroup>
-            <col style={{ width: '180px' }} />
-            <col style={{ width: '180px' }} />
-            <col style={{ width: '180px' }} />
-            <col style={{ width: '180px' }} />
-            <col style={{ width: '130px' }} />
-            <col style={{ width: '130px' }} />
-            <col style={{ width: '130px' }} />
-            <col style={{ width: '180px' }} />
-            <col style={{ width: '180px' }} />
-            <col style={{ width: 'auto' }} />
-            <col style={{ width: '64px' }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "130px" }} />
+            <col style={{ width: "130px" }} />
+            <col style={{ width: "130px" }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "64px" }} />
           </colgroup>
           <thead>
             <tr>
@@ -125,7 +126,7 @@ export default function ProductCostRegisterPage() {
                     <span className="ico ico--help">보기</span>
                   </button>
                   <div className="tooltip__box">
-                    <p>매입비용(매입원가)으로 처리할 경우 '체크'</p>
+                    <p>매입비용(매입원가)으로 처리할 경우 &apos;체크&apos;</p>
                   </div>
                 </div>
               </th>
@@ -144,10 +145,19 @@ export default function ProductCostRegisterPage() {
             <tr className="template">
               <td>
                 <div className="select">
-                  <input className="select__input" type="hidden" name="dealer" defaultValue="value1" />
+                  <input
+                    className="select__input"
+                    type="hidden"
+                    name="dealer"
+                    defaultValue="value1"
+                  />
                   <button className="select__toggle" type="button">
                     <span className="select__text">선택</span>
-                    <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                    <Image
+                      className="select__arrow"
+                      src="../assets/images/ico-dropdown.svg"
+                      alt=""
+                    />
                   </button>
 
                   <ul className="select__menu">
@@ -199,7 +209,10 @@ export default function ProductCostRegisterPage() {
                 <div className="input">
                   <input type="text" className="input__field" placeholder="" />
                   <div className="input__utils">
-                    <button type="button" className="jsInputClear input__clear ico ico--input-delete"></button>
+                    <button
+                      type="button"
+                      className="jsInputClear input__clear ico ico--input-delete"
+                    ></button>
                   </div>
                 </div>
               </td>
@@ -226,10 +239,19 @@ export default function ProductCostRegisterPage() {
 
               <td>
                 <div className="select">
-                  <input className="select__input" type="hidden" name="dealer" defaultValue="value1" />
+                  <input
+                    className="select__input"
+                    type="hidden"
+                    name="dealer"
+                    defaultValue="value1"
+                  />
                   <button className="select__toggle" type="button">
                     <span className="select__text">선택</span>
-                    <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                    <Image
+                      className="select__arrow"
+                      src="../assets/images/ico-dropdown.svg"
+                      alt=""
+                    />
                   </button>
 
                   <ul className="select__menu">
@@ -254,7 +276,10 @@ export default function ProductCostRegisterPage() {
                 <div className="input">
                   <input type="text" className="input__field" placeholder="" />
                   <div className="input__utils">
-                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                    <button
+                      type="button"
+                      className="jsInputClear input__clear ico ico--input-delete"
+                    >
                       비고/지출처
                     </button>
                   </div>
@@ -277,11 +302,11 @@ export default function ProductCostRegisterPage() {
         </div>
         <table className="table">
           <colgroup>
-            <col style={{ width: '180px' }} />
-            <col style={{ width: 'auto' }} />
-            <col style={{ width: 'auto' }} />
-            <col style={{ width: 'auto' }} />
-            <col style={{ width: 'auto' }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "auto" }} />
           </colgroup>
           <tbody>
             <tr>
@@ -323,7 +348,7 @@ export default function ProductCostRegisterPage() {
           className="btn btn--light"
           type="button"
           onClick={() => {
-            if (typeof window !== 'undefined') window.location.href = 'm2.jsp';
+            if (typeof window !== "undefined") window.location.href = "m2.jsp";
           }}
         >
           취소

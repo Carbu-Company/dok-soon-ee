@@ -5,10 +5,10 @@ import Link from "next/link";
 export default function Header() {
   // 쿠키에서 CSRF 토큰 가져오기
   const getCsrfToken = () => {
-    const cookies = document.cookie.split(';');
+    const cookies = document.cookie.split(";");
     for (let cookie of cookies) {
-      const [name, value] = cookie.trim().split('=');
-      if (name === 'csrf') {
+      const [name, value] = cookie.trim().split("=");
+      if (name === "csrf") {
         return value;
       }
     }
@@ -18,31 +18,31 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       const csrfToken = getCsrfToken();
-      
+
       if (!csrfToken) {
-        console.warn('CSRF 토큰을 찾을 수 없습니다.');
+        console.warn("CSRF 토큰을 찾을 수 없습니다.");
         // CSRF 토큰이 없어도 로그아웃 진행
-        window.location.href = '/login';
+        window.location.href = "/login";
         return;
       }
 
-      const response = await fetch('/api/auth/logout', { 
-        method: 'POST',
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-csrf-token': csrfToken
-        }
+          "Content-Type": "application/json",
+          "x-csrf-token": csrfToken,
+        },
       });
 
       if (!response.ok) {
-        console.error('로그아웃 요청 실패:', response.status);
+        console.error("로그아웃 요청 실패:", response.status);
       }
     } catch (e) {
-      console.error('로그아웃 에러:', e);
+      console.error("로그아웃 에러:", e);
     }
-    
+
     // 성공/실패 여부와 관계없이 로그인 페이지로 이동
-    window.location.href = '/login';
+    window.location.href = "/login";
   };
 
   return (
@@ -67,7 +67,14 @@ export default function Header() {
             <span>원격지원</span>
           </a>
           {/* JSP로 이동하는 하드링크 대신, 기존 로그아웃 로직 유지 */}
-          <a className="header__nav-menu logout" href="/login" onClick={(e) => { e.preventDefault(); handleLogout(); }}>
+          <a
+            className="header__nav-menu logout"
+            href="/login"
+            onClick={e => {
+              e.preventDefault();
+              handleLogout();
+            }}
+          >
             <span>로그아웃</span>
           </a>
           {/* <a className="header__nav-menu login on" href="#"><span>로그인</span></a> */}
@@ -110,9 +117,7 @@ export default function Header() {
                   <div className="form-option">
                     <label className="form-option__label">
                       <input type="radio" name="searchgroup" defaultChecked />
-                      <span className="form-option__title">
-                        246가5678 | 그랜저 | 홍길동 딜러
-                      </span>
+                      <span className="form-option__title">246가5678 | 그랜저 | 홍길동 딜러</span>
                     </label>
                   </div>
                 </li>
@@ -120,9 +125,7 @@ export default function Header() {
                   <div className="form-option">
                     <label className="form-option__label">
                       <input type="radio" name="searchgroup" />
-                      <span className="form-option__title">
-                        123가5678 | 그랜저 | 홍길동 딜러
-                      </span>
+                      <span className="form-option__title">123가5678 | 그랜저 | 홍길동 딜러</span>
                     </label>
                   </div>
                 </li>
@@ -207,10 +210,14 @@ export default function Header() {
             </button>
             <ul className="select__menu">
               <li className="select__option select__option--selected">
-                <Link href="/car-goods/list" className="select__option-link">차량별 리스트</Link>
+                <Link href="/car-goods/list" className="select__option-link">
+                  차량별 리스트
+                </Link>
               </li>
               <li className="select__option">
-                <Link href="/car-goods/cost" className="select__option-link">상품화비용 리스트</Link>
+                <Link href="/car-goods/cost" className="select__option-link">
+                  상품화비용 리스트
+                </Link>
               </li>
             </ul>
           </div>
@@ -229,10 +236,14 @@ export default function Header() {
             </button>
             <ul className="select__menu">
               <li className="select__option select__option--selected">
-                <Link href="/inventory-finance/inventory-list" className="select__option-link">재고금융 리스트</Link>
+                <Link href="/inventory-finance/inventory-list" className="select__option-link">
+                  재고금융 리스트
+                </Link>
               </li>
               <li className="select__option">
-                <Link href="/inventory-finance/interest-list" className="select__option-link">이자납입 리스트</Link>
+                <Link href="/inventory-finance/interest-list" className="select__option-link">
+                  이자납입 리스트
+                </Link>
               </li>
             </ul>
           </div>
@@ -291,5 +302,3 @@ export default function Header() {
     </header>
   );
 }
-
-

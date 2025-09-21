@@ -93,9 +93,11 @@ export default function OtherDealerMediationSalesPage() {
                     />
                     <button className="select__toggle" type="button">
                       <span className="select__text">알선판매일</span>
-                      <img
+                      <Image
                         className="select__arrow"
-                        src="../assets/images/ico-dropdown.svg"
+                        src="/images/ico-dropdown.svg"
+                        width={10}
+                        height={10}
                         alt=""
                       />
                     </button>
@@ -161,7 +163,13 @@ export default function OtherDealerMediationSalesPage() {
                 />
                 <button className="select__toggle" type="button">
                   <span className="select__text">알선판매일</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
                 </button>
 
                 <ul className="select__menu">
@@ -182,7 +190,13 @@ export default function OtherDealerMediationSalesPage() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">내림차순</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
                 </button>
 
                 <ul className="select__menu">
@@ -200,7 +214,13 @@ export default function OtherDealerMediationSalesPage() {
                 <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
                 <button className="select__toggle" type="button">
                   <span className="select__text">10건씩</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
                 </button>
 
                 <ul className="select__menu">
@@ -256,9 +276,11 @@ export default function OtherDealerMediationSalesPage() {
                         />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img
+                          <Image
                             className="select__arrow"
-                            src="../assets/images/ico-dropdown.svg"
+                            src="/images/ico-dropdown.svg"
+                            width={10}
+                            height={10}
                             alt=""
                           />
                         </button>
@@ -294,9 +316,11 @@ export default function OtherDealerMediationSalesPage() {
                           />
                           <button className="select__toggle" type="button">
                             <span className="select__text">알선판매일</span>
-                            <img
+                            <Image
                               className="select__arrow"
-                              src="../assets/images/ico-dropdown.svg"
+                              src="/images/ico-dropdown.svg"
+                              width={10}
+                              height={10}
                               alt=""
                             />
                           </button>
@@ -343,9 +367,11 @@ export default function OtherDealerMediationSalesPage() {
                         />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img
+                          <Image
                             className="select__arrow"
-                            src="../assets/images/ico-dropdown.svg"
+                            src="/images/ico-dropdown.svg"
+                            width={10}
+                            height={10}
                             alt=""
                           />
                         </button>
@@ -418,9 +444,11 @@ export default function OtherDealerMediationSalesPage() {
                         />
                         <button className="select__toggle" type="button">
                           <span className="select__text">선택</span>
-                          <img
+                          <Image
                             className="select__arrow"
-                            src="../assets/images/ico-dropdown.svg"
+                            src="/images/ico-dropdown.svg"
+                            width={10}
+                            height={10}
                             alt=""
                           />
                         </button>
@@ -497,7 +525,13 @@ export default function OtherDealerMediationSalesPage() {
               />
               <button className="select__toggle" type="button">
                 <span className="select__text">알선판매일</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
               <ul className="select__menu">
@@ -515,7 +549,13 @@ export default function OtherDealerMediationSalesPage() {
               <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
               <button className="select__toggle" type="button">
                 <span className="select__text">내림차순</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
               <ul className="select__menu">
@@ -533,7 +573,13 @@ export default function OtherDealerMediationSalesPage() {
               <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
               <button className="select__toggle" type="button">
                 <span className="select__text">10건씩</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
               <ul className="select__menu">
