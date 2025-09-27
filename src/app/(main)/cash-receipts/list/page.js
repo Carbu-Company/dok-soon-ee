@@ -1,18 +1,18 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import ListPage from "@/app/(main)/inventory-finance/inventory-list/ListPage";
-import { getCarLoanCarSumList, getCarLoanSummary } from "./api";
+import ListPage from "@/app/(main)/cash-receipts/list/ListPage";
+import { getCarCashList, getCarCashSummary } from "./api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
 // Server Action 정의
-async function searchCarLoanCarSumList(searchParamsWithPage) {
+async function searchCarCashList(searchParamsWithPage) {
   "use server";
 
   try {
-    const result = await getCarLoanCarSumList(searchParamsWithPage);
+    const result = await getCarCashList(searchParamsWithPage);
 
     console.log('서버 액션 결과*******************:', { 
-      carLoanCarSumListLength: result?.data?.carLoanCarSumList?.length, 
+      carCashListLength: result?.data?.carCashList?.length, 
       totalCount: result?.data?.pagination?.totalCount,
       page: searchParamsWithPage.page,
       pageSize: searchParamsWithPage.pageSize 
@@ -27,11 +27,11 @@ async function searchCarLoanCarSumList(searchParamsWithPage) {
 
 
 // Server Action 정의
-async function searchCarLoanSummary(searchParamsWithPage) {
+async function searchCarCashSummary(searchParamsWithPage) {
   "use server";
   
   try {
-    const result = await getCarLoanSummary(searchParamsWithPage);
+    const result = await getCarCashSummary(searchParamsWithPage);
 
     return result;
   } catch (error) {
@@ -42,13 +42,13 @@ async function searchCarLoanSummary(searchParamsWithPage) {
 
 
 // Server Action 정의
-async function searchCarLoanCarSumListAndSummary(searchParamsWithPage) {
+async function searchCarCashListAndSummary(searchParamsWithPage) {
   "use server";
   
   try {
     const [listResult, summaryResult] = await Promise.all([
-      getCarLoanCarSumList(searchParamsWithPage),
-      getCarLoanSummary(searchParamsWithPage)
+      getCarCashList(searchParamsWithPage),
+      getCarCashSummary(searchParamsWithPage)
     ]);
 
     return {
@@ -65,7 +65,7 @@ async function searchCarLoanCarSumListAndSummary(searchParamsWithPage) {
   }
 }
 
-export default async function CarLoanCarSumList() {
+export default async function CarCashList() {
   /* 쿠키에서 세션 정보 가져오기
   {
   usrId: '005110001',
@@ -104,16 +104,16 @@ export default async function CarLoanCarSumList() {
     ordAscDesc: 'desc'
   };
 
-  const carLoanCarSumList = await searchCarLoanCarSumList({ ...defaultParams, ...searchParams });
+  const carCashList = await searchCarCashList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
-  const carLoanSummary = await searchCarLoanSummary({ ...defaultParams, ...searchParams });
+  const carCashSummary = await searchCarCashSummary({ ...defaultParams, ...searchParams });
 
   return <ListPage session={session}
-                   carList={carLoanCarSumList}
+                   carList={carCashList}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
-                   searchAction={searchCarLoanCarSumListAndSummary}
-                   carSummary={carLoanSummary}
+                   searchAction={searchCarCashListAndSummary}
+                   carSummary={carCashSummary}
    />;
 }

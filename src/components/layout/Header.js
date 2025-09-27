@@ -248,19 +248,19 @@ export default function Header() {
             </ul>
           </div>
 
-          <Link href="/car-sell" className="header__gnb-menu">
+          <Link href="/car-sell/list" className="header__gnb-menu">
             매도(판매)/정산
           </Link>
-          <Link href="/cash-receipts" className="header__gnb-menu">
+          <Link href="/cash-receipts/list" className="header__gnb-menu">
             현금영수증
           </Link>
-          <Link href="/electronic-tax-invoice" className="header__gnb-menu">
+          <Link href="/electronic-tax-invoice/list" className="header__gnb-menu">
             전자세금계산서
           </Link>
-          <Link href="/car-concil" className="header__gnb-menu">
+          <Link href="/car-concil/list" className="header__gnb-menu">
             타상사알선판매
           </Link>
-          <a href="/bank-account" className="header__gnb-menu">
+          <a href="/bank-account/list" className="header__gnb-menu">
             통장입출금내역
           </a>
 

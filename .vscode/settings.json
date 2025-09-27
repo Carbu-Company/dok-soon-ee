@@ -1,6 +1,6 @@
 {
     "eslint.enable": false,
     "editor.codeActionsOnSave": {},
-    "editor.lightbulb.enabled": false
+    "editor.lightbulb.enabled": "off"
 }
   

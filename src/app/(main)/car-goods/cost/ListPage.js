@@ -1,13 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PaginationComponent from "@/components/utils/PaginationComponent";
-import PurchaseRemoveModal from "@/components/modal/PurchaseRemoveModal";
-import { useRouter } from "next/navigation";
+import CarGoodsRegisterModal from "@/components/modal/carGoodsRegister";
+import Image from "next/image";
 
-export default function ListPage(props) {
+export default function ProductCostList(props) {
   const router = useRouter();
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 기본 검색 영역
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -20,17 +21,19 @@ export default function ListPage(props) {
   const initialPagination = props.carList?.data?.pagination || {};
 
   // Summary 데이터
-  const initialPurchasesSummary = props.purchasesSummary?.data || [];
+  const initialGoodsFeeCarSummary = props.carSummary?.data || [];
 
   const [carList, setCarList] = useState(initialCarListData);
   const [pagination, setPagination] = useState(initialPagination);
   const [totalPages, setTotalPages] = useState(initialPagination.totalPages || 1);
 
-  const [purchasesSummary, setPurchasesSummary] = useState(initialPurchasesSummary);
+  const [goodsFeeCarSummary, setGoodsFeeCarSummary] = useState(initialGoodsFeeCarSummary);
 
   const [dealerList, setDealerList] = useState(props.dealerList || []);
-  const [evdcCdList, setEvdcCdList] = useState(props.evdcCdList || []);
+  const [expdItemList, setExpdItemList] = useState(props.expdItemList || []);
+  const [expdEvdcList, setExpdEvdcList] = useState(props.expdEvdcList || []);
 
+  
   const [currentPage, setCurrentPage] = useState(initialPagination.currentPage || 1);
   const [pageSize, setPageSize] = useState(initialPagination.pageSize || 10);
 
@@ -52,7 +55,7 @@ export default function ListPage(props) {
   const [endDt, setEndDt] = useState("");
 
   // 매입취소/삭제 모달 관련 state
-  const [isPurchaseRemoveModalOpen, setIsPurchaseRemoveModalOpen] = useState(false);
+  const [isGoodsFeeCarRemoveModalOpen, setIsGoodsFeeCarRemoveModalOpen] = useState(false);
   const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
   const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
 
@@ -91,11 +94,6 @@ export default function ListPage(props) {
   // 상세 검색 영역
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // 페이지네이션 영역
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   // 페이지 정렬 순서 항목
 
   // 정렬순서 항목
@@ -128,7 +126,7 @@ export default function ListPage(props) {
     console.log("listCount", listCountDtl);
   }, [ordItemDtl, ordAscDescDtl, listCountDtl]);
 
-
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // 상세 검색 차량번호
   const [dtlCarNo, setDtlCarNo] = useState("");
@@ -144,32 +142,32 @@ export default function ListPage(props) {
   const [dtlStartDt, setDtlStartDt] = useState("");
   const [dtlEndDt, setDtlEndDt] = useState("");
 
-  // 상세 검색 고객명
-  const [dtlCustomerName, setDtlCustomerName] = useState("");
+  // 상세 검색 차량번호(신)
+  const [dtlNewCarNo, setDtlNewCarNo] = useState("");
 
-  // 상세 검색 고객구분
-  const [dtlCustGubun, setDtlCustGubun] = useState("");
-  const [isDtlCustGubunSelectOpen, setIsDtlCustGubunSelectOpen] = useState(false);
+  // 상세 검색 차량번호(구)
+  const [dtlOldCarNo, setDtlOldCarNo] = useState("");
 
-  // 상세 검색 증빙종류
-  const [dtlEvdcGubun, setDtlEvdcGubun] = useState("");
-  const [isDtlEvdcGubunSelectOpen, setIsDtlEvdcGubunSelectOpen] = useState(false);
+  // 과세 구분
+  const [dtlTaxGubun, setDtlTaxGubun] = useState("");
+  const [isDtlTaxGubunSelectOpen, setIsDtlTaxGubunSelectOpen] = useState(false);
 
-  // 상세 검색 제시구분분
-  const [dtlPrsnGubun, setDtlPrsnGubun] = useState("");
-  const [isDtlPrsnGubunSelectOpen, setIsDtlPrsnGubunSelectOpen] = useState(false);
+  // 상세 검색 지출항목
+  const [dtlExpdItem, setDtlExpdItem] = useState("");
+  const [isDtlExpdItemSelectOpen, setIsDtlExpdItemSelectOpen] = useState(false);
 
-  // 상세 검색 사업자등록번호
-  const [dtlOwnerBrno, setDtlOwnerBrno] = useState("");
+  // 상세 검색 과세/면세 구분
+  const [dtlExpdEvdc, setDtlExpdEvdc] = useState("");
+  const [isDtlExpdEvdcSelectOpen, setIsDtlExpdEvdcSelectOpen] = useState(false);
 
-  // 상세 검색 주민(법인)등록번호
-  const [dtlOwnerSsn, setDtlOwnerSsn] = useState("");
+  // 상세 검색 지출구분
+  const [dtlExpdGubun, setDtlExpdGubun] = useState("");
 
-  // 상세 검색 계약서번호
-  const [dtlCtshNo, setDtlCtshNo] = useState("");
+  // 상세 검색 비고/지출처
+  const [dtlRmrk, setDtlRmrk] = useState("");
 
-  // 상세 검색 차량번호(매입전)
-  const [dtlCarNoBefore, setDtlCarNoBefore] = useState("");
+  // 상세 검색 반영/제외 구분
+  const [dtlAdjInclusYN, setDtlAdjInclusYN] = useState("");
 
   // setSearchBtn
   const [searchBtn, setSearchBtn] = useState(1);
@@ -192,14 +190,14 @@ export default function ListPage(props) {
     dtGubun: searchBtn === 1 ? dtGubun : dtlDtGubun,
     startDt: searchBtn === 1 ? startDt : dtlStartDt,
     endDt: searchBtn === 1 ? endDt : dtlEndDt,
-    dtlCustomerName: dtlCustomerName,
-    dtlCustGubun: dtlCustGubun,
-    dtlEvdcGubun: dtlEvdcGubun,
-    dtlPrsnGubun: dtlPrsnGubun,
-    dtlOwnerBrno: dtlOwnerBrno,
-    dtlOwnerSsn: dtlOwnerSsn,
-    dtlCtshNo: dtlCtshNo,
-    dtlCarNoBefore: dtlCarNoBefore,
+    dtlOldCarNo: dtlOldCarNo,
+    dtlNewCarNo: dtlNewCarNo,
+    dtlExpdItem: dtlExpdItem,
+    dtlTaxGubun: dtlTaxGubun,
+    dtlExpdGubun: dtlExpdGubun,
+    dtlExpdEvdc: dtlExpdEvdc,
+    dtlRmrk: dtlRmrk,
+    dtlAdjInclusYN: dtlAdjInclusYN,
     orderItem: ordItem,
     ordAscDesc: ordAscDesc,
   };
@@ -235,7 +233,7 @@ export default function ListPage(props) {
 
           setCarList(responseData);
           setPagination(paginationInfo);
-          setPurchasesSummary(summaryData);
+          setGoodsFeeCarSummary(summaryData);
 
           // 서버에서 제공하는 페이지네이션 정보 사용
           setTotalPages(paginationInfo.totalPages || 1);
@@ -279,26 +277,6 @@ export default function ListPage(props) {
     handleSearch(1);
   };
 
-  // 매입취소/삭제 모달 관련 핸들러
-  const handlePurchaseRemoveModalOpen = (car, type) => {
-    setSelectedCarForRemove(car);
-    setSelectedCarTypeForRemove(type);
-    setIsPurchaseRemoveModalOpen(true);
-  };
-
-  const handlePurchaseRemoveModalClose = () => {
-    setIsPurchaseRemoveModalOpen(false);
-    setSelectedCarForRemove(null);
-  };
-
-  const handlePurchaseRemoveConfirm = async () => {
-    // TODO: 실제 매입취소/삭제 API 호출 구현
-    console.log("매입취소/삭제 확인:", selectedCarForRemove);
-    // API 호출 후 성공하면 모달 닫기 및 목록 새로고침
-    handlePurchaseRemoveModalClose();
-    // handleSearch(currentPage); // 목록 새로고침
-  };
-
   /**
    * 페이지 처리
    */
@@ -306,22 +284,27 @@ export default function ListPage(props) {
     await handleSearch(page);
   };
 
-  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">매입차량 리스트</h2>
+        <h2 className="container__title">상품화비용 리스트(차량별)</h2>
+
         <div className="guidebox">
-          <p className="guidebox__title">이용안내</p>
+          <p className="guidebox__title">차량 : 상품화항목 = 1 : N</p>
           <p className="guidebox__desc">
-            ※ 신규 제시 등록 및 현재 제시 상태의 차량을 관리할 수 있습니다.
+            ※ 상품화비용을 차량별, 상품화 비용건별 확인이 가능합니다.
+          </p>
+          <p className="guidebox__desc">
+            ※ 상품화 비용은 일반적으로 상사 매입 자료로 비용 처리하여 세무상 반영할 수 있습니다.
+            다만, 적격 증빙 여부 등 구체적인 사항은 세무사 사무실에 확인하시기 바랍니다.
           </p>
         </div>
       </div>
 
       <div className="table-wrap">
-        <h2 className="table-wrap__title">매입차량 검색</h2>
+        <h2 className="table-wrap__title">검색</h2>
         <table className="table table--lg">
           <colgroup>
             <col style={{ width: "10%" }} />
@@ -336,13 +319,7 @@ export default function ListPage(props) {
               <th>차량번호</th>
               <td>
                 <div className="input">
-                  <input
-                    type="text"
-                    className="input__field"
-                    placeholder="차량번호(매입전/후)"
-                    value={carNo}
-                    onChange={e => setCarNo(e.target.value)}
-                  />
+                  <input type="text" className="input__field" placeholder="차량번호(매입전/후)" value={carNo} onChange={e => setCarNo(e.target.value)} />
                   <div className="input__utils">
                     <button
                       type="button"
@@ -429,9 +406,9 @@ export default function ListPage(props) {
                         {dtGubun === "01"
                           ? "제시(매입)일"
                           : dtGubun === "02"
-                            ? "이전일"
+                            ? "상품화등록일"
                             : dtGubun === "03"
-                              ? "똑순이등록일"
+                              ? "매도(판매)일"
                               : "선택"}
                       </span>
                       <Image
@@ -457,22 +434,22 @@ export default function ListPage(props) {
                         제시(매입)일
                       </li>
                       <li
-                        className={`select__option ${dtGubun === "이전일" ? "select__option--selected" : ""}`}
+                        className={`select__option ${dtGubun === "상품화등록일" ? "select__option--selected" : ""}`}
                         onClick={() => {
                           setDtGubun("02");
                           setIsDtGubunSelectOpen(false);
                         }}
                       >
-                        이전일
+                        상품화등록일
                       </li>
                       <li
-                        className={`select__option ${dtGubun === "똑순이등록일" ? "select__option--selected" : ""}`}
+                        className={`select__option ${dtGubun === "매도(판매)일" ? "select__option--selected" : ""}`}
                         onClick={() => {
                           setDtGubun("03");
                           setIsDtGubunSelectOpen(false);
                         }}
                       >
-                        똑순이등록일
+                        매도(판매)일
                       </li>
                     </ul>
                   </div>
@@ -531,15 +508,15 @@ export default function ListPage(props) {
                 <span className="ico ico--reset"></span>선택 초기화
               </button>
 
-            {/* 딜러명 */}
+            {/* 항목 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="제시일" />
+              <input className="select__input" type="hidden" name="dealer" defaultValue="제시(매입)일" />
               <button
                 className="select__toggle"
                 type="button"
                 onClick={() => setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl)}
               >
-                <span className="select__text">{ordItemDtl || "제시일"}</span>
+                <span className="select__text">{ordItemDtl || "제시(매입)일"}</span>
                 <Image
                   className="select__arrow"
                   src="/images/ico-dropdown.svg"
@@ -554,44 +531,34 @@ export default function ListPage(props) {
                 style={{ display: isOrdItemSelectOpenDtl ? "block" : "none" }}
                 >
                 <li
-                  className={`select__option ${ordItemDtl === "제시일" ? "select__option--selected" : ""}`}
+                  className={`select__option ${ordItemDtl === "제시(매입)일" ? "select__option--selected" : ""}`}
                   onClick={() => {
-                    setOrdItemDtl("제시일");
+                    setOrdItemDtl("제시(매입)일");
                     setIsOrdItemSelectOpenDtl(false);
                     handleSearch(1);
                   }}
                 >
-                  제시일
+                  제시(매입)일
                 </li>
                 <li
-                  className={`select__option ${ordItemDtl === "담당딜러" ? "select__option--selected" : ""}`}
+                  className={`select__option ${ordItemDtl === "차량번호" ? "select__option--selected" : ""}`}
                   onClick={() => {
-                    setOrdItemDtl("담당딜러");
+                    setOrdItemDtl("차량번호");
                     setIsOrdItemSelectOpenDtl(false);
                     handleSearch(1);
                   }}
                 >
-                  담당딜러
+                  차량번호
                 </li>
                 <li
-                  className={`select__option ${ordItemDtl === "제시구분" ? "select__option--selected" : ""}`}
+                  className={`select__option ${ordItemDtl === "상품화등록일" ? "select__option--selected" : ""}`}
                   onClick={() => {
-                    setOrdItemDtl("제시구분");
+                    setOrdItemDtl("상품화등록일");
                     setIsOrdItemSelectOpenDtl(false);
                     handleSearch(1);
                   }}
                 >
-                  제시구분
-                </li>
-                <li
-                  className={`select__option ${ordItemDtl === "고객유형" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItemDtl("고객유형");
-                    setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
-                  }}
-                >
-                  고객유형
+                  상품화등록일
                 </li>
               </ul>
             </div>
@@ -715,15 +682,15 @@ export default function ListPage(props) {
                 </colgroup>
                 <tbody>
                   <tr>
-                    <th>차량번호(매입후)</th>
+                    <th>차량번호(신)</th>
                     <td>
                       <div className="input">
                         <input
                           type="text"
                           className="input__field"
-                          placeholder="차량번호(매입후)"
-                          value={dtlCarNo}
-                          onChange={e => setDtlCarNo(e.target.value)}
+                          placeholder="차량번호(신)"
+                          value={dtlNewCarNo}
+                          onChange={e => setDtlNewCarNo(e.target.value)}
                         />
                         <div className="input__utils">
                           <button
@@ -839,22 +806,22 @@ export default function ListPage(props) {
                               제시(매입)일
                             </li>
                             <li
-                              className={`select__option ${dtlDtGubun === "이전일" ? "select__option--selected" : ""}`}
+                              className={`select__option ${dtlDtGubun === "상품화등록일일" ? "select__option--selected" : ""}`}
                               onClick={() => {
                                 setDtlDtGubun("02");
                                 setIsDtlDtGubunSelectOpen(false);
                               }}
                             >
-                              이전일
+                              상품화등록일
                             </li>
                             <li
-                              className={`select__option ${dtlDtGubun === "똑순이등록일" ? "select__option--selected" : ""}`}
+                              className={`select__option ${dtlDtGubun === "매도(판매)일" ? "select__option--selected" : ""}`}
                               onClick={() => {
                                 setDtlDtGubun("03");
                                 setIsDtlDtGubunSelectOpen(false);
                               }}
                             >
-                              똑순이등록일
+                              매도(판매)일
                             </li>
                           </ul>
                         </div>
@@ -883,17 +850,16 @@ export default function ListPage(props) {
                       </div>
                     </td>
                   </tr>
-
                   <tr>
-                    <th>차량번호(매입전)</th>
+                    <th>차량번호(구)</th>
                     <td>
                       <div className="input">
                         <input
                           type="text"
                           className="input__field"
-                          placeholder="차량번호(매입전)"
-                          value={dtlCarNoBefore}
-                          onChange={e => setDtlCarNoBefore(e.target.value)}
+                          placeholder="차량번호(구)"
+                          value={dtlOldCarNo}
+                          onChange={e => setDtlOldCarNo(e.target.value)}
                         />
                         <div className="input__utils">
                           <button
@@ -905,27 +871,8 @@ export default function ListPage(props) {
                         </div>
                       </div>
                     </td>
-                    <th>고객명</th>
-                    <td>
-                      <div className="input">
-                        <input
-                          type="text"
-                          className="input__field"
-                          placeholder="고객명"
-                          value={dtlCustomerName}
-                          onChange={e => setDtlCustomerName(e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button
-                            type="button"
-                            className="jsInputClear input__clear ico ico--input-delete"
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <th>고객구분</th>
+
+                    <th>비용항목</th>
                     <td>
                       <div className="select">
                         <input
@@ -934,81 +881,14 @@ export default function ListPage(props) {
                           name="dealer"
                           defaultValue=""
                         />
-                        <button
-                          className="select__toggle"
+                        <button 
+                          className="select__toggle" 
                           type="button"
-                          onClick={() => setIsDtlCustGubunSelectOpen(!isDtlCustGubunSelectOpen)}
+                          onClick={() => setIsDtlExpdItemSelectOpen(!isDtlExpdItemSelectOpen)}
                         >
                           <span className="select__text">
-                            {dtlCustGubun === "01"
-                              ? "개인"
-                              : dtlCustGubun === "02"
-                                ? "법인"
-                                : "선택"}
-                          </span>
-                          <Image
-                            className="select__arrow"
-                            src="/images/ico-dropdown.svg"
-                            alt=""
-                            width={10}
-                            height={10}
-                          />
-                        </button>
-
-                        <ul
-                          className="select__menu"
-                          style={{ display: isDtlCustGubunSelectOpen ? "block" : "none" }}
-                        >
-                          <li
-                            className={`select__option ${dtlCustGubun === "" ? "select__option--selected" : ""}`}
-                            onClick={() => {
-                              setDtlCustGubun("");
-                              setIsDtlCustGubunSelectOpen(false);
-                            }}
-                          >
-                            선택
-                          </li>
-                          <li
-                            className={`select__option ${dtlCustGubun === "01" ? "select__option--selected" : ""}`}
-                            onClick={() => {
-                              setDtlCustGubun("01");
-                              setIsDtlCustGubunSelectOpen(false);
-                            }}
-                          >
-                            개인
-                          </li>
-                          <li
-                            className={`select__option ${dtlCustGubun === "02" ? "select__option--selected" : ""}`}
-                            onClick={() => {
-                              setDtlCustGubun("02");
-                              setIsDtlCustGubunSelectOpen(false);
-                            }}
-                          >
-                            법인
-                          </li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <th>증빙종류</th>
-                    <td>
-                      <div className="select">
-                        <input
-                          className="select__input"
-                          type="hidden"
-                          name="dealer"
-                          defaultValue=""
-                        />
-                        <button
-                          className="select__toggle"
-                          type="button"
-                          onClick={() => setIsDtlEvdcGubunSelectOpen(!isDtlEvdcGubunSelectOpen)}
-                        >
-                          <span className="select__text">
-                            {dtlEvdcGubun
-                              ? evdcCdList.find(item => item.CD === dtlEvdcGubun)?.CD_NM
+                            {dtlExpdItem 
+                              ? expdItemList.find(c => c.CD === dtlExpdItem)?.CD_NM || "선택"
                               : "선택"}
                           </span>
                           <Image
@@ -1020,142 +900,234 @@ export default function ListPage(props) {
                           />
                         </button>
 
-                        <ul
+                        <ul 
                           className="select__menu"
-                          style={{ display: isDtlEvdcGubunSelectOpen ? "block" : "none" }}
+                          style={{ display: isDtlExpdItemSelectOpen ? "block" : "none" }}
                         >
-                          <li
-                            className={`select__option ${dtlEvdcGubun === "" ? "select__option--selected" : ""}`}
+                          <li 
+                            className={`select__option ${!dtlExpdItem ? "select__option--selected" : ""}`}
                             onClick={() => {
-                              setDtlEvdcGubun("");
-                              setIsDtlEvdcGubunSelectOpen(false);
+                              setDtlExpdItem("");
+                              setIsDtlExpdItemSelectOpen(false);
                             }}
                           >
                             선택
                           </li>
-                          {evdcCdList.map(item => (
+                          {expdItemList.map((code) => (
                             <li
-                              key={item.CD}
-                              className={`select__option ${dtlEvdcGubun === item.CD ? "select__option--selected" : ""}`}
+                              key={code.CD}
+                              className={`select__option ${dtlExpdItem === code.CD ? "select__option--selected" : ""}`}
                               onClick={() => {
-                                setDtlEvdcGubun(item.CD);
-                                setIsDtlEvdcGubunSelectOpen(false);
+                                setDtlExpdItem(code.CD);
+                                setIsDtlExpdItemSelectOpen(false);
                               }}
                             >
-                              {item.CD_NM}
+                              {code.CD_NM}
                             </li>
                           ))}
                         </ul>
                       </div>
                     </td>
-                    <th>주민(법인)등록번호</th>
-                    <td>
-                      <div className="input">
-                        <input
-                          type="text"
-                          className="input__field"
-                          placeholder="주민(법인)등록번호"
-                          value={dtlOwnerSsn}
-                          onChange={e => setDtlOwnerSsn(e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button
-                            type="button"
-                            className="jsInputClear input__clear ico ico--input-delete"
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <th>계약서번호</th>
-                    <td>
-                      <div className="input">
-                        <input
-                          type="text"
-                          className="input__field"
-                          placeholder="계약서번호"
-                          value={dtlCtshNo}
-                          onChange={e => setDtlCtshNo(e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button
-                            type="button"
-                            className="jsInputClear input__clear ico ico--input-delete"
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
 
-                  <tr>
-                    <th>제시구분</th>
+                    <th>과세구분</th>
                     <td>
                       <div className="form-option-wrap">
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input
-                              type="radio"
-                              checked={dtlPrsnGubun === ""}
-                              name="group-type"
-                              onChange={() => setDtlPrsnGubun("")}
+                            <input 
+                              type="radio" 
+                              checked={dtlTaxGubun === ""} 
+                              onChange={() => setDtlTaxGubun("")}
+                              name="group-type2" 
                             />
                             <span className="form-option__title">전체</span>
                           </label>
                         </div>
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input
-                              type="radio"
-                              name="group-type"
-                              checked={dtlPrsnGubun === "01"}
-                              onChange={() => setDtlPrsnGubun("01")}
+                            <input 
+                              type="radio" 
+                              checked={dtlTaxGubun === "1"}
+                              onChange={() => setDtlTaxGubun("1")}
+                              name="group-type2" 
                             />
-                            <span className="form-option__title">상사매입</span>
+                            <span className="form-option__title">과세</span>
                           </label>
                         </div>
 
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input
-                              type="radio"
-                              name="group-type"
-                              checked={dtlPrsnGubun === "02"}
-                              onChange={() => setDtlPrsnGubun("02")}
+                            <input 
+                              type="radio" 
+                              checked={dtlTaxGubun === "2"}
+                              onChange={() => setDtlTaxGubun("2")}
+                              name="group-type2" 
                             />
-                            <span className="form-option__title">고객위탁</span>
+                            <span className="form-option__title">면세</span>
                           </label>
                         </div>
                       </div>
                     </td>
-                    <th>사업자등록번호</th>
+                  </tr>
+                  <tr>
+                    <th>지출구분</th>
+                    <td>
+                      <div className="form-option-wrap">
+                        <div className="form-option">
+                          <label className="form-option__label">
+                            <input 
+                              type="radio" 
+                              checked={dtlExpdGubun === ""} 
+                              onChange={() => setDtlExpdGubun("")}
+                              name="group-type" 
+                            />
+                            <span className="form-option__title">전체</span>
+                          </label>
+                        </div>
+                        <div className="form-option">
+                          <label className="form-option__label">
+                            <input 
+                              type="radio"
+                              checked={dtlExpdGubun === "1"}
+                              onChange={() => setDtlExpdGubun("1")} 
+                              name="group-type" 
+                            />
+                            <span className="form-option__title">상사지출</span>
+                          </label>
+                        </div>
+
+                        <div className="form-option">
+                          <label className="form-option__label">
+                            <input 
+                              type="radio"
+                              checked={dtlExpdGubun === "2"}
+                              onChange={() => setDtlExpdGubun("2")}
+                              name="group-type" 
+                            />
+                            <span className="form-option__title">딜러지출</span>
+                          </label>
+                        </div>
+                      </div>
+                    </td>
+                    <th>지출증빙</th>
+                    <td>
+                      <div className="select">
+                        <input
+                          className="select__input"
+                          type="hidden"
+                          name="expdEvdc"
+                          value={dtlExpdEvdc}
+                          onChange={(e) => setDtlExpdEvdc(e.target.value)}
+                        />
+                        <button 
+                          className="select__toggle" 
+                          type="button"
+                          onClick={() => setIsDtlExpdEvdcSelectOpen(!isDtlExpdEvdcSelectOpen)}
+                        >
+                          <span className="select__text">
+                            {dtlExpdEvdc ? expdEvdcList.find(item => item.CD === dtlExpdEvdc)?.CD_NM : '선택'}
+                          </span>
+                          <img
+                            className="select__arrow"
+                            src="../assets/images/ico-dropdown.svg"
+                            alt=""
+                          />
+                        </button>
+
+                        <ul className={`select__menu ${isDtlExpdEvdcSelectOpen ? 'active' : ''}`}>
+                          <li
+                            className={`select__option ${!dtlExpdEvdc ? 'select__option--selected' : ''}`}
+                            onClick={() => {
+                              setDtlExpdEvdc('');
+                              setIsDtlExpdEvdcSelectOpen(false);
+                            }}
+                          >
+                            선택
+                          </li>
+                          {expdEvdcList.map((item) => (
+                            <li 
+                              key={item.CD}
+                              className={`select__option ${dtlExpdEvdc === item.CD ? 'select__option--selected' : ''}`}
+                              onClick={() => {
+                                setDtlExpdEvdc(item.CD);
+                                setIsDtlExpdEvdcSelectOpen(false);
+                              }}
+                            >
+                              {item.CD_NM} 
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </td>
+                    <th>비고/지출처</th>
                     <td>
                       <div className="input">
-                        <input
-                          type="text"
-                          className="input__field"
-                          placeholder="사업자등록번호"
-                          value={dtlOwnerBrno}
-                          onChange={e => setDtlOwnerBrno(e.target.value)}
+                        <input 
+                          type="text" 
+                          className="input__field" 
+                          placeholder=""
+                          value={dtlRmrk}
+                          onChange={(e) => setDtlRmrk(e.target.value)}
                         />
                         <div className="input__utils">
                           <button
                             type="button"
                             className="jsInputClear input__clear ico ico--input-delete"
+                            onClick={() => setDtlRmrk('')}
                           >
                             삭제
                           </button>
                         </div>
                       </div>
                     </td>
+                  </tr>
+                  <tr>
+                    <th>정산반영여부</th>
+                    <td>
+                      <div className="form-option-wrap">
+                        <div className="form-option">
+                          <label className="form-option__label">
+                            <input 
+                              type="radio" 
+                              checked={dtlAdjInclusYN === ""} 
+                              onChange={() => setDtlAdjInclusYN("")}
+                              name="group-type3" 
+                            />
+                            <span className="form-option__title">전체</span>
+                          </label>
+                        </div>
+                        <div className="form-option">
+                          <label className="form-option__label">
+                            <input 
+                              type="radio" 
+                              checked={dtlAdjInclusYN === "Y"}
+                              onChange={() => setDtlAdjInclusYN("Y")}
+                              name="group-type3" 
+                            />
+                            <span className="form-option__title">반영</span>
+                          </label>
+                        </div>
+
+                        <div className="form-option">
+                          <label className="form-option__label">
+                            <input 
+                              type="radio" 
+                              checked={dtlAdjInclusYN === "N"}
+                              onChange={() => setDtlAdjInclusYN("N")}
+                              name="group-type3" 
+                            />
+                            <span className="form-option__title">제외</span>
+                          </label>
+                        </div>
+                      </div>
+                    </td>
+                    <th></th>
+                    <td></td>
                     <th></th>
                     <td></td>
                   </tr>
 
-                  {/* 기타 검색 (주석 처리) */}
-                  {/*
+                  {/* 
                     <tr>
                       <th>기타 검색</th>
                       <td colSpan={5}>
@@ -1166,14 +1138,14 @@ export default function ListPage(props) {
                               <span className="select__text">선택</span>
                               <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
                             </button>
-
+  
                             <ul className="select__menu">
                               <li className="select__option select__option--selected" data-value="1">선택</li>
                               <li className="select__option" data-value="2">선택2</li>
                               <li className="select__option" data-value="2">선택3</li>
                             </ul>
                           </div>
-
+  
                           <div className="input w200">
                             <input type="text" className="input__field" placeholder="Input" />
                             <div className="input__utils">
@@ -1202,78 +1174,41 @@ export default function ListPage(props) {
 
       <div className="table-wrap">
         <h2 className="table-wrap__title">
-          매입차량 리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span>
+          리스트<span>Total 100건</span>
         </h2>
         <div className="table-wrap__head table-wrap__title">
           <button
             type="button"
-            className="btn btn--red"
-            onClick={() => (window.location.href = "/purchases/register")}
+            className="btn btn--red btn--padding--r30"
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              router.push("/car-goods/register");
+            }}
           >
-            <span className="ico ico--add"></span>매입차량 직접등록
+            <span className="ico ico--add"></span>상품화비용 등록
           </button>
           <div className="input-group">
             {/* 딜러명 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="제시일" />
-              <button
-                className="select__toggle"
-                type="button"
-                onClick={() => setIsOrdItemSelectOpen(!isOrdItemSelectOpen)}
-              >
-                <span className="select__text">{ordItem || "제시일"}</span>
-                <Image
-                  className="select__arrow"
-                  src="/images/ico-dropdown.svg"
-                  alt=""
-                  width={10}
-                  height={10}
-                />
+              <input className="select__input" type="hidden" name="dealer" defaultValue="" />
+              <button className="select__toggle" type="button">
+                <span className="select__text">등록일</span>
+                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
               </button>
 
-              <ul
-                className="select__menu"
-                style={{ display: isOrdItemSelectOpen ? "block" : "none" }}
-              >
-                <li
-                  className={`select__option ${ordItem === "제시일" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItem("제시일");
-                    setIsOrdItemSelectOpen(false);
-                    handleSearch(1);
-                  }}
-                >
-                  제시일
+              <ul className="select__menu">
+                <li className="select__option select__option--selected" data-value="">
+                  등록일
                 </li>
-                <li
-                  className={`select__option ${ordItem === "담당딜러" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItem("담당딜러");
-                    setIsOrdItemSelectOpen(false);
-                    handleSearch(1);
-                  }}
-                >
-                  담당딜러
+                <li className="select__option" data-value="">
+                  결제일
                 </li>
-                <li
-                  className={`select__option ${ordItem === "제시구분" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItem("제시구분");
-                    setIsOrdItemSelectOpen(false);
-                    handleSearch(1);
-                  }}
-                >
-                  제시구분
+                <li className="select__option" data-value="">
+                  지출구분
                 </li>
-                <li
-                  className={`select__option ${ordItem === "고객유형" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItem("고객유형");
-                    setIsOrdItemSelectOpen(false);
-                    handleSearch(1);
-                  }}
-                >
-                  고객유형
+                <li className="select__option" data-value="">
+                  과세구분
                 </li>
               </ul>
             </div>
@@ -1281,45 +1216,16 @@ export default function ListPage(props) {
             {/* 정렬순서 */}
             <div className="select select--dark w160">
               <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
-              <button
-                className="select__toggle"
-                type="button"
-                onClick={() => setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen)}
-              >
-                <span className="select__text">
-                  {ordAscDesc === "desc" ? "내림차순" : "오름차순"}
-                </span>
-                <Image
-                  className="select__arrow"
-                  src="/images/ico-dropdown.svg"
-                  alt=""
-                  width={10}
-                  height={10}
-                />
+              <button className="select__toggle" type="button">
+                <span className="select__text">내림차순</span>
+                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
               </button>
 
-              <ul
-                className="select__menu"
-                style={{ display: isOrdAscDescSelectOpen ? "block" : "none" }}
-              >
-                <li
-                  className={`select__option ${ordAscDesc === "desc" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdAscDesc("desc");
-                    setIsOrdAscDescSelectOpen(false);
-                    handleSearch(1);
-                  }}
-                >
+              <ul className="select__menu">
+                <li className="select__option select__option--selected" data-value="desc">
                   내림차순
                 </li>
-                <li
-                  className={`select__option ${ordAscDesc === "asc" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdAscDesc("asc");
-                    setIsOrdAscDescSelectOpen(false);
-                    handleSearch(1);
-                  }}
-                >
+                <li className="select__option" data-value="asc">
                   오름차순
                 </li>
               </ul>
@@ -1327,303 +1233,201 @@ export default function ListPage(props) {
 
             {/* 건수 */}
             <div className="select select--dark w160">
-              <input
-                className="select__input"
-                type="hidden"
-                name="dealer"
-                defaultValue={listCount}
-              />
-              <button
-                className="select__toggle"
-                type="button"
-                onClick={() => setIsListCountSelectOpen(!isListCountSelectOpen)}
-              >
-                <span className="select__text">{listCount}건씩</span>
-                <Image
-                  className="select__arrow"
-                  src="/images/ico-dropdown.svg"
-                  alt=""
-                  width={10}
-                  height={10}
-                />
+              <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
+              <button className="select__toggle" type="button">
+                <span className="select__text">10건씩</span>
+                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
               </button>
 
-              <ul
-                className="select__menu"
-                style={{ display: isListCountSelectOpen ? "block" : "none" }}
-              >
-                <li
-                  className={`select__option ${listCount === 10 ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setListCount(10);
-                    setIsListCountSelectOpen(false);
-                  }}
-                >
+              <ul className="select__menu">
+                <li className="select__option select__option--selected" data-value="10">
                   10건씩
                 </li>
-                <li
-                  className={`select__option ${listCount === 30 ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setListCount(30);
-                    setIsListCountSelectOpen(false);
-                  }}
-                >
+                <li className="select__option" data-value="30">
                   30건씩
                 </li>
-                <li
-                  className={`select__option ${listCount === 50 ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setListCount(50);
-                    setIsListCountSelectOpen(false);
-                  }}
-                >
+                <li className="select__option" data-value="50">
                   50건씩
                 </li>
               </ul>
             </div>
 
-            <button className="btn btn--white" type="button">
+            <button className="btn btn--white btn--padding--r30" type="button">
               <span className="ico ico--download"></span>다운로드
             </button>
           </div>
         </div>
 
+        {/* 차량별 리스트 s */}
         <table className="table">
           <colgroup>
-            <col style={{ width: "150px" }} />
-            <col style={{ width: "70px" }} />
-            <col style={{ width: "150px" }} />
             <col style={{ width: "auto" }} />
             <col style={{ width: "150px" }} />
-            <col style={{ width: "auto" }} />
+            <col style={{ width: "120px" }} />
+            <col style={{ width: "120px" }} />
             <col style={{ width: "150px" }} />
-            <col style={{ width: "auto" }} />
-            <col style={{ width: "auto" }} />
-            <col style={{ width: "auto" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "130px" }} />
+            <col style={{ width: "150px" }} />
             <col style={{ width: "100px" }} />
             <col style={{ width: "100px" }} />
           </colgroup>
           <thead>
             <tr>
-              <th>제시일</th>
-              <th>구분</th>
-              <th>차량번호</th>
-              <th>차명</th>
-              <th>제시금액</th>
-              <th>담당딜러</th>
-              <th>재고금융</th>
-              <th>상품화비용</th>
-              <th>상사매입비</th>
-              <th>조합매도일</th>
+              <th>
+                차량정보
+                <div className="tooltip">
+                  <button className="jsTooltipBtn tooltip__btn btn btn--ico"><span className="ico ico--help">보기</span></button>
+                  <div className="tooltip__box">
+                    <p>차량번호 / 담당딜러 / 차량명 / 매입일 / 매입금액</p>
+                  </div>
+                </div>
+              </th>
+
+              <th>비용항목</th>
+              <th>지출구분</th>
+              <th>과세구분</th>
+
+              <th>금액</th>
+              <th>공급가</th>
+              <th>부가세</th>
+              <th>정산반영</th>
+              <th>결제일</th>
+              <th>지출증빙</th>
+
               <th>바로가기</th>
               <th>보기</th>
             </tr>
           </thead>
           <tbody>
-            {carList && carList.length > 0 ? (
-              carList.map((car, index) => (
-                <tr
-                  key={`${car.CAR_REG_ID}-${index}`}
-                  className="hover:bg-purple-900/10 cursor-pointer"
-                >
-                  <td>{car.CAR_PUR_DT}</td>
-                  <td>
-                    {car.PRSN_SCT_CD === "0" ? "상사" : <span style={{ color: "red" }}>고객</span>}
-                  </td>
-                  <td>{car.CAR_NO}</td>
-                  <td>{car.CAR_NM}</td>
-                  <td>{car.PUR_AMT.toLocaleString()}</td>
-                  <td>{car.DLR_NM}</td>
-                  <td>{car.CAR_LOAN_AMT.toLocaleString()}</td>
-                  <td>{car.TOT_CMRC_COST_FEE.toLocaleString()}</td>
-                  <td>{car.AGENT_PUR_CST.toLocaleString()}</td>
-                  <td>{car.TXBL_ISSU_DT}</td>
-                  <td>
-                    <div className="input-group input-group--sm input-group--center">
-                      <div className="select select--utils">
-                        <button
-                          type="button"
-                          className="select__toggle"
-                          onClick={e => e.stopPropagation()}
-                        >
-                          더보기
-                        </button>
+            {carList.map((car, index) => (
+              <tr key={index}>
+                <td>{car.carNo} / {car.dealerNm} / {car.carNm} / {car.buyDt} / {car.buyAmt}</td>
 
-                        <ul className="select__menu">
-                          <li className="select__option">
-                            <button
-                              type="button"
-                              onClick={e => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                router.push(
-                                  `/car-goods/register?carId=${car.CAR_REG_ID}&openModal=true`
-                                );
-                              }}
-                              style={{
-                                border: "none",
-                                background: "none",
-                                padding: 0,
-                                color: "inherit",
-                                cursor: "pointer",
-                                width: "100%",
-                                textAlign: "left",
-                              }}
-                            >
-                              상품화비용 등록
-                            </button>
-                          </li>
-                          <li className="select__option">
-                            <Link href="/inventory-finance/inventory-list">재고금융 등록</Link>
-                          </li>
-                          <li className="select__option">
-                            <Link href="#">판매 처리</Link>
-                          </li>
-                          <li className="select__option">
-                            <Link href={`/purchases/edit/${car.CAR_REG_ID}`}>매입 수정</Link>
-                          </li>
-                          <li className="select__option">
-                            <button
-                              type="button"
-                              onClick={e => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handlePurchaseRemoveModalOpen(car, "cancel");
-                              }}
-                              style={{
-                                border: "none",
-                                background: "none",
-                                padding: 0,
-                                color: "inherit",
-                                cursor: "pointer",
-                                width: "100%",
-                                textAlign: "left",
-                              }}
-                            >
-                              매입 취소
-                            </button>
-                          </li>
-                          <li className="select__option">
-                            <button
-                              type="button"
-                              onClick={e => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handlePurchaseRemoveModalOpen(car, "delete");
-                              }}
-                              style={{
-                                border: "none",
-                                background: "none",
-                                padding: 0,
-                                color: "inherit",
-                                cursor: "pointer",
-                                width: "100%",
-                                textAlign: "left",
-                              }}
-                            >
-                              매입 삭제
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                <td>{car.expdItem}</td>
+                <td>{car.expdGubun}</td>
+                <td>{car.taxGubun}</td>
+
+                <td>{car.amt}</td>
+                <td>{car.supAmt}</td>
+                <td>{car.vatAmt}</td>
+
+                <td>{car.adjInclusYN}</td>
+                <td>{car.payDt}</td>
+                <td>{car.expdEvdc}</td>
+
+                <td>
+                  <div className="input-group input-group--sm input-group--center">
+                    <div className="select select--utils">
+                      <button type="button" className="select__toggle">더보기</button>
+
+                      <ul className="select__menu">
+                        <li className="select__option">
+                          <a href="m2.jsp">상품화비용 수정</a>
+                        </li>
+
+                        <li className="select__option">
+                          <a href="javascript:openModal('2');">상품화비용 삭제</a>
+                        </li>
+                      </ul>
                     </div>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="btn btn--light btn--sm"
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <Link
-                        href={`/detail/purchases/${car.CAR_REG_ID}`}
-                        onClick={e => e.stopPropagation()}
-                      >
-                        상세보기
-                      </Link>
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="12" className="text-center py-8 text-gray-500">
-                  데이터가 존재하지 않습니다.
+                  </div>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn btn--light btn--sm"
+                    onClick={() => router.push(`/detail/car-goods/${car.id}`)}
+                  >
+                    상세보기
+                  </button>
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
+        {/* 차량별 리스트 e */}
 
-        {/* 페이지네이션 */}
-        {carList && carList.length > 0 && (
-          <div>
-            <PaginationComponent
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              show={totalPages > 1}
-            />
-          </div>
-        )}
+        <div className="pagination">
+          <a href="#" className="pagination__btn pagination__btn--prev">
+            이전
+          </a>
+          {/* MEMO: <a> 태그에 .on 추가 시, selected 상태 적용 */}
+          <a href="#" className="pagination__btn on">
+            1
+          </a>
+          <a href="#" className="pagination__btn">
+            2
+          </a>
+          <a href="#" className="pagination__btn">
+            3
+          </a>
+          <a href="#" className="pagination__btn">
+            ...
+          </a>
+          <a href="#" className="pagination__btn">
+            9
+          </a>
+          <a href="#" className="pagination__btn">
+            10
+          </a>
+          <a href="#" className="pagination__btn pagination__btn--next">
+            다음
+          </a>
+        </div>
       </div>
 
       <div className="table-wrap">
-        <h2 className="table-wrap__title">제시(매입)차량 현황</h2>
+        <h2 className="table-wrap__title">합계표</h2>
         <table className="table">
           <thead>
             <tr>
               <th rowSpan={2}>구분</th>
               <th rowSpan={2}>건수</th>
               <th colSpan={3} className="col-half">
-                매입금액
+                상품화비용
               </th>
-              <th rowSpan={2}>재고금융</th>
-              <th rowSpan={2}>매입비</th>
             </tr>
             <tr>
+              <th className="col-half">합계금액</th>
               <th className="col-half">공급가</th>
               <th className="col-half">부가세</th>
-              <th className="col-half">합계금액</th>
             </tr>
           </thead>
           <tbody>
-            {purchasesSummary && purchasesSummary.length > 0 ? (
-              purchasesSummary.map((carSummary, index) => (
+            {goodsFeeCarSummary && goodsFeeCarSummary.length > 0 ? (
+              goodsFeeCarSummary.map((summary, index) => (
                 <tr key={index}>
-                  <td>{carSummary.PRSN_SCT_CD}</td>
-                  <td>{carSummary.CNT.toLocaleString()}</td>
-                  <td>{carSummary.PUR_AMT.toLocaleString()}</td>
-                  <td>{carSummary.PUR_SUP_PRC.toLocaleString()}</td>
-                  <td>{carSummary.PUR_VAT.toLocaleString()}</td>
-                  <td className={carSummary.CAR_LOAN_AMT < 0 ? "text-red" : ""}>
-                    {carSummary.CAR_LOAN_AMT.toLocaleString()}
-                  </td>
-                  <td>
-                    <span className={carSummary.AGENT_PUR_CST < 0 ? "text-point" : ""}>
-                      {carSummary.AGENT_PUR_CST}
-                    </span>
-                  </td>
+                  <td>{summary.TAX_SCT_NM}</td>
+                  <td>{summary.CNT.toLocaleString()}</td>
+                  <td>{summary.EXPD_AMT.toLocaleString()}</td>
+                  <td>{summary.EXPD_SUP_PRC.toLocaleString()}</td>
+                  <td>{summary.EXPD_VAT.toLocaleString()}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center py-8 text-gray-500">
+                <td colSpan="5" className="text-center py-8 text-gray-500">
                   데이터가 존재하지 않습니다.
                 </td>
               </tr>
             )}
           </tbody>
+          <tfoot>
+            {goodsFeeCarSummary && goodsFeeCarSummary.length > 0 && (
+              <tr>
+                <th>합계</th>
+                <th>{goodsFeeCarSummary.reduce((sum, item) => sum + item.CNT, 0).toLocaleString()}</th>
+                <th>{goodsFeeCarSummary.reduce((sum, item) => sum + item.EXPD_AMT, 0).toLocaleString()}</th>
+                <th>{goodsFeeCarSummary.reduce((sum, item) => sum + item.EXPD_SUP_PRC, 0).toLocaleString()}</th>
+                <th>{goodsFeeCarSummary.reduce((sum, item) => sum + item.EXPD_VAT, 0).toLocaleString()}</th>
+              </tr>
+            )}
+          </tfoot>
         </table>
       </div>
-
-      {/* 매입취소/삭제 모달 */}
-      <PurchaseRemoveModal
-        car={selectedCarForRemove}
-        flagType={selectedCarTypeForRemove}
-        open={isPurchaseRemoveModalOpen}
-        onClose={handlePurchaseRemoveModalClose}
-        onConfirm={handlePurchaseRemoveConfirm}
-      />
     </main>
   );
 }
