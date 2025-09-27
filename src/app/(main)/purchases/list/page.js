@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth";
 import ListPage from "@/app/(main)/purchases/list/ListPage";
 import { getCarPurList, getCarPurSummary } from "./api";
@@ -76,7 +77,25 @@ export default async function CarPurList() {
   } 
   */
   const cookieStore = await cookies();
-  const session = await verifySession(cookieStore.get("session")?.value).catch(console.error);
+  const sessionToken = cookieStore.get("session")?.value;
+  
+  // 세션 토큰이 없거나 유효하지 않은 경우 로그인 페이지로 리다이렉트
+  if (!sessionToken) {
+    redirect('/login');
+  }
+
+  let session;
+  try {
+    session = await verifySession(sessionToken);
+  } catch (error) {
+    console.error('세션 검증 실패:', error);
+    redirect('/login');
+  }
+
+  // 세션이 유효하지 않은 경우 로그인 페이지로 리다이렉트
+  if (!session || !session.agentId) {
+    redirect('/login');
+  }
 
   // 기본 파라미터
   const defaultParams = {

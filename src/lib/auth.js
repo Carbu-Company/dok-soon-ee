@@ -19,6 +19,10 @@ export async function signSession(payload, expires = DEFAULT_EXPIRES) {
 }
 
 export async function verifySession(token) {
+  if (!token || typeof token !== 'string') {
+    throw new Error('Invalid token: token must be a non-empty string');
+  }
+  
   const secret = getSecret();
   const { payload } = await jwtVerify(token, secret);
   return payload;
