@@ -2,19 +2,19 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from 'next/navigation';
-import CarGoodsRegisterModal from "@/components/modal/carGoodsRegister";
+import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
 import Image from "next/image";
 
 export default function ProductCostRegisterPage({ 
- 
-    session = null, 
+  
+    session, 
     dealerList = [], 
     expdCdList = [], 
     carPurDetail = [] 
 
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCarId, setSelectedCarId] = useState(null);
+  const [selectedCar, setSelectedCar] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [productCostRows, setProductCostRows] = useState([
@@ -33,23 +33,48 @@ export default function ProductCostRegisterPage({
     }
   ]);
 
-  // URL 파라미터를 확인해서 모달을 자동으로 열기
+  // 페이지 로드 시 모달 자동 열기
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      const openModal = urlParams.get("openModal");
-      const carId = urlParams.get("carId");
-
-      if (openModal === "true") {
-        setIsModalOpen(true);
-        if (carId) {
-          setSelectedCarId(carId);
-        }
-      }
+    console.log('=== RegPage useEffect 실행 ===');
+    console.log('session:', session);
+    console.log('session?.agentId:', session?.agentId);
+    console.log('carPurDetail:', carPurDetail);
+    
+    // 차량 정보가 없으면 모달을 자동으로 열기
+    if (!carPurDetail || !carPurDetail.CAR_REG_ID) {
+      console.log('차량 정보 없음 - 모달 열기');
+      setIsModalOpen(true);
+    } else {
+      console.log('차량 정보 있음 - 모달 열지 않음');
     }
-  }, []);
+  }, [carPurDetail]);
+
+  // 제시구분 코드를 텍스트로 변환하는 함수
+  const getCarStatusText = (statusCode) => {
+    const statusMap = {
+      '001': 'CAR_STAT_CD제시',
+      '002': 'CAR_STAT_CD매입',
+      '003': 'CAR_STAT_CD매도',
+      '004': 'CAR_STAT_CD완료'
+    };
+    return statusMap[statusCode] || statusCode || '';
+  };
+
+  // 차량 선택 핸들러
+  const handleCarSelect = (car) => {
+    console.log('선택된 차량:', car);
+    setSelectedCar(car);
+    setIsModalOpen(false);
+  };
 
   const handleModalClose = () => {
+    // 차량이 선택되지 않았고 기존 차량 정보도 없으면 경고
+    if (!selectedCar && (!carPurDetail || !carPurDetail.CAR_REG_ID)) {
+      const confirmClose = window.confirm("차량을 선택하지 않으면 상품화비용을 등록할 수 없습니다. 정말 닫으시겠습니까?");
+      if (!confirmClose) {
+        return; // 사용자가 취소하면 모달을 닫지 않음
+      }
+    }
     setIsModalOpen(false);
   };
 
@@ -146,8 +171,10 @@ export default function ProductCostRegisterPage({
 
   // 상품화비용 등록 API 호출
   const insertGoodsFee = async () => {
-    if (!carPurDetail?.CAR_REG_ID) {
+    const carRegId = selectedCar?.CAR_REG_ID || (carPurDetail && carPurDetail.CAR_REG_ID);
+    if (!carRegId) {
       alert('차량 정보가 없습니다. 차량을 먼저 선택해주세요.');
+      setIsModalOpen(true); // 모달을 다시 열기
       return;
     }
 
@@ -173,7 +200,7 @@ export default function ProductCostRegisterPage({
       // 각 행에 대해 API 호출
       const promises = validRows.map(async (row) => {
         const formValues = {
-          carRegId: carPurDetail.CAR_REG_ID,           // 차량 등록 ID
+          carRegId: carRegId,           // 차량 등록 ID
           expdItemCd: row.productItem || '',           // 지출 항목 코드
           expdItemNm: row.productItem || '',            // 지출 항목 명
           expdSctCd: row.expenseType === 'dealer' ? '01' : '02', // 지출 구분 코드 (딜러: 01, 상사: 02)
@@ -278,15 +305,15 @@ export default function ProductCostRegisterPage({
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>{carPurDetail?.CAR_STAT_CD}</td>
+              <td>{getCarStatusText(selectedCar?.CAR_STAT_CD || (carPurDetail && carPurDetail.CAR_STAT_CD))}</td>
               <th>차량번호</th>
-              <td>{carPurDetail?.CAR_NO}</td>
+              <td>{selectedCar?.CAR_NO || (carPurDetail && carPurDetail.CAR_NO) || ""}</td>
               <th>매입딜러</th>
-              <td>{carPurDetail?.DLR_NM}</td>
+              <td>{selectedCar?.DLR_NM || (carPurDetail && carPurDetail.DLR_NM) || ""}</td>
               <th>차량명</th>
-              <td>{carPurDetail?.CAR_NM}</td>
+              <td>{selectedCar?.CAR_NM || (carPurDetail && carPurDetail.CAR_NM) || ""}</td>
               <th>매입일</th>
-              <td>{carPurDetail?.CAR_PUR_DT}</td>
+              <td>{selectedCar?.CAR_PUR_DT || (carPurDetail && carPurDetail.CAR_PUR_DT) || ""}</td>
             </tr>
           </tbody>
         </table>
@@ -647,7 +674,12 @@ export default function ProductCostRegisterPage({
       </div>
 
       {/* 차량 검색 모달 */}
-      <CarGoodsRegisterModal open={isModalOpen} onClose={handleModalClose} />
+      <CarGoodsRegisterModal 
+        open={isModalOpen} 
+        onClose={handleModalClose} 
+        onCarSelect={handleCarSelect}
+        agentId={session}
+      />
     </main>
   );
 }

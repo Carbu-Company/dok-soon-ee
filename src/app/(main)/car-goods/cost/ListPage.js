@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PaginationComponent from "@/components/utils/PaginationComponent";
-import CarGoodsRegisterModal from "@/components/modal/carGoodsRegister";
+import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
 import Image from "next/image";
 
 export default function ProductCostList(props) {
