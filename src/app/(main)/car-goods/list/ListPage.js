@@ -806,7 +806,7 @@ export default function ProductCostList(props) {
                               제시(매입)일
                             </li>
                             <li
-                              className={`select__option ${dtlDtGubun === "상품화등록일일" ? "select__option--selected" : ""}`}
+                              className={`select__option ${dtlDtGubun === "상품화등록일" ? "select__option--selected" : ""}`}
                               onClick={() => {
                                 setDtlDtGubun("02");
                                 setIsDtlDtGubunSelectOpen(false);
@@ -1191,23 +1191,69 @@ export default function ProductCostList(props) {
           <div className="input-group">
             {/* 딜러명 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="" />
-              <button className="select__toggle" type="button">
-                <span className="select__text">등록일</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+              <input className="select__input" type="hidden" name="dealer" defaultValue={ordItem} />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => setIsOrdItemSelectOpen(!isOrdItemSelectOpen)}
+              >
+                <span className="select__text">
+                  {ordItem === "01" ? "등록일" : 
+                   ordItem === "02" ? "결제일" :
+                   ordItem === "03" ? "지출구분" :
+                   ordItem === "04" ? "과세구분" : "등록일"}
+                </span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
-              <ul className="select__menu">
-                <li className="select__option select__option--selected" data-value="">
+              <ul
+                className="select__menu"
+                style={{ display: isOrdItemSelectOpen ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${ordItem === "01" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("01");
+                    setIsOrdItemSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   등록일
                 </li>
-                <li className="select__option" data-value="">
+                <li
+                  className={`select__option ${ordItem === "02" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("02");
+                    setIsOrdItemSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   결제일
                 </li>
-                <li className="select__option" data-value="">
+                <li
+                  className={`select__option ${ordItem === "03" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("03");
+                    setIsOrdItemSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   지출구분
                 </li>
-                <li className="select__option" data-value="">
+                <li
+                  className={`select__option ${ordItem === "04" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("04");
+                    setIsOrdItemSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   과세구분
                 </li>
               </ul>
@@ -1216,16 +1262,45 @@ export default function ProductCostList(props) {
             {/* 정렬순서 */}
             <div className="select select--dark w160">
               <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
-              <button className="select__toggle" type="button">
-                <span className="select__text">내림차순</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen)}
+              >
+                <span className="select__text">
+                  {ordAscDesc === "desc" ? "내림차순" : "오름차순"}
+                </span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
-              <ul className="select__menu">
-                <li className="select__option select__option--selected" data-value="desc">
+              <ul
+                className="select__menu"
+                style={{ display: isOrdAscDescSelectOpen ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${ordAscDesc === "desc" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdAscDesc("desc");
+                    setIsOrdAscDescSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   내림차순
                 </li>
-                <li className="select__option" data-value="asc">
+                <li
+                  className={`select__option ${ordAscDesc === "asc" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdAscDesc("asc");
+                    setIsOrdAscDescSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   오름차순
                 </li>
               </ul>
@@ -1233,20 +1308,56 @@ export default function ProductCostList(props) {
 
             {/* 건수 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
-              <button className="select__toggle" type="button">
-                <span className="select__text">10건씩</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+              <input
+                className="select__input"
+                type="hidden"
+                name="dealer"
+                defaultValue={listCount}
+              />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => setIsListCountSelectOpen(!isListCountSelectOpen)}
+              >
+                <span className="select__text">{listCount}건씩</span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
-              <ul className="select__menu">
-                <li className="select__option select__option--selected" data-value="10">
+              <ul
+                className="select__menu"
+                style={{ display: isListCountSelectOpen ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${listCount === 10 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCount(10);
+                    setIsListCountSelectOpen(false);
+                  }}
+                >
                   10건씩
                 </li>
-                <li className="select__option" data-value="30">
+                <li
+                  className={`select__option ${listCount === 30 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCount(30);
+                    setIsListCountSelectOpen(false);
+                  }}
+                >
                   30건씩
                 </li>
-                <li className="select__option" data-value="50">
+                <li
+                  className={`select__option ${listCount === 50 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCount(50);
+                    setIsListCountSelectOpen(false);
+                  }}
+                >
                   50건씩
                 </li>
               </ul>

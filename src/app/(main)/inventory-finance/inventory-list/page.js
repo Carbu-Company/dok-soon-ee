@@ -20,7 +20,7 @@ async function searchCarLoanCarSumList(searchParamsWithPage) {
 
     return result;
   } catch (error) {
-    console.error('검색 중 오류 발생:', error);
+    console.error('getCarLoanCarSumList 검색 중 오류 발생:', error);
     return { success: false, error: error.message };
   }
 }
@@ -35,7 +35,7 @@ async function searchCarLoanSummary(searchParamsWithPage) {
 
     return result;
   } catch (error) {
-    console.error('검색 중 오류 발생:', error);
+    console.error('searchCarLoanSummary 검색 중 오류 발생:', error);
     return { success: false, error: error.message };
   }
 }
@@ -60,7 +60,7 @@ async function searchCarLoanCarSumListAndSummary(searchParamsWithPage) {
       error: listResult.error || summaryResult.error
     };
   } catch (error) {
-    console.error('검색 중 오류 발생:', error);
+    console.error('searchCarLoanCarSumListAndSummary 검색 중 오류 발생:', error);
     return { success: false, error: error.message };
   }
 }
@@ -92,14 +92,12 @@ export default async function CarLoanCarSumList() {
     dtGubun: '',  
     startDt: '',  
     endDt: '',  
-    dtlCustomerName: '', 
-    dtlCustGubun: '', 
-    dtlEvdcGubun: '', 
-    dtlPrsnGubun: '', 
-    dtlOwnerBrno: '', 
-    dtlOwnerSsn: '', 
-    dtlCtshNo: '' , 
-    dtlCarNoBefore: '', 
+    dtlNewCarNo: '',
+    dtlOldCarNo: '',
+    dtlCapital: '',
+    dtlLoanMemo: '',
+    dtlLoanSctGubun: '',
+    dtlLoanStatGubun: '',
     orderItem: '제시일', 
     ordAscDesc: 'desc'
   };

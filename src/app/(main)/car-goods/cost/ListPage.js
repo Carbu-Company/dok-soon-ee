@@ -284,21 +284,16 @@ export default function ProductCostList(props) {
     await handleSearch(page);
   };
 
-
-
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">상품화비용 리스트(차량별)</h2>
+        <h2 className="container__title">상품화비용 리스트(비용별)</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">차량 : 상품화항목 = 1 : N</p>
+          <p className="guidebox__desc">※ 상품화비용을 차량별, 상품화 비용건별 확인이 가능합니다.</p>
           <p className="guidebox__desc">
-            ※ 상품화비용을 차량별, 상품화 비용건별 확인이 가능합니다.
-          </p>
-          <p className="guidebox__desc">
-            ※ 상품화 비용은 일반적으로 상사 매입 자료로 비용 처리하여 세무상 반영할 수 있습니다.
-            다만, 적격 증빙 여부 등 구체적인 사항은 세무사 사무실에 확인하시기 바랍니다.
+            ※ 상품화 비용은 일반적으로 상사 매입 자료로 비용 처리하여 세무상 반영할 수 있습니다. 다만, 적격 증빙 여부 등 구체적인 사항은 세무사 사무실에 확인하시기 바랍니다.
           </p>
         </div>
       </div>
@@ -1304,19 +1299,19 @@ export default function ProductCostList(props) {
           <tbody>
             {carList.map((car, index) => (
               <tr key={index}>
-                <td>{car.carNo} / {car.dealerNm} / {car.carNm} / {car.buyDt} / {car.buyAmt}</td>
+                <td>{car.CAR_NO} / {car.DLR_NM} / {car.CAR_NM} / {car.CAR_PUR_DT} / {car.PUR_AMT.toLocaleString()}</td>
 
-                <td>{car.expdItem}</td>
-                <td>{car.expdGubun}</td>
-                <td>{car.taxGubun}</td>
+                <td>{car.TAX_SCT_NM}</td>
+                <td>{car.EXPD_SCT_NM}</td>
+                <td>{car.TAX_SCT_NM}</td>
 
-                <td>{car.amt}</td>
-                <td>{car.supAmt}</td>
-                <td>{car.vatAmt}</td>
+                <td>{car.EXPD_AMT.toLocaleString()}</td>
+                <td>{car.EXPD_SUP_PRC.toLocaleString()}</td>
+                <td>{car.EXPD_VAT.toLocaleString()}</td>
 
-                <td>{car.adjInclusYN}</td>
-                <td>{car.payDt}</td>
-                <td>{car.expdEvdc}</td>
+                <td>{car.ADJ_INCLUS_YN}</td>
+                <td>{car.EXPD_DT.toLocaleString()}</td>
+                <td>{car.EXPD_EVDC_NM}</td>
 
                 <td>
                   <div className="input-group input-group--sm input-group--center">

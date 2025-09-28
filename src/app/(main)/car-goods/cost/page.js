@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import ListPage from "@/app/(main)/car-goods/list/ListPage";
+import ListPage from "@/app/(main)/car-goods/cost/ListPage";
 import { getGoodsFeeList, getGoodsFeeCarSummary } from "./api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
@@ -111,6 +111,7 @@ export default async function CarSelList() {
   const goodsFeeCarSummary = await searchGoodsFeeCarSummary({ ...defaultParams, ...searchParams });
 
   console.log(goodsFeeList.data.carlist);
+
 
   return <ListPage session={session}
                    carList={goodsFeeList}
