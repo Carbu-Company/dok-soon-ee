@@ -12,7 +12,7 @@ async function searchCarLoanCarSumList(searchParamsWithPage) {
     const result = await getCarLoanCarSumList(searchParamsWithPage);
 
     console.log('서버 액션 결과*******************:', { 
-      carLoanCarSumListLength: result?.data?.carLoanCarSumList?.length, 
+      carLoanCarSumListLength: result?.data?.loanList?.length, 
       totalCount: result?.data?.pagination?.totalCount,
       page: searchParamsWithPage.page,
       pageSize: searchParamsWithPage.pageSize 
@@ -33,6 +33,11 @@ async function searchCarLoanSummary(searchParamsWithPage) {
   try {
     const result = await getCarLoanSummary(searchParamsWithPage);
 
+    console.log('서버 액션 결과*******************:', { 
+      carLoanSummaryLength: result?.data?.length
+    });
+
+
     return result;
   } catch (error) {
     console.error('searchCarLoanSummary 검색 중 오류 발생:', error);
@@ -46,10 +51,22 @@ async function searchCarLoanCarSumListAndSummary(searchParamsWithPage) {
   "use server";
   
   try {
+
+
+    console.log('searchParamsWithPage*******************:', searchParamsWithPage);
+
+
+
+
     const [listResult, summaryResult] = await Promise.all([
       getCarLoanCarSumList(searchParamsWithPage),
       getCarLoanSummary(searchParamsWithPage)
     ]);
+
+    console.log('***서버 액션 결과*******************:', { 
+      carLoanCarSumListLength: listResult?.data?.loanList?.length,
+      carLoanSummaryLength: summaryResult?.data?.length
+    });
 
     return {
       success: listResult.success && summaryResult.success,
@@ -106,6 +123,9 @@ export default async function CarLoanCarSumList() {
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const carLoanSummary = await searchCarLoanSummary({ ...defaultParams, ...searchParams });
+  
+
+  //console.log('carLoanSummary*******************:', carLoanSummary);
 
   return <ListPage session={session}
                    carList={carLoanCarSumList}

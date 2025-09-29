@@ -23,7 +23,7 @@ export default function InventoryFinanceList(props) {
   const [loading, setLoading] = useState(false);
 
   // 초기 데이터: 서버에서 전달된 데이터 구조 처리
-  const initialCarListData = props.carList?.data?.carlist || [];
+  const initialCarListData = props.carList?.data?.loanList || [];
   const initialPagination = props.carList?.data?.pagination || {};
 
   // Summary 데이터
@@ -88,7 +88,7 @@ export default function InventoryFinanceList(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCount);
-    handleSearch(1);
+    // handleSearch(1); // 자동 검색 비활성화
     console.log("pageSize", pageSize);
     console.log("listCount", listCount);
   }, [ordItem, ordAscDesc, listCount]);
@@ -129,7 +129,7 @@ export default function InventoryFinanceList(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCountDtl);
-    handleSearch(1);
+    // handleSearch(1); // 자동 검색 비활성화
     console.log("pageSize", pageSize);
     console.log("listCount", listCountDtl);
   }, [ordItemDtl, ordAscDescDtl, listCountDtl]);
@@ -256,42 +256,10 @@ export default function InventoryFinanceList(props) {
     }
   };
 
-  // 컴포넌트 마운트 시: 서버에서 이미 데이터가 전달되었다면 그걸 우선 사용하고,
-  // 데이터가 없을 때만 검색을 수행합니다 (중복 호출 방지).
-  // 초기 자동 검색 비활성화
-  /*
-    useEffect(() => {
-      if (!initialCarListData || initialCarListData.length === 0) {
-        handleSearch(1);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    */
-
   // 상세 검색 버튼 클릭 핸들러
   const handleDtlSearch = () => {
     setSearchBtn(2);
     handleSearch(1);
-  };
-
-  // 매입취소/삭제 모달 관련 핸들러
-  const handlePurchaseRemoveModalOpen = (car, type) => {
-    setSelectedCarForRemove(car);
-    setSelectedCarTypeForRemove(type);
-    setIsPurchaseRemoveModalOpen(true);
-  };
-
-  const handlePurchaseRemoveModalClose = () => {
-    setIsPurchaseRemoveModalOpen(false);
-    setSelectedCarForRemove(null);
-  };
-
-  const handlePurchaseRemoveConfirm = async () => {
-    // TODO: 실제 매입취소/삭제 API 호출 구현
-    console.log("매입취소/삭제 확인:", selectedCarForRemove);
-    // API 호출 후 성공하면 모달 닫기 및 목록 새로고침
-    handlePurchaseRemoveModalClose();
-    // handleSearch(currentPage); // 목록 새로고침
   };
 
   /**
@@ -542,7 +510,7 @@ export default function InventoryFinanceList(props) {
                   onClick={() => {
                     setOrdItemDtl("대출실행일");
                     setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   대출실행일
@@ -552,7 +520,7 @@ export default function InventoryFinanceList(props) {
                   onClick={() => {
                     setOrdItemDtl("제시(매입)일");
                     setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   제시(매입)일
@@ -589,7 +557,7 @@ export default function InventoryFinanceList(props) {
                   onClick={() => {
                     setOrdAscDescDtl("desc");
                     setIsOrdAscDescSelectOpenDtl(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   내림차순
@@ -599,7 +567,7 @@ export default function InventoryFinanceList(props) {
                   onClick={() => {
                     setOrdAscDescDtl("asc");
                     setIsOrdAscDescSelectOpenDtl(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   오름차순
@@ -1128,7 +1096,7 @@ export default function InventoryFinanceList(props) {
                   onClick={() => {
                     setOrdAscDesc("desc");
                     setIsOrdAscDescSelectOpen(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   내림차순
@@ -1138,7 +1106,7 @@ export default function InventoryFinanceList(props) {
                   onClick={() => {
                     setOrdAscDesc("asc");
                     setIsOrdAscDescSelectOpen(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   오름차순
@@ -1257,21 +1225,20 @@ export default function InventoryFinanceList(props) {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>123가4567 / 홍길동 / 그랜저 / 2025-08-01 / 100,000,000</td>
-              <td>메리츠캐피탈</td>
-              <td>신규</td>
-              <td>30,000,000</td>
-              <td>2025-08-10</td>
-              <td>6개월</td>
-              <td>15%</td>
-              <td>100,000</td>
-              <td>1,000,000</td>
-              <td>500,000</td>
-              <td>
-                <span className="text-red">2025-09-01</span>
-              </td>
-              <td>진행중</td>
+            {carList.map((car, index) => (
+              <tr key={index}>
+              <td>{car.CAR_NO} / {car.DLR_NM} / {car.CAR_NM} / {car.CAR_PUR_DT} / {car.PUR_AMT.toLocaleString()}</td>
+              <td>{car.LOAN_CORP_NM}</td>
+              <td>{car.LOAN_SCT_NM}</td>
+              <td>{car.LOAN_AMT.toLocaleString()}</td>
+              <td>{car.LOAN_DT}</td>
+              <td>{car.LOAN_MM_CNT}개월</td>
+              <td>{car.DLR_APLY_INTR_RT}</td>
+              <td>{car.MM_INTR_AMT?.toLocaleString()}</td>
+              <td>{car.TOT_INTR_AMT?.toLocaleString()}</td>
+              <td>{car.TOT_PAY_INTR_AMT?.toLocaleString()}</td>
+              <td>{car.RCNT_PAY_DTIME}</td>
+              <td>{car.LOAN_STAT_NM}</td>
               <td>
                 <div className="input-group input-group--sm input-group--center">
                   <div className="select select--utils">
@@ -1318,12 +1285,13 @@ export default function InventoryFinanceList(props) {
                 <button
                   type="button"
                   className="btn btn--light btn--sm"
-                  onClick={() => router.push("/detail/inventory-finance/1")}
+                  onClick={() => router.push(`/detail/inventory-finance/${car.CAR_REG_ID}`)}
                 >
                   상세보기
                 </button>
               </td>
             </tr>
+            ))}
           </tbody>
         </table>
         {/* 차량별 리스트 e */}
@@ -1381,48 +1349,47 @@ export default function InventoryFinanceList(props) {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>하나캐피탈</td>
-              <td>500,000,000</td>
-              <td>250,000,000</td>
-              <td>250,000,000</td>
-              <td>10일</td>
-              <td>50%</td>
-              <td>15건</td>
-              <td>123가4567</td>
-              <td>홍길동</td>
-              <td>그랜저</td>
-              <td>2025-09-01</td>
-            </tr>
-            <tr>
-              <td>KB캐피탈</td>
-              <td>500,000,000</td>
-              <td>250,000,000</td>
-              <td>250,000,000</td>
-              <td>10일</td>
-              <td>50%</td>
-              <td>15건</td>
-              <td>123가4567</td>
-              <td>홍길동</td>
-              <td>그랜저</td>
-              <td>2025-09-01</td>
-            </tr>
+            {carLoanSummary && carLoanSummary.length > 0 ? (
+              carLoanSummary.map((summary, index) => (
+                <tr key={index}>
+                  <td>{summary.LOAN_CORP_NM}</td>
+                  <td>{summary.TOT_LMT_AMT.toLocaleString()}</td>
+                  <td>{summary.TOT_LOAN_AMT.toLocaleString()}</td>
+                  <td>{summary.LMT_AMT.toLocaleString()}</td>
+                  <td>{summary.RT}일</td>
+                  <td>{summary.RT}%</td>
+                  <td>{summary.TOT_CNT}건</td>
+                  <td>{summary.CAR_NO}</td>
+                  <td>{summary.DLR_NM}</td>
+                  <td>{summary.CAR_NM}</td>
+                  <td>{summary.LOAN_DT}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="11" className="text-center py-8 text-gray-500">
+                  데이터가 존재하지 않습니다.
+                </td>
+              </tr>
+            )}
           </tbody>
 
           <tfoot>
-            <tr>
-              <th>합계</th>
-              <th></th>
-              <th></th>
-              <th></th>
-              <th>-</th>
-              <th></th>
-              <th></th>
-              <th>-</th>
-              <th>-</th>
-              <th>-</th>
-              <th>-</th>
-            </tr>
+            {carLoanSummary && carLoanSummary.length > 0 && (
+              <tr>
+                <th>합계</th>
+                <th>{carLoanSummary.reduce((sum, item) => sum + item.TOT_LMT_AMT, 0).toLocaleString()}</th>
+                <th>{carLoanSummary.reduce((sum, item) => sum + item.TOT_LOAN_AMT, 0).toLocaleString()}</th>
+                <th>{carLoanSummary.reduce((sum, item) => sum + item.LMT_AMT, 0).toLocaleString()}</th>
+                <th>-</th>
+                <th>{(carLoanSummary.reduce((sum, item) => sum + item.RT, 0) / carLoanSummary.length).toFixed(1)}%</th>
+                <th>{carLoanSummary.reduce((sum, item) => sum + item.TOT_CNT, 0)}건</th>
+                <th>-</th>
+                <th>-</th>
+                <th>-</th>
+                <th>-</th>
+              </tr>
+            )}
           </tfoot>
         </table>
       </div>

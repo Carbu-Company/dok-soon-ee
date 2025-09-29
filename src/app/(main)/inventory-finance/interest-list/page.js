@@ -92,14 +92,10 @@ export default async function CarLoanList() {
     dtGubun: '',  
     startDt: '',  
     endDt: '',  
-    dtlCustomerName: '', 
-    dtlCustGubun: '', 
-    dtlEvdcGubun: '', 
-    dtlPrsnGubun: '', 
-    dtlOwnerBrno: '', 
-    dtlOwnerSsn: '', 
-    dtlCtshNo: '' , 
-    dtlCarNoBefore: '', 
+    dtlNewCarNo: '',
+    dtlOldCarNo: '',
+    dtlCapital: '',
+    dtlLoanMemo: '',
     orderItem: '제시일', 
     ordAscDesc: 'desc'
   };

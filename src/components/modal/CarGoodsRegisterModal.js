@@ -11,7 +11,7 @@ export default function CarGoodsRegisterModal({ open, onClose, onCarSelect, agen
     carNo: "",
     dealer: "",
     page: 1,
-    pageSize: 10,
+    pageSize: 5,
     orderItem: "제시일",
     ordAscDesc: "desc"
   });
@@ -423,24 +423,17 @@ export default function CarGoodsRegisterModal({ open, onClose, onCarSelect, agen
                   <ul className="select__menu">
                     <li 
                       className={`select__option ${searchParams.pageSize === 10 ? "select__option--selected" : ""}`}
+                      data-value="5"
+                      onClick={() => handlePageSizeChange(5)}
+                    >
+                      5건씩
+                    </li>
+                    <li 
+                      className={`select__option ${searchParams.pageSize === 20 ? "select__option--selected" : ""}`}
                       data-value="10"
                       onClick={() => handlePageSizeChange(10)}
                     >
                       10건씩
-                    </li>
-                    <li 
-                      className={`select__option ${searchParams.pageSize === 20 ? "select__option--selected" : ""}`}
-                      data-value="20"
-                      onClick={() => handlePageSizeChange(20)}
-                    >
-                      20건씩
-                    </li>
-                    <li 
-                      className={`select__option ${searchParams.pageSize === 30 ? "select__option--selected" : ""}`}
-                      data-value="30"
-                      onClick={() => handlePageSizeChange(30)}
-                    >
-                      30건씩
                     </li>
                   </ul>
                 </div>
