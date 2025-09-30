@@ -4,11 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CarGoodsRegisterModal from "@/components/modal/inventoryRegister";
 
-export default function InventoryFinanceRegisterPage() {
+export default function InventoryFinanceRegisterPage({ session = null, dealerList = [], loanCompList = [] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
+
+  // 대출회사 선택 상태 관리 (콤보 박스)
+  const [isLoanCompSelectOpen, setIsLoanCompSelectOpen] = useState(false);
+  const [loanCompCd, setLoanCompCd] = useState('');
 
   useEffect(() => {
     // URL 쿼리 파라미터에서 showModal이 true이면 모달을 열기
@@ -111,11 +115,13 @@ export default function InventoryFinanceRegisterPage() {
                     <input
                       className="select__input"
                       type="hidden"
-                      name="dealer"
-                      defaultValue="value1"
+                      name="loanCompCd"
+                      value={loanCompCd || ''}
                     />
-                    <button className="select__toggle" type="button">
-                      <span className="select__text">선택</span>
+                    <button className="select__toggle" type="button" onClick={() => setIsLoanCompSelectOpen(!isLoanCompSelectOpen)}>
+                      <span className="select__text">
+                        {loanCompCd ? loanCompList.find(item => item.CD === loanCompCd)?.CD_NM : '선택'}
+                      </span>
                       <Image
                         className="select__arrow"
                         src="/images/ico-dropdown.svg"
@@ -125,35 +131,23 @@ export default function InventoryFinanceRegisterPage() {
                       />
                     </button>
 
-                    <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">
+                    <ul className={`select__menu ${isLoanCompSelectOpen ? 'active' : ''}`}>
+                      <li className={`select__option ${!loanCompCd ? 'select__option--selected' : ''}`} data-value="" onClick={() => {
+                        setLoanCompCd('');
+                        setIsLoanCompSelectOpen(false);
+                      }}>
                         선택
                       </li>
-                      <li className="select__option" data-value="">
-                        하나캐피탈
-                      </li>
-                      <li className="select__option" data-value="">
-                        KB캐피탈
-                      </li>
+                      {loanCompList.map((comp) => (
+                        <li key={comp.CD_ID} className={`select__option ${loanCompCd === comp.CD_ID ? 'select__option--selected' : ''}`} data-value={comp.CD_ID} onClick={() => {
+                          setLoanCompCd(comp.CD_ID);
+                          setIsLoanCompSelectOpen(false);
+                        }}>
+                          {comp.CD_NM}
+                        </li>
+                      ))}
                     </ul>
                   </div>
-                  {/* 
-                    <div className="form-option-wrap">
-                      <div className="form-option">
-                        <label className="form-option__label">
-                          <input type="radio" name="radiogroup" />
-                          <span className="form-option__title">신규</span>
-                        </label>
-                      </div>
-                      <div className="form-option">
-                        <label className="form-option__label">
-                          <input type="radio" name="radiogroup" />
-                          <span className="form-option__title">추가</span>
-                        </label>
-                      </div>
-                    </div>
-                    */}
-                  {/* <span className="input-help">캐피탈사 대출 실행일 (이자 계산 기준일)</span> */}
                 </div>
               </td>
               <th>총한도</th>

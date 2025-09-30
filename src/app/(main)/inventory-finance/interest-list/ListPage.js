@@ -921,7 +921,11 @@ export default function InventoryFinanceInterestList( props ) {
           <button
             type="button"
             className="btn btn--red btn--padding--r30"
-            onClick={() => router.push("/inventory-finance/register?showModal=true")}
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              router.push("/inventory-finance/register?showModal=true");
+            }}
           >
             <span className="ico ico--add"></span>재고금융 등록
           </button>
