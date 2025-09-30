@@ -4,16 +4,50 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CarGoodsRegisterModal from "@/components/modal/inventoryRegister";
 
-export default function InventoryFinanceRegisterPage({ session = null, dealerList = [], loanCompList = [] }) {
+export default function InventoryFinanceRegisterPage({ session = null, carPurDetail = [], dealerList = [], loanCompList = [] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const [companyLoanLimit, setCompanyLoanLimit] = useState([]);
 
   // 대출회사 선택 상태 관리 (콤보 박스)
   const [isLoanCompSelectOpen, setIsLoanCompSelectOpen] = useState(false);
   const [loanCompCd, setLoanCompCd] = useState('');
 
+  // 대출금액 선택 상태 관리
+  const [loanAmt, setLoanAmt] = useState('');
+  const [loanDt, setLoanDt] = useState('');
+
+  // 개월수 콤보 선택
+  const [isLoanMmCntSelectOpen, setIsLoanMmCntSelectOpen] = useState(false);
+  const [loanMmCnt, setLoanMmCnt] = useState('');
+
+  // 캐피탈이율 선택 상태 관리
+  const [loanCorpIntrRt, setLoanCorpIntrRt] = useState('');
+
+  // 딜러이율 선택 상태 관리
+  const [dlrAplyIntrRt, setDlrAplyIntrRt] = useState('');
+
+  // 대출유형 선택 상태 관리
+  const [loanSctCd, setLoanSctCd] = useState('');
+
+  // 특이사항 선택 상태 관리
+  const [loanMemo, setLoanMemo] = useState('');
+
+  // 제시구분 코드를 텍스트로 변환하는 함수
+  const getCarStatusText = (statusCode) => {
+    const statusMap = {
+      '001': '상사매입입',
+      '002': '일반판매',
+      '003': '알선판매'
+    };
+    return statusMap[statusCode] || statusCode || '';
+  };
+  
   useEffect(() => {
     // URL 쿼리 파라미터에서 showModal이 true이면 모달을 열기
     if (searchParams.get("showModal") === "true") {
@@ -32,6 +66,96 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
     setIsModalOpen(false);
     router.replace("/inventory-finance/register");
   };
+
+
+  // 재고금융 등록 API 호출
+  const insertInventoryFinance = async () => {
+    const carRegId = selectedCar?.CAR_REG_ID || (carPurDetail && carPurDetail.CAR_REG_ID);
+    if (!carRegId) {
+      alert('차량 정보가 없습니다. 차량을 먼저 선택해주세요.');
+      setIsModalOpen(true); // 모달을 다시 열기
+      return;
+    }
+
+    if (productCostRows.length === 0) {
+      alert('상품화비용을 입력해주세요.');
+      return;
+    }
+
+    // 유효한 데이터가 있는 행만 필터링
+    const validRows = productCostRows.filter(row => 
+      row.amount && parseFloat(row.amount) > 0
+    );
+
+    if (validRows.length === 0) {
+      alert('유효한 상품화비용을 입력해주세요.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // 각 행에 대해 API 호출
+      const promises = validRows.map(async (row) => {
+        const formValues = {
+          carRegId: carRegId,           // 차량 등록 ID
+          expdItemCd: row.productItem || '',           // 지출 항목 코드
+          expdItemNm: row.productItem || '',            // 지출 항목 명
+          expdSctCd: row.expenseType === 'dealer' ? '01' : '02', // 지출 구분 코드 (딜러: 01, 상사: 02)
+          expdAmt: parseFloat(row.amount) || 0,        // 지출 금액
+          expdSupPrc: parseFloat(row.supplyPrice) || 0, // 지출 공급가
+          expdVat: parseFloat(row.taxAmount) || 0,     // 지출 부가세
+          expdDt: row.paymentDate || '',               // 지출 일자
+          expdMethCd: '',                              // 지출 방식 코드
+          expdEvdcCd: row.expenseProof || '',          // 지출 증빙 코드
+          taxSctCd: row.taxType === 'taxable' ? '01' : '02', // 세금 구분 코드 (과세: 01, 면세: 02)
+          txblIssuDt: '',                               // 세금계산서 발행 일자
+          rmrk: row.remarks || '',                     // 비고
+          adjInclusYn: row.settlementReflect ? 'Y' : 'N', // 정산 포함 여부
+          cashRecptRcgnNo: '',                         // 현금 영수증 식별 번호
+          cashMgmtkey: '',                              // 현금 관리키
+          delYn: 'N',                                  // 삭제여부
+          regDtime: new Date().toISOString(),           // 등록 일시
+          regrId: session?.usrId || '',                // 등록자 ID
+          modDtime: '',                                // 수정 일시
+          modrId: ''                                   // 수정자 ID
+        };
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertGoodsFee`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formValues)
+        });
+
+        const res = await response.json();
+        
+        if (!res.success) {
+          throw new Error(res.message || '상품화비용 등록에 실패했습니다');
+        }
+
+        return res;
+      });
+
+      await Promise.all(promises);
+      
+      alert('상품화비용이 성공적으로 등록되었습니다.');
+      setLoading(false);
+      // 성공 후 목록 페이지로 이동하거나 필요한 처리
+      // router.push('/car-goods/list');
+      
+    } catch (error) {
+      console.error('상품화비용 등록 오류:', error);
+      setError(error.message);
+      alert('상품화비용 등록 중 오류가 발생했습니다: ' + error.message);
+      setLoading(false);
+    }
+  };
+
+
+
   return (
     <main className="container container--page">
       <div className="container__head">
@@ -79,15 +203,15 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>상사매입</td>
+              <td>{getCarStatusText(selectedCar?.CAR_STAT_CD || (carPurDetail && carPurDetail.CAR_STAT_CD))}</td>
               <th>차량번호</th>
-              <td>{selectedCar ? selectedCar.carNumber : "123가1234 (123허1234)"}</td>
+              <td>{selectedCar?.CAR_NO || (carPurDetail && carPurDetail.CAR_NO) || ""}</td>
               <th>매입딜러</th>
-              <td>{selectedCar ? selectedCar.dealer : "홍길동"}</td>
+              <td>{selectedCar?.DLR_NM || (carPurDetail && carPurDetail.DLR_NM) || ""}</td>
               <th>차량명</th>
-              <td>{selectedCar ? selectedCar.carName : "그랜저(승용)"}</td>
+              <td>{selectedCar?.CAR_NM || (carPurDetail && carPurDetail.CAR_NM) || ""}</td>
               <th>매입일</th>
-              <td>{selectedCar ? selectedCar.purchaseDate : "2025-08-01"}</td>
+              <td>{selectedCar?.CAR_PUR_DT || (carPurDetail && carPurDetail.CAR_PUR_DT) || ""}</td>
             </tr>
           </tbody>
         </table>
@@ -139,8 +263,8 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
                         선택
                       </li>
                       {loanCompList.map((comp) => (
-                        <li key={comp.CD_ID} className={`select__option ${loanCompCd === comp.CD_ID ? 'select__option--selected' : ''}`} data-value={comp.CD_ID} onClick={() => {
-                          setLoanCompCd(comp.CD_ID);
+                        <li key={comp.CD} className={`select__option ${loanCompCd === comp.CD ? 'select__option--selected' : ''}`} data-value={comp.CD} onClick={() => {
+                          setLoanCompCd(comp.CD);
                           setIsLoanCompSelectOpen(false);
                         }}>
                           {comp.CD_NM}
@@ -161,11 +285,18 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
               </th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="금액" defaultValue="" />
+                  <input 
+                    type="text" 
+                    className="input__field" 
+                    placeholder="금액" 
+                    value={loanAmt || ''}
+                    onChange={(e) => setLoanAmt(e.target.value)}
+                  />
                   <div className="input__utils">
                     <button
                       type="button"
                       className="jsInputClear input__clear ico ico--input-delete"
+                      onClick={() => setLoanAmt('')}
                     >
                       삭제
                     </button>
@@ -183,6 +314,8 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
                       className="jsStartDate input__field input__field--date"
                       placeholder="날짜"
                       autoComplete="off"
+                      value={loanDt || ''}
+                      onChange={(e) => setLoanDt(e.target.value)}
                     />
                   </div>
                   <span className="input-help">대출 실행일</span>
@@ -205,11 +338,11 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
                     <input
                       className="select__input"
                       type="hidden"
-                      name="dealer"
-                      defaultValue="value1"
+                      name="loanMmCnt"
+                      defaultValue=""
                     />
                     <button className="select__toggle" type="button">
-                      <span className="select__text">선택</span>
+                      <span className="select__text">{loanMmCnt || '선택'}</span>
                       <Image
                         className="select__arrow"
                         src="/images/ico-dropdown.svg"
@@ -219,18 +352,20 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
                       />
                     </button>
                     <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">
-                        선택
-                      </li>
-                      <li className="select__option" data-value="value2">
-                        1
-                      </li>
-                      <li className="select__option" data-value="value3">
-                        2
-                      </li>
-                      <li className="select__option" data-value="value4">
-                        3
-                      </li>
+                      <li className="select__option" data-value="1">1</li>
+                      <li className="select__option" data-value="2">2</li>
+                      <li className="select__option" data-value="3">3</li>
+                      <li className="select__option" data-value="4">4</li>
+                      <li className="select__option" data-value="5">5</li>
+                      <li className="select__option" data-value="6">6</li>
+                      <li className="select__option" data-value="7">7</li>
+                      <li className="select__option" data-value="8">8</li>
+                      <li className="select__option" data-value="9">9</li>
+                      <li className="select__option" data-value="10">10</li>
+                      <li className="select__option" data-value="11">11</li>
+                      <li className="select__option" data-value="12">12</li>
+                      <li className="select__option" data-value="24">24</li>
+                      <li className="select__option" data-value="36">36</li>
                     </ul>
                   </div>
                   <span className="input-help">개월</span>
@@ -256,12 +391,19 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
                       type="text"
                       className="input__field center"
                       placeholder="이율"
-                      defaultValue=""
+                      value={loanCorpIntrRt}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                          setLoanCorpIntrRt(value);
+                        }
+                      }}
                     />
                     <div className="input__utils">
                       <button
                         type="button"
                         className="jsInputClear input__clear ico ico--input-delete"
+                        onClick={() => setLoanCorpIntrRt('')}
                       >
                         삭제
                       </button>
@@ -294,12 +436,19 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
                       type="text"
                       className="input__field center"
                       placeholder="이율"
-                      defaultValue=""
+                      value={dlrAplyIntrRt}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                          setDlrAplyIntrRt(value);
+                        }
+                      }}
                     />
                     <div className="input__utils">
                       <button
                         type="button"
                         className="jsInputClear input__clear ico ico--input-delete"
+                        onClick={() => setDlrAplyIntrRt('')}
                       >
                         삭제
                       </button>
@@ -320,13 +469,25 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
                 <div className="form-option-wrap">
                   <div className="form-option">
                     <label className="form-option__label">
-                      <input type="radio" name="radiogroup01" defaultChecked />
+                      <input 
+                        type="radio" 
+                        name="loanSctCd" 
+                        value="1"
+                        checked
+                        onChange={(e) => setLoanSctCd(e.target.value)}
+                      />
                       <span className="form-option__title">신규</span>
                     </label>
                   </div>
                   <div className="form-option">
                     <label className="form-option__label">
-                      <input type="radio" name="radiogroup01" />
+                      <input 
+                        type="radio" 
+                        name="loanSctCd" 
+                        value="2"
+                        checked={loanSctCd === '2'}
+                        onChange={(e) => setLoanSctCd(e.target.value)}
+                      />
                       <span className="form-option__title">추가</span>
                     </label>
                   </div>
@@ -335,11 +496,18 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
               <th>특이사항</th>
               <td colSpan="3">
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="" defaultValue="" />
+                  <input 
+                    type="text" 
+                    className="input__field" 
+                    placeholder="" 
+                    value={loanMemo}
+                    onChange={(e) => setLoanMemo(e.target.value)}
+                  />
                   <div className="input__utils">
                     <button
                       type="button"
                       className="jsInputClear input__clear ico ico--input-delete"
+                      onClick={() => setLoanMemo('')}
                     >
                       삭제
                     </button>
@@ -364,8 +532,13 @@ export default function InventoryFinanceRegisterPage({ session = null, dealerLis
         <button className="btn btn--primary" type="button" disabled>
           확인
         </button>
-        <button className="btn btn--primary" type="button">
-          확인
+        <button 
+          className="btn btn--primary" 
+          type="button" 
+          onClick={insertInventoryFinance}
+          disabled={loading}
+        >
+          {loading ? '등록 중...' : '확인'}
         </button>
       </div>
 

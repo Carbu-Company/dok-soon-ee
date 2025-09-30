@@ -35,8 +35,6 @@ export default async function RegisterPage({ searchParams }) {
   // 테스트를 위해 차량 정보를 null로 설정 (모달이 항상 열리도록)
   carPurDetail = null;
 
-
-
   const dealerList = await getDealerList(session.agentId);
   const expdCdList = await getCDList('08');   // 상품화비 지출 항목 코드 목록
 

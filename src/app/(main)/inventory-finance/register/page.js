@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import RegPage from "@/app/(main)/inventory-finance/register/RegPage";
 import { getSuggestOne } from "./api";
-import { getDealerList, getCDList } from "@/app/(main)/common/api";
+import { getDealerList, getCDList, getCompanyLoanLimit } from "@/app/(main)/common/api";
 
 export default async function RegisterPage({ searchParams }) {
   const cookieStore = await cookies();
@@ -36,12 +36,17 @@ export default async function RegisterPage({ searchParams }) {
   // 테스트를 위해 차량 정보를 null로 설정 (모달이 항상 열리도록)
   carPurDetail = null;
 
+
   const dealerList = await getDealerList(session.agentId);
   const loanCompList = await getCDList('05');   // 대출회사 코드 목록
+  const companyLoanLimit = await getCompanyLoanLimit(session.agentId);   // 상사 대출회사 한도
+
+  console.log(companyLoanLimit);
 
   return <RegPage session={session}
-                   dealerList={dealerList.data}
-                   loanCompList={loanCompList.data}
-
+                  carPurDetail={carPurDetail} 
+                  dealerList={dealerList.data}
+                  loanCompList={loanCompList.data}
+                  companyLoanLimit={companyLoanLimit.data}    // loanCompList 대신 사용해야 되고, 콤보에서 선택시 한도 및 잔여한도 안내
    />;
 }

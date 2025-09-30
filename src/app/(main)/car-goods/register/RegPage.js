@@ -52,10 +52,9 @@ export default function ProductCostRegisterPage({
   // 제시구분 코드를 텍스트로 변환하는 함수
   const getCarStatusText = (statusCode) => {
     const statusMap = {
-      '001': 'CAR_STAT_CD제시',
-      '002': 'CAR_STAT_CD매입',
-      '003': 'CAR_STAT_CD매도',
-      '004': 'CAR_STAT_CD완료'
+      '001': '상사매입입',
+      '002': '일반판매',
+      '003': '알선판매'
     };
     return statusMap[statusCode] || statusCode || '';
   };
