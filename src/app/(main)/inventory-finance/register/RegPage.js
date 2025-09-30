@@ -41,7 +41,7 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
   // 제시구분 코드를 텍스트로 변환하는 함수
   const getCarStatusText = (statusCode) => {
     const statusMap = {
-      '001': '상사매입입',
+      '001': '상사매입',
       '002': '일반판매',
       '003': '알선판매'
     };
@@ -77,79 +77,60 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
       return;
     }
 
-    if (productCostRows.length === 0) {
-      alert('상품화비용을 입력해주세요.');
-      return;
-    }
-
-    // 유효한 데이터가 있는 행만 필터링
-    const validRows = productCostRows.filter(row => 
-      row.amount && parseFloat(row.amount) > 0
-    );
-
-    if (validRows.length === 0) {
-      alert('유효한 상품화비용을 입력해주세요.');
-      return;
-    }
+    console.log('loanCompCd', loanCompCd);    // 대출회사 코드
+    console.log('loanAmt', loanAmt);    // 대출금액
+    console.log('loanDt', loanDt);    // 대출실행일
+    console.log('loanMmCnt', loanMmCnt);    // 대출기간
+    console.log('loanCorpIntrRt', loanCorpIntrRt);    // 캐피탈이율
+    console.log('dlrAplyIntrRt', dlrAplyIntrRt);    // 딜러이율
+    console.log('loanSctCd', loanSctCd);    // 대출유형
+    console.log('loanMemo', loanMemo);    // 특이사항
 
     setLoading(true);
     setError(null);
 
     try {
-      // 각 행에 대해 API 호출
-      const promises = validRows.map(async (row) => {
-        const formValues = {
-          carRegId: carRegId,           // 차량 등록 ID
-          expdItemCd: row.productItem || '',           // 지출 항목 코드
-          expdItemNm: row.productItem || '',            // 지출 항목 명
-          expdSctCd: row.expenseType === 'dealer' ? '01' : '02', // 지출 구분 코드 (딜러: 01, 상사: 02)
-          expdAmt: parseFloat(row.amount) || 0,        // 지출 금액
-          expdSupPrc: parseFloat(row.supplyPrice) || 0, // 지출 공급가
-          expdVat: parseFloat(row.taxAmount) || 0,     // 지출 부가세
-          expdDt: row.paymentDate || '',               // 지출 일자
-          expdMethCd: '',                              // 지출 방식 코드
-          expdEvdcCd: row.expenseProof || '',          // 지출 증빙 코드
-          taxSctCd: row.taxType === 'taxable' ? '01' : '02', // 세금 구분 코드 (과세: 01, 면세: 02)
-          txblIssuDt: '',                               // 세금계산서 발행 일자
-          rmrk: row.remarks || '',                     // 비고
-          adjInclusYn: row.settlementReflect ? 'Y' : 'N', // 정산 포함 여부
-          cashRecptRcgnNo: '',                         // 현금 영수증 식별 번호
-          cashMgmtkey: '',                              // 현금 관리키
-          delYn: 'N',                                  // 삭제여부
-          regDtime: new Date().toISOString(),           // 등록 일시
-          regrId: session?.usrId || '',                // 등록자 ID
-          modDtime: '',                                // 수정 일시
-          modrId: ''                                   // 수정자 ID
-        };
+      const formValues = {
+        carRegId: carRegId,               // 차량 등록 ID
+        loanCompCd: loanCompCd,           // 대출회사 코드
+        loanAmt: loanAmt,                 // 대출금액
+        loanDt: loanDt,                   // 대출실행일
+        loanMmCnt: loanMmCnt,             // 대출기간
+        loanCorpIntrRt: loanCorpIntrRt,   // 캐피탈이율
+        dlrAplyIntrRt: dlrAplyIntrRt,     // 딜러이율
+        loanSctCd: loanSctCd,             // 대출유형
+        loanMemo: loanMemo,               // 특이사항
+        regrId: session?.usrId || '',     // 등록자 ID
+        modrId: session?.usrId || '',     // 수정자 ID
+      };
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertGoodsFee`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formValues)
-        });
-
-        const res = await response.json();
-        
-        if (!res.success) {
-          throw new Error(res.message || '상품화비용 등록에 실패했습니다');
-        }
-
-        return res;
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertCarLoan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formValues)
       });
+
+      const res = await response.json();
+      
+      if (!res.success) {
+        throw new Error(res.message || '재고금융 등록에 실패했습니다');
+      }
+
+      return res;
 
       await Promise.all(promises);
       
-      alert('상품화비용이 성공적으로 등록되었습니다.');
+      alert('재고금융이 성공적으로 등록되었습니다.');
       setLoading(false);
       // 성공 후 목록 페이지로 이동하거나 필요한 처리
-      // router.push('/car-goods/list');
+      // router.push('/inventory-finance/list');
       
     } catch (error) {
-      console.error('상품화비용 등록 오류:', error);
+      console.error('재고금융 등록 오류:', error);
       setError(error.message);
-      alert('상품화비용 등록 중 오류가 발생했습니다: ' + error.message);
+      alert('재고금융 등록 중 오류가 발생했습니다: ' + error.message);
       setLoading(false);
     }
   };
