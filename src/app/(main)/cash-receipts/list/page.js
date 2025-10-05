@@ -92,27 +92,31 @@ export default async function CarCashList() {
     dtGubun: '',  
     startDt: '',  
     endDt: '',  
-    dtlCustomerName: '', 
-    dtlCustGubun: '', 
-    dtlEvdcGubun: '', 
-    dtlPrsnGubun: '', 
-    dtlOwnerBrno: '', 
-    dtlOwnerSsn: '', 
-    dtlCtshNo: '' , 
-    dtlCarNoBefore: '', 
-    orderItem: '제시일', 
+    dtlNewCarNo: '',
+    dtlOldCarNo: '',
+    dtlCustomerName: '',
+    dtlSaleItem: '',
+    dtlMemo: '',
+    dtlTradeProcNm: '',
+    dtlTradeSctGubun: '',
+    dtlCrStat: [],
+    dtlRcgnNo: '',
+    dtlNtsConfNo: '',
+    orderItem: '01',        // 거래발생일일
     ordAscDesc: 'desc'
   };
 
   const carCashList = await searchCarCashList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
-  const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
+  const saleItemList = await getCDList('21');   // 매출품명목록
+  const crStatList = await getCDList('22');   // 현금영수증 전송 상태 목록 
   const carCashSummary = await searchCarCashSummary({ ...defaultParams, ...searchParams });
 
   return <ListPage session={session}
                    carList={carCashList}
                    dealerList={dealerList.data}
-                   evdcCdList={evdcCDList.data}
+                   saleItemList={saleItemList.data}
+                   crStatList={crStatList.data}
                    searchAction={searchCarCashListAndSummary}
                    carSummary={carCashSummary}
    />;

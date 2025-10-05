@@ -1,8 +1,272 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import PaginationComponent from "@/components/utils/PaginationComponent";
+import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
+import Image from "next/image";
 
-export default function CashReceiptList() {
+export default function CashReceiptList(
+props
+) {
   const router = useRouter();
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 기본 검색 영역
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // props 값 가져오기
+  const [loading, setLoading] = useState(false);
+
+  // 초기 데이터: 서버에서 전달된 데이터 구조 처리
+  const initialCarListData = props.carList?.data?.carlist || [];
+  const initialPagination = props.carList?.data?.pagination || {};
+
+  // Summary 데이터
+  const initialCarCashSummary = props.carSummary?.data || [];
+
+  const [carList, setCarList] = useState(initialCarListData);
+  const [pagination, setPagination] = useState(initialPagination);
+  const [totalPages, setTotalPages] = useState(initialPagination.totalPages || 1);
+
+  const [carCashSummary, setCarCashSummary] = useState(initialCarCashSummary);
+
+  const [dealerList, setDealerList] = useState(props.dealerList || []);
+  const [saleItemList, setSaleItemList] = useState(props.saleItemList || []);
+  const [crStatList, setCrStatList] = useState(props.crStatList || []);
+
+  
+  const [currentPage, setCurrentPage] = useState(initialPagination.currentPage || 1);
+  const [pageSize, setPageSize] = useState(initialPagination.pageSize || 10);
+
+  const searchAction = props.searchAction;
+
+  // 차량번호
+  const [carNo, setCarNo] = useState("");
+
+  // 담당 딜러
+  const [selectedDealer, setSelectedDealer] = useState("");
+  const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
+
+  // 검색 구분 항목
+  const [dtGubun, setDtGubun] = useState("");
+  const [isDtGubunSelectOpen, setIsDtGubunSelectOpen] = useState(false);
+
+  // 검색 기간
+  const [startDt, setStartDt] = useState("");
+  const [endDt, setEndDt] = useState("");
+
+  // 매입취소/삭제 모달 관련 state
+  const [isGoodsFeeCarRemoveModalOpen, setIsGoodsFeeCarRemoveModalOpen] = useState(false);
+  const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
+  const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //console.log(carList);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 페이지네이션 영역
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // 페이지 정렬 순서 항목
+
+  // 정렬순서 항목
+  const [ordItem, setOrdItem] = useState("제시일");
+  const [isOrdItemSelectOpen, setIsOrdItemSelectOpen] = useState(false);
+
+  // 정렬순서
+  const [ordAscDesc, setOrdAscDesc] = useState("desc");
+  const [isOrdAscDescSelectOpen, setIsOrdAscDescSelectOpen] = useState(false);
+
+  // 건수 - pageSize
+  const [listCount, setListCount] = useState(10);
+  const [isListCountSelectOpen, setIsListCountSelectOpen] = useState(false);
+
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 상세 검색 영역
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // 페이지 정렬 순서 항목
+
+  // 정렬순서 항목
+  const [ordItemDtl, setOrdItemDtl] = useState("제시일");
+  useEffect(() => {
+    setOrdItem(ordItemDtl);
+  }, [ordItemDtl]);
+  const [isOrdItemSelectOpenDtl, setIsOrdItemSelectOpenDtl] = useState(false);
+
+  // 정렬순서
+  const [ordAscDescDtl, setOrdAscDescDtl] = useState("desc");
+  useEffect(() => {
+    setOrdAscDesc(ordAscDescDtl);
+  }, [ordAscDescDtl]);
+    const [isOrdAscDescSelectOpenDtl, setIsOrdAscDescSelectOpenDtl] = useState(false);
+
+  // 건수 - pageSize
+  const [listCountDtl, setListCountDtl] = useState(10);
+  useEffect(() => {
+    setListCount(listCountDtl);
+  }, [listCountDtl]);
+  const [isListCountSelectOpenDtl, setIsListCountSelectOpenDtl] = useState(false);
+
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // 상세 검색 차량번호
+  const [dtlCarNo, setDtlCarNo] = useState("");
+  // 상세 검색 담당 딜러
+  const [dtlDealer, setDtlDealer] = useState("");
+  const [isDtlDealerSelectOpen, setIsDtlDealerSelectOpen] = useState(false);
+
+  // 상세 검색 검색기간 구분
+  const [dtlDtGubun, setDtlDtGubun] = useState("");
+  const [isDtlDtGubunSelectOpen, setIsDtlDtGubunSelectOpen] = useState(false);
+
+  // 상세 검색 검색기간
+  const [dtlStartDt, setDtlStartDt] = useState("");
+  const [dtlEndDt, setDtlEndDt] = useState("");
+
+  // 상세 검색 차량번호(신)
+  const [dtlNewCarNo, setDtlNewCarNo] = useState("");
+
+  // 상세 검색 차량번호(구)
+  const [dtlOldCarNo, setDtlOldCarNo] = useState("");
+
+  // 상세 검색 고객명
+  const [dtlCustomerName, setDtlCustomerName] = useState("");
+
+  // 상세 검색 매출품명
+  const [dtlSaleItem, setDtlSaleItem] = useState("");
+  const [isDtlSaleItemSelectOpen, setIsDtlSaleItemSelectOpen] = useState(false);
+
+  // 상세 검색 메모
+  const [dtlMemo, setDtlMemo] = useState("");
+
+  // 거래 처리 명
+  const [dtlTradeProcNm, setDtlTradeProcNm] = useState("");
+
+  // 거래 구분
+  const [dtlTradeSctGubun, setDtlTradeSctGubun] = useState("");
+
+  // 현금영수증 전송 상태
+  const [dtlCrStat, setDtlCrStat] = useState([]);
+
+  // 상세 검색 식별번호4
+  const [dtlRcgnNo, setDtlRcgnNo] = useState("");
+
+  // 상세 검색 문서번호
+  const [dtlNtsConfNo, setDtlNtsConfNo] = useState("");
+
+  const [searchBtn, setSearchBtn] = useState(0);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // 검색 영역
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // 기본 파라미터 (동적으로 생성)
+  const getDefaultParams = (pageNum = currentPage, pageSize = listCount) => ({
+    carAgent: props.session?.agentId,
+    page: pageNum,
+    pageSize: pageSize,
+  });
+
+  // 검색 파라미터
+  const searchParams = {
+    carNo: searchBtn === 1 ? carNo : dtlCarNo,
+    dealer: searchBtn === 1 ? selectedDealer : dtlDealer,
+    dtGubun: searchBtn === 1 ? dtGubun : dtlDtGubun,
+    startDt: searchBtn === 1 ? startDt : dtlStartDt,
+    endDt: searchBtn === 1 ? endDt : dtlEndDt,
+    dtlNewCarNo: dtlNewCarNo,
+    dtlOldCarNo: dtlOldCarNo,
+    dtlCustomerName: dtlCustomerName,
+    dtlSaleItem: dtlSaleItem,
+    dtlMemo: dtlMemo,
+    dtlTradeProcNm: dtlTradeProcNm,
+    dtlTradeSctGubun: dtlTradeSctGubun,
+    dtlCrStat: dtlCrStat,
+    dtlRcgnNo: dtlRcgnNo,
+    dtlNtsConfNo: dtlNtsConfNo,
+    orderItem: ordItem,
+    ordAscDesc: ordAscDesc,
+  };    
+
+  // 검색 버튼 클릭 핸들러
+  const handleSearch = async (pageNum = 1) => {
+    console.log("***검색 버튼 클릭***", { pageNum, pageSize });
+
+    try {
+      setLoading(true);
+
+      if (typeof searchAction === "function") {
+        const searchParamsWithPage = {
+          ...getDefaultParams(pageNum),
+          ...searchParams,
+        };
+
+        //console.log('서버 액션 호출 파라미터:', searchParamsWithPage);
+        const result = await searchAction(searchParamsWithPage);
+        //console.log('서버 액션 응답:', result);
+
+        if (result && result.success) {
+          //console.log('result.data', result.data);
+          const responseData = result.data?.list?.carlist || [];
+          const paginationInfo = result.data?.list?.pagination || {};
+          const summaryData = result.data?.summary || [];
+
+          // console.log('응답 데이터:', {
+          //   responseDataLength: responseData.length,
+          //   paginationInfo,
+          //   summaryData
+          // });
+
+          setCarList(responseData);
+          setPagination(paginationInfo);
+          setGoodsFeeCarSummary(summaryData);
+
+          // 서버에서 제공하는 페이지네이션 정보 사용
+          setTotalPages(paginationInfo.totalPages || 1);
+          setCurrentPage(paginationInfo.currentPage || pageNum);
+        } else {
+          alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
+        }
+      } else {
+        // 오류 발생
+        alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
+      }
+    } catch (error) {
+      console.error("검색 에러:", error);
+      alert("검색 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시: 서버에서 이미 데이터가 전달되었다면 그걸 우선 사용하고,
+  // 데이터가 없을 때만 검색을 수행합니다 (중복 호출 방지).
+  // 초기 자동 검색 비활성화
+  /*
+    useEffect(() => {
+      if (!initialCarListData || initialCarListData.length === 0) {
+        handleSearch(1);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    */
+
+  // 상세 검색 버튼 클릭 핸들러
+  const handleDtlSearch = () => {
+    setSearchBtn(2);
+    handleSearch(1);
+  };
+
+  /**
+   * 페이지 처리
+   */
+  const handlePageChange = async page => {
+    await handleSearch(page);
+  };
+
   const openModal = (id) => {
     if (typeof window !== "undefined" && window.openModal) {
       window.openModal(id);
@@ -10,6 +274,24 @@ export default function CashReceiptList() {
       console.log("openModal stub:", id);
     }
   };
+
+    // listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
+  // // 자동 검색 비활성화
+  // useEffect(() => {
+  //   setPageSize(listCount);
+  //   // handleSearch(1); // 자동 검색 비활성화
+  //   console.log("pageSize", pageSize);
+  //   console.log("listCount", listCount);
+  // }, [ordItem, ordAscDesc, listCount]);
+
+  // listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
+  // 자동 검색 비활성화
+  useEffect(() => {
+    setPageSize(listCountDtl);
+    if (searchBtn === 1 || searchBtn === 2) handleSearch(1); // 자동 검색 비활성화
+    console.log("pageSize", pageSize);
+    console.log("listCount", listCountDtl);
+  }, [ordItem, ordAscDesc, listCount]);
 
   return (
     <main className="container container--page">
@@ -41,9 +323,22 @@ export default function CashReceiptList() {
               <th>차량번호</th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
+                  <input 
+                    type="text" 
+                    className="input__field" 
+                    placeholder=""
+                    value={carNo}
+                    onChange={(e) => {
+                      const value = e.target.value || '';
+                      setCarNo(value);
+                    }}
+                  />
                   <div className="input__utils">
-                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                    <button 
+                      type="button" 
+                      className="jsInputClear input__clear ico ico--input-delete"
+                      onClick={() => setCarNo("")}
+                    >
                       삭제
                     </button>
                   </div>
@@ -52,28 +347,57 @@ export default function CashReceiptList() {
               <th>담당딜러</th>
               <td>
                 <div className="select">
-                  <input className="select__input" type="hidden" name="dealer" defaultValue="" />
-                  <button className="select__toggle" type="button">
-                    <span className="select__text">선택</span>
-                    <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                  <input
+                    className="select__input"
+                    type="hidden"
+                    name="dealer"
+                    defaultValue="선택"
+                  />
+                  <button
+                    className="select__toggle"
+                    type="button"
+                    onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                  >
+                    <span className="select__text">
+                      {dtlDealer
+                        ? dealerList.find(d => d.USR_ID === dtlDealer)?.USR_NM || "선택"
+                        : "선택"}
+                    </span>
+                    <Image
+                      className="select__arrow"
+                      src="/images/ico-dropdown.svg"
+                      alt=""
+                      width={10}
+                      height={10}
+                    />
                   </button>
 
-                  <ul className="select__menu">
-                    <li className="select__option select__option--selected" data-value="">
+                  <ul
+                    className="select__menu"
+                    style={{ display: isDtlDealerSelectOpen ? "block" : "none" }}
+                  >
+                    <li
+                      className={`select__option ${!dtlDealer ? "select__option--selected" : ""}`}
+                      onClick={() => {
+                        setDtlDealer("");
+                        setIsDtlDealerSelectOpen(false);
+                      }}
+                    >
                       선택
                     </li>
-                    <li className="select__option" data-value="">
-                      선택1
-                    </li>
-                    <li className="select__option" data-value="">
-                      선택2
-                    </li>
-                    <li className="select__option" data-value="">
-                      선택3
-                    </li>
-                    <li className="select__option" data-value="">
-                      선택4
-                    </li>
+                    {dealerList.map((dealer, index) => (
+                      <li
+                        key={index}
+                        className={`select__option ${dtlDealer === dealer.USR_ID ? "select__option--selected" : ""}`}
+                        data-value={dealer.USR_ID}
+                        onClick={() => {
+                          setDtlDealer(dealer.USR_ID);
+                          setIsDtlDealerSelectOpen(false);
+                        }}
+                      >
+                        {dealer.USR_NM}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </td>
@@ -81,23 +405,65 @@ export default function CashReceiptList() {
               <td>
                 <div className="input-group">
                   <div className="select w140">
-                    <input className="select__input" type="hidden" name="dealer" defaultValue="거래일" />
-                    <button className="select__toggle" type="button">
-                      <span className="select__text">거래(발행)일</span>
-                      <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
-                    </button>
+                      <input
+                        className="select__input"
+                        type="hidden"
+                        name="dealer"
+                        defaultValue="거래(발행)일"
+                      />
+                      <button
+                        className="select__toggle"
+                        type="button"
+                        onClick={() => setIsDtGubunSelectOpen(!isDtGubunSelectOpen)}
+                      >
+                        <span className="select__text">
+                          {dtGubun === "01"
+                            ? "매도(판매)일"
+                            : dtGubun === "02"
+                              ? "제시(매입)일" 
+                              : "거래(발행)일"}
+                        </span>
+                        <Image
+                          className="select__arrow"
+                          src="/images/ico-dropdown.svg"
+                          alt=""
+                          width={10}
+                          height={10}
+                        />
+                      </button>
 
-                    <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="거래일">
-                        거래(발행)일
-                      </li>
-                      <li className="select__option" data-value="매도(판매)일">
-                        매도(판매)일
-                      </li>
-                      <li className="select__option" data-value="제시(매입)일">
-                        제시(매입)일
-                      </li>
-                    </ul>
+                      <ul
+                        className="select__menu"
+                        style={{ display: isDtGubunSelectOpen ? "block" : "none" }}
+                      >
+                        <li
+                          className={`select__option ${dtGubun === "01" || !dtGubun ? "select__option--selected" : ""}`}
+                          onClick={() => {
+                            setDtGubun("01");
+                            setIsDtGubunSelectOpen(false);
+                          }}
+                        >
+                          거래(발행)일
+                        </li>
+                        <li
+                          className={`select__option ${dtGubun === "02" ? "select__option--selected" : ""}`}
+                          onClick={() => {
+                            setDtGubun("02");
+                            setIsDtGubunSelectOpen(false);
+                          }}
+                        >
+                          매도(판매)일
+                        </li>
+                        <li
+                          className={`select__option ${dtGubun === "03" ? "select__option--selected" : ""}`}
+                          onClick={() => {
+                            setDtGubun("03");
+                            setIsDtGubunSelectOpen(false);
+                          }}
+                        >
+                          제시(매입)일
+                        </li>
+                      </ul>
                   </div>
 
                   <div className="input w140">
@@ -106,6 +472,8 @@ export default function CashReceiptList() {
                       className="jsStartDate input__field input__field--date"
                       placeholder="시작일"
                       autoComplete="off"
+                      value={startDt}
+                      onChange={e => setStartDt(e.target.value)}
                     />
                   </div>
                   <span className="input-group__dash">-</span>
@@ -115,11 +483,21 @@ export default function CashReceiptList() {
                       className="jsEndDate input__field input__field--date"
                       placeholder="종료일"
                       autoComplete="off"
+                      value={endDt}
+                      onChange={e => setEndDt(e.target.value)}
                     />
                   </div>
 
                   {/* disabled 속성 제거 시, 활성화 상태 적용 */}
-                  <button type="button" className="btn btn--type03">
+                  <button
+                    type="button"
+                    className="btn btn--type03"
+                    onClick={() => {
+                      setSearchBtn(1);
+                      handleSearch(1);
+                    }}
+                    disabled={loading}
+                  >
                     <span className="ico ico--search"></span>차량검색
                   </button>
                   <button type="button" className="jsSearchboxBtn btn btn--type02">
@@ -141,40 +519,103 @@ export default function CashReceiptList() {
                 <span className="ico ico--reset"></span>선택 초기화
               </button>
 
-              {/* 딜러명 */}
+              {/* 정렬항목 */}
               <div className="select select--dark w160">
                 <input className="select__input" type="hidden" name="dealer" defaultValue="거래일" />
-                <button className="select__toggle" type="button">
-                  <span className="select__text">거래일</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                <button
+                className="select__toggle"
+                type="button"
+                onClick={() => setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl)}
+              >
+                  <span className="select__text">{ordItemDtl || "거래일"}</span>
+                  <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
                 </button>
 
-                <ul className="select__menu">
-                  <li className="select__option select__option--selected" data-value="딜러명1">
-                    거래일
-                  </li>
-                  <li className="select__option" data-value="담당딜러">
-                    담당딜러
-                  </li>
-                  <li className="select__option" data-value="차량번호">
-                    차량번호
-                  </li>
-                </ul>
+                <ul
+                className="select__menu"
+                style={{ display: isOrdItemSelectOpenDtl ? "block" : "none" }}
+                >
+                <li
+                  className={`select__option ${ordItemDtl === "거래일" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItemDtl("거래일");
+                    setIsOrdItemSelectOpenDtl(false);
+                    // handleSearch(1); // 자동 검색 비활성화
+                  }}
+                >
+                  거래일
+                </li>
+                <li
+                  className={`select__option ${ordItemDtl === "담당딜러" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItemDtl("담당딜러");
+                    setIsOrdItemSelectOpenDtl(false);
+                    // handleSearch(1); // 자동 검색 비활성화
+                  }}
+                >
+                  담당딜러
+                </li>
+                <li
+                  className={`select__option ${ordItemDtl === "차량번호" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItemDtl("차량번호");
+                    setIsOrdItemSelectOpenDtl(false);
+                    // handleSearch(1); // 자동 검색 비활성화
+                  }}
+                >
+                  차량번호
+                </li>
+              </ul>
               </div>
 
               {/* 정렬순서 */}
               <div className="select select--dark w160">
                 <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
-                <button className="select__toggle" type="button">
-                  <span className="select__text">내림차순</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                <button
+                  className="select__toggle"
+                  type="button"
+                  onClick={() => setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl)}
+                >
+                  <span className="select__text">
+                    {ordAscDescDtl === "desc" ? "내림차순" : ordAscDescDtl === "asc" ? "오름차순" : "선택"}
+                  </span>
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
                 </button>
 
-                <ul className="select__menu">
-                  <li className="select__option select__option--selected" data-value="desc">
+                <ul
+                  className="select__menu"
+                  style={{ display: isOrdAscDescSelectOpenDtl ? "block" : "none" }}
+                >
+                  <li
+                    className={`select__option ${ordAscDescDtl === "desc" ? "select__option--selected" : ordAscDescDtl === "asc" ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setOrdAscDescDtl("desc");
+                      setIsOrdAscDescSelectOpenDtl(false);
+                      // handleSearch(1); // 자동 검색 비활성화
+                    }}
+                  >
                     내림차순
                   </li>
-                  <li className="select__option" data-value="asc">
+                  <li
+                    className={`select__option ${ordAscDescDtl === "asc" ? "select__option--selected" : ordAscDescDtl === "desc" ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setOrdAscDescDtl("asc");
+                      setIsOrdAscDescSelectOpenDtl(false);
+                      // handleSearch(1); // 자동 검색 비활성화
+                    }}
+                  >
                     오름차순
                   </li>
                 </ul>
@@ -182,24 +623,60 @@ export default function CashReceiptList() {
 
               {/* 건수 */}
               <div className="select select--dark w160">
-                <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
-                <button className="select__toggle" type="button">
-                  <span className="select__text">10건씩</span>
-                  <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
-                </button>
+              <input
+                className="select__input"
+                type="hidden"
+                name="dealer"
+                defaultValue={listCountDtl}
+              />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl)}
+              >
+                <span className="select__text">{listCountDtl}건씩</span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
+              </button>
 
-                <ul className="select__menu">
-                  <li className="select__option select__option--selected" data-value="10">
-                    10건씩
-                  </li>
-                  <li className="select__option" data-value="20">
-                    20건씩
-                  </li>
-                  <li className="select__option" data-value="30">
-                    30건씩
-                  </li>
-                </ul>
-              </div>
+              <ul
+                className="select__menu"
+                style={{ display: isListCountSelectOpenDtl ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${listCountDtl === 10 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCountDtl(10);
+                    setIsListCountSelectOpenDtl(false);
+                  }}
+                >
+                  10건씩
+                </li>
+                <li
+                  className={`select__option ${listCountDtl === 30 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCountDtl(30);
+                    setIsListCountSelectOpenDtl(false);
+                  }}
+                >
+                  30건씩
+                </li>
+                <li
+                  className={`select__option ${listCountDtl === 50 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCountDtl(50);
+                    setIsListCountSelectOpenDtl(false);
+                  }}
+                >
+                  50건씩
+                </li>
+              </ul>
+            </div>
             </div>
           </div>
 
@@ -218,10 +695,19 @@ export default function CashReceiptList() {
                   <tr>
                     <th>차량번호(신)</th>
                     <td>
-                      <div className="input">
-                        <input type="text" className="input__field" placeholder="" />
+                    <div className="input">
+                        <input
+                          type="text"
+                          className="input__field"
+                          placeholder="차량번호(신)"
+                          value={dtlNewCarNo}
+                          onChange={e => setDtlNewCarNo(e.target.value)}
+                        />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -230,28 +716,57 @@ export default function CashReceiptList() {
                     <th>담당딜러</th>
                     <td>
                       <div className="select">
-                        <input className="select__input" type="hidden" name="dealer" defaultValue="" />
-                        <button className="select__toggle" type="button">
-                          <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                        <input
+                          className="select__input"
+                          type="hidden"
+                          name="dealer"
+                          defaultValue="선택"
+                        />
+                        <button
+                          className="select__toggle"
+                          type="button"
+                          onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                        >
+                          <span className="select__text">
+                            {dtlDealer
+                              ? dealerList.find(d => d.USR_ID === dtlDealer)?.USR_NM || "선택"
+                              : "선택"}
+                          </span>
+                          <Image
+                            className="select__arrow"
+                            src="/images/ico-dropdown.svg"
+                            alt=""
+                            width={10}
+                            height={10}
+                          />
                         </button>
 
-                        <ul className="select__menu">
-                          <li className="select__option select__option--selected" data-value="선택1">
+                        <ul
+                          className="select__menu"
+                          style={{ display: isDtlDealerSelectOpen ? "block" : "none" }}
+                        >
+                          <li
+                            className={`select__option ${!dtlDealer ? "select__option--selected" : ""}`}
+                            onClick={() => {
+                              setDtlDealer("");
+                              setIsDtlDealerSelectOpen(false);
+                            }}
+                          >
                             선택
                           </li>
-                          <li className="select__option" data-value="">
-                            선택1
-                          </li>
-                          <li className="select__option" data-value="">
-                            선택2
-                          </li>
-                          <li className="select__option" data-value="">
-                            선택3
-                          </li>
-                          <li className="select__option" data-value="">
-                            선택4
-                          </li>
+                          {dealerList.map((dealer, index) => (
+                            <li
+                              key={index}
+                              className={`select__option ${dtlDealer === dealer.USR_ID ? "select__option--selected" : ""}`}
+                              data-value={dealer.USR_ID}
+                              onClick={() => {
+                                setDtlDealer(dealer.USR_ID);
+                                setIsDtlDealerSelectOpen(false);
+                              }}
+                            >
+                              {dealer.USR_NM}
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     </td>
@@ -259,21 +774,65 @@ export default function CashReceiptList() {
                     <td>
                       <div className="input-group">
                         <div className="select w140">
-                          <input className="select__input" type="hidden" name="dealer" defaultValue="거래(발행)일" />
-                          <button className="select__toggle" type="button">
-                            <span className="select__text">거래(발행)일</span>
-                            <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                          <input
+                            className="select__input"
+                            type="hidden"
+                            name="dealer"
+                            defaultValue="제시(매입)일"
+                          />
+                          <button
+                            className="select__toggle"
+                            type="button"
+                            onClick={() => setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen)}
+                          >
+                            <span className="select__text">
+                              {dtlDtGubun === "01"
+                                ? "제시(매입)일"
+                                : dtlDtGubun === "02"
+                                  ? "이전일"
+                                  : dtlDtGubun === "03"
+                                    ? "똑순이등록일"
+                                    : "선택"}
+                            </span>
+                            <Image
+                              className="select__arrow"
+                              src="/images/ico-dropdown.svg"
+                              alt=""
+                              width={10}
+                              height={10}
+                            />
                           </button>
 
-                          <ul className="select__menu">
-                            <li className="select__option select__option--selected" data-value="">
-                              거래(발행)일
-                            </li>
-                            <li className="select__option" data-value="">
-                              매도(판매)일
-                            </li>
-                            <li className="select__option" data-value="">
+                          <ul
+                            className="select__menu"
+                            style={{ display: isDtlDtGubunSelectOpen ? "block" : "none" }}
+                          >
+                            <li
+                              className={`select__option ${dtlDtGubun === "제시(매입)일" ? "select__option--selected" : ""}`}
+                              onClick={() => {
+                                setDtlDtGubun("01");
+                                setIsDtlDtGubunSelectOpen(false);
+                              }}
+                            >
                               제시(매입)일
+                            </li>
+                            <li
+                              className={`select__option ${dtlDtGubun === "상품화등록일" ? "select__option--selected" : ""}`}
+                              onClick={() => {
+                                setDtlDtGubun("02");
+                                setIsDtlDtGubunSelectOpen(false);
+                              }}
+                            >
+                              상품화등록일
+                            </li>
+                            <li
+                              className={`select__option ${dtlDtGubun === "매도(판매)일" ? "select__option--selected" : ""}`}
+                              onClick={() => {
+                                setDtlDtGubun("03");
+                                setIsDtlDtGubunSelectOpen(false);
+                              }}
+                            >
+                              매도(판매)일
                             </li>
                           </ul>
                         </div>
@@ -284,6 +843,8 @@ export default function CashReceiptList() {
                             className="jsStartDate input__field input__field--date"
                             placeholder="시작일"
                             autoComplete="off"
+                            value={dtlStartDt}
+                            onChange={e => setDtlStartDt(e.target.value)}
                           />
                         </div>
                         <span className="input-group__dash">-</span>
@@ -293,6 +854,8 @@ export default function CashReceiptList() {
                             className="jsEndDate input__field input__field--date"
                             placeholder="종료일"
                             autoComplete="off"
+                            value={dtlEndDt}
+                            onChange={e => setDtlEndDt(e.target.value)}
                           />
                         </div>
                       </div>
@@ -302,9 +865,18 @@ export default function CashReceiptList() {
                     <th>차량번호(구)</th>
                     <td>
                       <div className="input">
-                        <input type="text" className="input__field" placeholder="" />
+                        <input
+                          type="text"
+                          className="input__field"
+                          placeholder="차량번호(구)"
+                          value={dtlOldCarNo}
+                          onChange={e => setDtlOldCarNo(e.target.value)}
+                        />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -313,9 +885,18 @@ export default function CashReceiptList() {
                     <th>고객명</th>
                     <td>
                       <div className="input">
-                        <input type="text" className="input__field" placeholder="" />
+                        <input
+                          type="text"
+                          className="input__field"
+                          placeholder="고객명"
+                          value={dtlCustomerName}
+                          onChange={e => setDtlCustomerName(e.target.value)}
+                        />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                          >
                             삭제
                           </button>
                         </div>
@@ -325,24 +906,46 @@ export default function CashReceiptList() {
                     <td>
                       <div className="select">
                         <input className="select__input" type="hidden" name="dealer" defaultValue="선택" />
-                        <button className="select__toggle" type="button">
-                          <span className="select__text">선택</span>
-                          <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+                        <button 
+                          className="select__toggle" 
+                          type="button"
+                          onClick={() => setIsDtlSaleItemSelectOpen(!isDtlSaleItemSelectOpen)}
+                        >
+                          <span className="select__text">{dtlSaleItem || "선택"}</span>
+                          <Image
+                            className="select__arrow"
+                            src="/images/ico-dropdown.svg"
+                            alt=""
+                            width={10}
+                            height={10}
+                          />
                         </button>
 
-                        <ul className="select__menu">
-                          <li className="select__option select__option--selected" data-value="">
+                        <ul 
+                          className="select__menu"
+                          style={{ display: isDtlSaleItemSelectOpen ? "block" : "none" }}
+                        >
+                          <li
+                            className={`select__option ${dtlSaleItem === "" ? "select__option--selected" : ""}`}
+                            onClick={() => {
+                              setDtlSaleItem("");
+                              setIsDtlSaleItemSelectOpen(false);
+                            }}
+                          >
                             선택
                           </li>
-                          <li className="select__option" data-value="">
-                            차량매도
-                          </li>
-                          <li className="select__option" data-value="">
-                            법정수수료(상사매도비)
-                          </li>
-                          <li className="select__option" data-value="">
-                            성능보험료
-                          </li>
+                          {saleItemList.map((item) => (
+                            <li
+                              key={item.CD}
+                              className={`select__option ${dtlSaleItem === item.CD ? "select__option--selected" : ""}`}
+                              onClick={() => {
+                                setDtlSaleItem(item.CD);
+                                setIsDtlSaleItemSelectOpen(false);
+                              }}
+                            >
+                              {item.CD_NM}
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     </td>
@@ -353,44 +956,74 @@ export default function CashReceiptList() {
                       <div className="form-option-wrap">
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input type="radio" defaultChecked name="group-type1" />
+                            <input 
+                              type="radio" 
+                              checked={dtlTradeProcNm === ""} 
+                              onChange={() => setDtlTradeProcNm("")}
+                              name="group-type1" 
+                            />
                             <span className="form-option__title">전체</span>
                           </label>
                         </div>
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input type="radio" name="group-type1" />
+                            <input 
+                              type="radio" 
+                              checked={dtlTradeProcNm === "승인거래"}
+                              onChange={() => setDtlTradeProcNm("승인거래")}
+                              name="group-type1" 
+                            />
                             <span className="form-option__title">승인거래</span>
                           </label>
                         </div>
 
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input type="radio" name="group-type1" />
+                            <input 
+                              type="radio" 
+                              checked={dtlTradeProcNm === "취소거래"}
+                              onChange={() => setDtlTradeProcNm("취소거래")}
+                              name="group-type1" 
+                            />
                             <span className="form-option__title">취소거래</span>
                           </label>
                         </div>
                       </div>
                     </td>
-                    <th>제시구분</th>
+                    <th>거래래구분</th>
                     <td>
                       <div className="form-option-wrap">
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input type="radio" defaultChecked name="group-type2" />
+                            <input 
+                              type="radio" 
+                              checked={dtlTradeSctGubun === ""}
+                              onChange={() => setDtlTradeSctGubun("")}
+                              name="group-type2" 
+                            />
                             <span className="form-option__title">전체</span>
                           </label>
                         </div>
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input type="radio" name="group-type2" />
+                            <input 
+                              type="radio"
+                              checked={dtlTradeSctGubun === "소득공제"}
+                              onChange={() => setDtlTradeSctGubun("소득공제")}
+                              name="group-type2" 
+                            />
                             <span className="form-option__title">소득공제</span>
                           </label>
                         </div>
 
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input type="radio" name="group-type2" />
+                            <input 
+                              type="radio"
+                              checked={dtlTradeSctGubun === "지출증빙"}
+                              onChange={() => setDtlTradeSctGubun("지출증빙")}
+                              name="group-type2" 
+                            />
                             <span className="form-option__title">지출증빙</span>
                           </label>
                         </div>
@@ -402,34 +1035,32 @@ export default function CashReceiptList() {
                       <div className="form-option-wrap">
                         <div className="form-option">
                           <label className="form-option__label">
-                            <input type="checkbox" defaultChecked />
-                            <span className="form-option__title">발행대기</span>
+                            <input 
+                              type="checkbox"
+                              checked={dtlCrStat.length === 0}
+                              onChange={() => setDtlCrStat([])}
+                            />
+                            <span className="form-option__title">전체</span>
                           </label>
                         </div>
-                        <div className="form-option">
-                          <label className="form-option__label">
-                            <input type="checkbox" />
-                            <span className="form-option__title">발행완료</span>
-                          </label>
-                        </div>
-                        <div className="form-option">
-                          <label className="form-option__label">
-                            <input type="checkbox" />
-                            <span className="form-option__title">전송중</span>
-                          </label>
-                        </div>
-                        <div className="form-option">
-                          <label className="form-option__label">
-                            <input type="checkbox" />
-                            <span className="form-option__title">전송성공</span>
-                          </label>
-                        </div>
-                        <div className="form-option">
-                          <label className="form-option__label">
-                            <input type="checkbox" />
-                            <span className="form-option__title">전송실패</span>
-                          </label>
-                        </div>
+                        {crStatList.map((stat) => (
+                          <div className="form-option" key={stat.CD}>
+                            <label className="form-option__label">
+                              <input 
+                                type="checkbox"
+                                checked={dtlCrStat.includes(stat.CD)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setDtlCrStat([...dtlCrStat, stat.CD]);
+                                  } else {
+                                    setDtlCrStat(dtlCrStat.filter(cd => cd !== stat.CD));
+                                  }
+                                }}
+                              />
+                              <span className="form-option__title">{stat.CD_NM}</span>
+                            </label>
+                          </div>
+                        ))}
                       </div>
                     </td>
                   </tr>
@@ -437,9 +1068,19 @@ export default function CashReceiptList() {
                     <th>식별번호</th>
                     <td>
                       <div className="input">
-                        <input type="text" className="input__field" placeholder="휴대폰/주민등록/사업자/카드번호" />
+                        <input 
+                          type="text" 
+                          className="input__field" 
+                          placeholder="휴대폰/주민등록/사업자/카드번호"
+                          value={dtlRcgnNo}
+                          onChange={(e) => setDtlRcgnNo(e.target.value)} 
+                        />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button 
+                            type="button" 
+                            className="jsInputClear input__clear ico ico--input-delete"
+                            onClick={() => setDtlRcgnNo("")}
+                          >
                             삭제
                           </button>
                         </div>
@@ -449,9 +1090,19 @@ export default function CashReceiptList() {
                     <th>관리번호</th>
                     <td>
                       <div className="input">
-                        <input type="text" className="input__field" placeholder="문서번호/국세청승인번호" />
+                        <input 
+                          type="text" 
+                          className="input__field" 
+                          placeholder="문서번호/국세청승인번호"
+                          value={dtlNtsConfNo}
+                          onChange={(e) => setDtlNtsConfNo(e.target.value)}
+                        />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button 
+                            type="button" 
+                            className="jsInputClear input__clear ico ico--input-delete"
+                            onClick={() => setDtlNtsConfNo("")}
+                          >
                             삭제
                           </button>
                         </div>
@@ -460,9 +1111,19 @@ export default function CashReceiptList() {
                     <th>비고</th>
                     <td>
                       <div className="input">
-                        <input type="text" className="input__field" placeholder="" />
+                        <input 
+                          type="text" 
+                          className="input__field" 
+                          placeholder=""
+                          value={dtlMemo}
+                          onChange={(e) => setDtlMemo(e.target.value)}
+                        />
                         <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">
+                          <button 
+                            type="button" 
+                            className="jsInputClear input__clear ico ico--input-delete"
+                            onClick={() => setDtlMemo("")}
+                          >
                             삭제
                           </button>
                         </div>
@@ -476,7 +1137,11 @@ export default function CashReceiptList() {
                 <button className="jsSearchboxBtn btn btn--light" type="button">
                   취소
                 </button>
-                <button className="btn btn--primary" type="button">
+                <button
+                  className="btn btn--primary"
+                  type="button"
+                  onClick={handleDtlSearch}
+                >
                   <span className="ico ico--search"></span>검색
                 </button>
               </div>
@@ -500,7 +1165,7 @@ export default function CashReceiptList() {
             <span className="ico ico--add"></span>건별 발행 등록
           </button>
           <div className="input-group">
-            {/* 딜러명 */}
+            {/* 정렬항목 */}
             <div className="select select--dark w160">
               <input className="select__input" type="hidden" name="dealer" defaultValue="발행일" />
               <button className="select__toggle" type="button">
@@ -598,61 +1263,62 @@ export default function CashReceiptList() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>승인</td>
-              <td>2025-09-11 19:31:06</td>
-              <td>K00049933</td>
-              <td>소득공제</td>
-              <td>951011-*******</td>
-              <td>차산사람</td>
-              <td>홍길동</td>
-              <td>소나타 77칠7777 차량매도</td>
-              <td>100,000,000</td>
-              <td>전송성공</td>
+            {carList.map((car, index) => (
+              <tr key={index}>
+                <td>{car.TRADE_SCT_NM}</td>
+                <td>{car.TRADE_DT}</td>
+                <td>{car.NTS_CONF_NO}</td>
+                <td>{car.TRADE_TP_NM}</td>
+                <td>{car.RCGN_NO}</td>
+                <td>{car.CUST_NM}</td>
+                <td>{car.DLR_NM}</td>
+                <td>{car.CAR_NM} {car.CAR_NO}<br/>{car.CR_TRNS_STAT_NM}</td>
+                <td>{car.TRADE_AMT}</td>
+                <td>{car.CR_TRNS_STAT_NM}</td>
+                <td>
+                  <div className="input-group input-group--sm input-group--center">
+                    <div className="select select--utils">
+                      <button type="button" className="select__toggle">더보기</button>
 
-              <td>
-                <div className="input-group input-group--sm input-group--center">
-                  <div className="select select--utils">
-                    <button type="button" className="select__toggle">더보기</button>
-
-                    <ul className="select__menu">
-                      <li className="select__option">
-                        <a href="#">영수증인쇄</a>
-                      </li>
-                      <li className="select__option">
-                        <a href="#">알림톡전송</a>
-                      </li>
-                      <li className="select__option">
-                        <a href="#">메일전송</a>
-                      </li>
-                      <li className="select__option">
-                        <a href="#">Fax전송</a>
-                      </li>
-                      <li className="select__option">
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            openModal("1");
-                          }}
-                        >
-                          취소발행
-                        </a>
-                      </li>
-                    </ul>
+                      <ul className="select__menu">
+                        <li className="select__option">
+                          <a href="#">영수증인쇄</a>
+                        </li>
+                        <li className="select__option">
+                          <a href="#">알림톡전송</a>
+                        </li>
+                        <li className="select__option">
+                          <a href="#">메일전송</a>
+                        </li>
+                        <li className="select__option">
+                          <a href="#">Fax전송</a>
+                        </li>
+                        <li className="select__option">
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              openModal(car.CAR_REG_ID);
+                            }}
+                          >
+                            취소발행
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td>
-                <button
-                  type="button"
-                  className="btn btn--light btn--sm"
-                  onClick={() => router.push("/detail/cash-receipts/1")}
-                >
-                  상세보기
-                </button>
-              </td>
-            </tr>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    className="btn btn--light btn--sm"
+                    onClick={() => router.push(`/detail/cash-receipts/${car.id}`)}
+                  >
+                    상세보기
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
@@ -700,51 +1366,51 @@ export default function CashReceiptList() {
           </thead>
           <tbody>
             <tr>
-              <td rowSpan={2}>소득공제</td>
-              <td>승인</td>
-              <td>100</td>
-              <td>1,100,000</td>
-              <td>100,000</td>
-              <td>1,200,000</td>
+              <td rowSpan={2}>{carCashSummary?.[0]?.TRADE_TP_NM || '소득공제'}</td>
+              <td>{carCashSummary?.[0]?.TRADE_PROC_NM || '승인'}</td>
+              <td>{carCashSummary?.[0]?.CNT || 0}</td>
+              <td>{carCashSummary?.[0]?.TRADE_AMT?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[0]?.SUP_PRC?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[0]?.VAT?.toLocaleString() || 0}</td>
             </tr>
             <tr>
-              <td>취소</td>
-              <td>100</td>
-              <td>1,100,000</td>
-              <td>100,000</td>
-              <td>1,200,000</td>
+              <td>{carCashSummary?.[1]?.TRADE_PROC_NM || '취소'}</td>
+              <td>{carCashSummary?.[1]?.count || 0}</td>
+              <td>{carCashSummary?.[1]?.supplyAmount?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[1]?.taxAmount?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[1]?.totalAmount?.toLocaleString() || 0}</td>
             </tr>
             <tr>
-              <td rowSpan={2}>지출증빙</td>
-              <td>승인</td>
-              <td>100</td>
-              <td>1,100,000</td>
-              <td>100,000</td>
-              <td>1,200,000</td>
+              <td rowSpan={2}>{carCashSummary?.[2]?.TRADE_TP_NM || '지출증빙'}</td>
+              <td>{carCashSummary?.[2]?.TRADE_PROC_NM || '승인'}</td>
+              <td>{carCashSummary?.[2]?.CNT || 0}</td>
+              <td>{carCashSummary?.[2]?.TRADE_AMT?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[2]?.SUP_PRC?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[2]?.VAT?.toLocaleString() || 0}</td>
             </tr>
             <tr>
-              <td>취소</td>
-              <td>100</td>
-              <td>1,100,000</td>
-              <td>100,000</td>
-              <td>1,200,000</td>
+              <td>{carCashSummary?.[3]?.TRADE_PROC_NM || '취소'}</td>
+              <td>{carCashSummary?.[3]?.count || 0}</td>
+              <td>{carCashSummary?.[3]?.supplyAmount?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[3]?.taxAmount?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[3]?.totalAmount?.toLocaleString() || 0}</td>
             </tr>
           </tbody>
           <tfoot>
             <tr>
-              <th rowSpan={2}>합계</th>
-              <th>승인</th>
-              <th>100</th>
-              <th>1,000,000</th>
-              <th>100,000</th>
-              <th>1,100,000</th>
+              <td rowSpan={2}>{carCashSummary?.[4]?.TRADE_TP_NM || '합계계'}</td>
+              <td>{carCashSummary?.[4]?.TRADE_PROC_NM || '승인'}</td>
+              <td>{carCashSummary?.[4]?.CNT || 0}</td>
+              <td>{carCashSummary?.[4]?.TRADE_AMT?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[4]?.SUP_PRC?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[4]?.VAT?.toLocaleString() || 0}</td>
             </tr>
             <tr>
-              <th>취소</th>
-              <th>10</th>
-              <th>1,000,000</th>
-              <th>100,000</th>
-              <th>1,100,000</th>
+              <td>{carCashSummary?.[5]?.TRADE_PROC_NM || '취소'}</td>
+              <td>{carCashSummary?.[5]?.count || 0}</td>
+              <td>{carCashSummary?.[5]?.supplyAmount?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[5]?.taxAmount?.toLocaleString() || 0}</td>
+              <td>{carCashSummary?.[5]?.totalAmount?.toLocaleString() || 0}</td>
             </tr>
           </tfoot>
         </table>

@@ -1217,11 +1217,13 @@ export default function SalesVehicleList(props) {
           리스트<span>Total 100건</span>
         </h2>
         <div className="table-wrap__head table-wrap__title">
-          <button
+        <button
             type="button"
             className="btn btn--red btn--padding--r30"
-            onClick={() => {
-                router.push('/car-sell/register');
+            onClick={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              router.push("/car-sell/register");
             }}
           >
             <span className="ico ico--add"></span>판매차량 등록
@@ -1438,16 +1440,17 @@ export default function SalesVehicleList(props) {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>123가1234 / 홍길동 / 쏘나타 / 2025-07-01 / 100,000,000</td>
-              <td>상사매입</td>
-              <td>상사(알선)</td>
-              <td>백두산</td>
-              <td>차산사람</td>
-              <td>120,000,000</td>
-              <td>120,000</td>
-              <td>440,000</td>
-              <td>2025-09-01</td>
+            {carList.map((item, index) => (
+            <tr key={index}>
+              <td>{item.CAR_NO} / {item.DLR_NM} / {item.CAR_NM} / {item.CAR_PUR_DT} / {item.PUR_AMT.toLocaleString()}</td>
+              <td>{item.CAR_STAT_NM}</td>
+              <td>{item.SALE_TP_NM}</td>
+              <td>{item.SEL_DLR_NM}</td>
+              <td>{item.BUYER_NM}</td>
+              <td>{item.SALE_AMT.toLocaleString()}</td>
+              <td>{item.PERF_INFE_AMT.toLocaleString()}</td>
+              <td>{item.AGENT_SEL_COST.toLocaleString()}</td>
+              <td>{item.CAR_SALE_DT}</td> 
 
               <td>
                 <div className="input-group input-group--sm input-group--center">
@@ -1456,7 +1459,7 @@ export default function SalesVehicleList(props) {
 
                     <ul className="select__menu">
                       <li className="select__option">
-                        <a href="#">판매 수정</a>
+                      <Link href={`/car-sell/edit/${item.CAR_REG_ID}`}>매입 수정</Link>
                       </li>
                       <li className="select__option">
                         <a
@@ -1506,6 +1509,7 @@ export default function SalesVehicleList(props) {
                 </button>
               </td>
             </tr>
+            ))}
           </tbody>
         </table>
 

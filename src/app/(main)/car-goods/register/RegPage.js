@@ -52,7 +52,7 @@ export default function ProductCostRegisterPage({
   // 제시구분 코드를 텍스트로 변환하는 함수
   const getCarStatusText = (statusCode) => {
     const statusMap = {
-      '001': '상사매입입',
+      '001': '상사매입',
       '002': '일반판매',
       '003': '알선판매'
     };
@@ -304,7 +304,7 @@ export default function ProductCostRegisterPage({
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>{getCarStatusText(selectedCar?.CAR_STAT_CD || (carPurDetail && carPurDetail.CAR_STAT_CD))}</td>
+              <td>{selectedCar?.CAR_STAT_NM || (carPurDetail && carPurDetail.CAR_STAT_NM) || ""}</td>
               <th>차량번호</th>
               <td>{selectedCar?.CAR_NO || (carPurDetail && carPurDetail.CAR_NO) || ""}</td>
               <th>매입딜러</th>
