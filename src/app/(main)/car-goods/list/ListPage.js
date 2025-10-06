@@ -260,6 +260,56 @@ export default function ProductCostList(props) {
     }
   };
 
+  // 파라미터를 받아서 검색하는 함수
+  const handleSearchWithParams = async (pageNum = 1, customParams = null) => {
+    console.log("파라미터 검색 실행", { pageNum, customParams });
+
+    try {
+      setLoading(true);
+
+      if (typeof searchAction === "function") {
+        const searchParamsWithPage = {
+          ...getDefaultParams(pageNum),
+          ...(customParams || searchParams),
+        };
+
+        console.log('서버 액션 호출 파라미터:', searchParamsWithPage);
+        const result = await searchAction(searchParamsWithPage);
+        console.log('서버 액션 응답:', result);
+
+        if (result && result.success) {
+          const responseData = result.data?.list?.carlist || [];
+          const paginationInfo = result.data?.list?.pagination || {};
+          const summaryData = result.data?.summary || [];
+
+          setCarList(responseData);
+          setPagination(paginationInfo);
+          setGoodsFeeCarSummary(summaryData);
+
+          // 서버에서 제공하는 페이지네이션 정보 사용
+          setTotalPages(paginationInfo.totalPages || 1);
+          setCurrentPage(paginationInfo.currentPage || pageNum);
+        } else {
+          alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
+        }
+      } else {
+        // searchAction이 없으면 /api/purchases 엔드포인트 호출 시도
+        const res = await fetch(`/api/purchases?page=${pageNum}&pageSize=${pageSize}`);
+        if (!res.ok) throw new Error("서버 응답 에러");
+        const json = await res.json();
+        const dataArr = Array.isArray(json) ? json : json.data || [];
+        setCarList(dataArr);
+        setTotalPages(json.totalPages || Math.ceil(dataArr.length / pageSize) || 1);
+        setCurrentPage(pageNum);
+      }
+    } catch (error) {
+      console.error("검색 에러:", error);
+      alert("검색 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 컴포넌트 마운트 시: 서버에서 이미 데이터가 전달되었다면 그걸 우선 사용하고,
   // 데이터가 없을 때만 검색을 수행합니다 (중복 호출 방지).
   // 초기 자동 검색 비활성화
@@ -273,9 +323,29 @@ export default function ProductCostList(props) {
     */
 
   // 상세 검색 버튼 클릭 핸들러
-  const handleDtlSearch = () => {
+  const handleDtlSearch = async () => {
     setSearchBtn(2);
-    handleSearch(1);
+    
+    // 상세 검색 파라미터를 직접 구성하여 검색
+    const detailSearchParams = {
+      carNo: dtlCarNo,
+      dealer: dtlDealer,
+      dtGubun: dtlDtGubun,
+      startDt: dtlStartDt,
+      endDt: dtlEndDt,
+      dtlOldCarNo: dtlOldCarNo,
+      dtlNewCarNo: dtlNewCarNo,
+      dtlExpdItem: dtlExpdItem,
+      dtlTaxGubun: dtlTaxGubun,
+      dtlExpdGubun: dtlExpdGubun,
+      dtlExpdEvdc: dtlExpdEvdc,
+      dtlRmrk: dtlRmrk,
+      dtlAdjInclusYN: dtlAdjInclusYN,
+      orderItem: ordItem,
+      ordAscDesc: ordAscDesc,
+    };
+
+    await handleSearchWithParams(1, detailSearchParams);
   };
 
   /**
@@ -284,6 +354,47 @@ export default function ProductCostList(props) {
   const handlePageChange = async page => {
     await handleSearch(page);
   };
+
+  // 선택 초기화 함수
+  const handleResetSearch = () => {
+    // 기본 검색 필드 초기화
+    setCarNo("");
+    setSelectedDealer("");
+    setDtGubun("");
+    setStartDt("");
+    setEndDt("");
+
+    // 상세 검색 필드 초기화
+    setDtlCarNo("");
+    setDtlDealer("");
+    setDtlDtGubun("");
+    setDtlStartDt("");
+    setDtlEndDt("");
+    setDtlNewCarNo("");
+    setDtlOldCarNo("");
+    setDtlTaxGubun("");
+    setDtlExpdItem("");
+    setDtlExpdGubun("");
+    setDtlExpdEvdc("");
+    setDtlRmrk("");
+    setDtlAdjInclusYN("");
+
+    // 정렬 옵션 초기화
+    setOrdItem("제시일");
+    setOrdAscDesc("desc");
+    setListCount(10);
+    setOrdItemDtl("제시일");
+    setOrdAscDescDtl("desc");
+    setListCountDtl(10);
+
+    // 검색 버튼을 기본 검색으로 설정
+    setSearchBtn(1);
+
+    console.log("검색 조건이 초기화되었습니다.");
+  };
+
+  // 상세검색 영역 표시/숨김 상태
+  const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
 
   // 엑셀 다운로드용 컬럼 정의
   const excelColumns = [
@@ -507,7 +618,11 @@ export default function ProductCostList(props) {
                   >
                     <span className="ico ico--search"></span>차량검색
                   </button>
-                  <button type="button" className="jsSearchboxBtn btn btn--type02">
+                  <button 
+                    type="button" 
+                    className="jsSearchboxBtn btn btn--type02"
+                    onClick={() => setIsDetailSearchOpen(!isDetailSearchOpen)}
+                  >
                     <span className="ico ico--search_detail"></span>
                     상세조건검색
                   </button>
@@ -518,12 +633,12 @@ export default function ProductCostList(props) {
         </table>
 
         {/* 상세 검색 영역 */}
-        <div className="jsSearchbox searchbox">
+        <div className="jsSearchbox searchbox" style={{ display: isDetailSearchOpen ? "block" : "none" }}>
           <div className="searchbox__head">
             <h3 className="searchbox__title">상세검색</h3>
 
             <div className="input-group">
-              <button className="btn btn--white" type="button">
+              <button className="btn btn--white" type="button" onClick={handleResetSearch}>
                 <span className="ico ico--reset"></span>선택 초기화
               </button>
 
@@ -1179,10 +1294,21 @@ export default function ProductCostList(props) {
               </table>
 
               <div className="searchbox__btns container__btns">
-                <button className="jsSearchboxBtn btn btn--light" type="button">
+                <button 
+                  className="jsSearchboxBtn btn btn--light" 
+                  type="button"
+                  onClick={() => setIsDetailSearchOpen(false)}
+                >
                   취소
                 </button>
-                <button className="btn btn--primary" type="button" onClick={handleDtlSearch}>
+                <button 
+                  className="btn btn--primary" 
+                  type="button" 
+                  onClick={() => {
+                    handleDtlSearch();
+                    setIsDetailSearchOpen(false);
+                  }}
+                >
                   <span className="ico ico--search"></span>검색
                 </button>
               </div>

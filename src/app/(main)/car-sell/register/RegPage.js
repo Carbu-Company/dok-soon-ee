@@ -104,6 +104,37 @@ export default function SalesRegisterPage(
     setIsModalOpen(true);
   };
 
+  // 매수고객 추가 핸들러
+  const handleAddBuyerCustomer = () => {
+    const newCustomer = {
+      id: Date.now(), // 고유 ID 생성
+      customerName: '',
+      residentNumber: '',
+      businessNumber: '',
+      phone: '',
+      address: '',
+      memo: '',
+      shareRate: ''
+    };
+    setBuyerCustomers([...buyerCustomers, newCustomer]);
+  };
+
+  // 매수고객 삭제 핸들러
+  const handleDeleteBuyerCustomer = (customerId) => {
+    if (buyerCustomers.length > 1) { // 최소 1개는 유지
+      setBuyerCustomers(buyerCustomers.filter(customer => customer.id !== customerId));
+    }
+  };
+
+  // 매수고객 정보 업데이트 핸들러
+  const handleUpdateBuyerCustomer = (customerId, field, value) => {
+    setBuyerCustomers(buyerCustomers.map(customer => 
+      customer.id === customerId 
+        ? { ...customer, [field]: value }
+        : customer
+    ));
+  };
+
   /////////////////////////////////////////////////////////////////////////////
   // 매출 등록 항목 
   /////////////////////////////////////////////////////////////////////////////
@@ -138,6 +169,20 @@ export default function SalesRegisterPage(
 
   // 관련 서류 첨부 상태 관리
   const [attachedSellFiles, setAttachedSellFiles] = useState([]);
+
+  // 매수고객 정보 상태 관리
+  const [buyerCustomers, setBuyerCustomers] = useState([
+    {
+      id: 1,
+      customerName: '',
+      residentNumber: '',
+      businessNumber: '',
+      phone: '',
+      address: '',
+      memo: '',
+      shareRate: ''
+    }
+  ]);
 
   /////////////////////////////////////////////////////////////////////////////
 
@@ -1078,7 +1123,12 @@ export default function SalesRegisterPage(
       <div className="table-wrap">
         <div className="table-wrap__head">
           <h2 className="table-wrap__title">매수고객</h2>
-          <button className="btn btn--dark btn--padding--r20" type="button" id="btnClone">
+          <button 
+            className="btn btn--dark btn--padding--r20" 
+            type="button" 
+            id="btnClone"
+            onClick={handleAddBuyerCustomer}
+          >
             <span className="ico ico--add"></span>고객 추가(공동명의)
           </button>
         </div>
@@ -1106,131 +1156,195 @@ export default function SalesRegisterPage(
             </tr>
           </thead>
           <tbody>
-            <tr className="template">
-              <td>
-                <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
-                  <div className="input__utils">
-                    <button
-                      type="button"
-                      className="jsInputClear input__clear ico ico--input-delete"
-                    >
-                      고객명
-                    </button>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
-                  <div className="input__utils">
-                    <button
-                      type="button"
-                      className="jsInputClear input__clear ico ico--input-delete"
-                    >
-                      주민(법인)등록번호
-                    </button>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
-                  <div className="input__utils">
-                    <button
-                      type="button"
-                      className="jsInputClear input__clear ico ico--input-delete"
-                    >
-                      사업자등록번호
-                    </button>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
-                  <div className="input__utils">
-                    <button
-                      type="button"
-                      className="jsInputClear input__clear ico ico--input-delete"
-                    >
-                      연락처
-                    </button>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
-                  <div className="input__utils">
-                    <button
-                      type="button"
-                      className="jsInputClear input__clear ico ico--input-delete"
-                    >
-                      주소
-                    </button>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
-                  <div className="input__utils">
-                    <button
-                      type="button"
-                      className="jsInputClear input__clear ico ico--input-delete"
-                    >
-                      특이사항
-                    </button>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div className="input-group">
-                  <div className="select w200">
-                    <input
-                      className="select__input"
-                      type="hidden"
-                      name="dealer"
-                      defaultValue="value1"
+            {buyerCustomers.map((customer, index) => (
+              <tr key={customer.id}>
+                <td>
+                  <div className="input">
+                    <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="고객명"
+                      value={customer.customerName}
+                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'customerName', e.target.value)}
                     />
-                    <button className="select__toggle" type="button">
-                      <span className="select__text">선택</span>
-                      <Image
-                        className="select__arrow"
-                        src="/images/ico-dropdown.svg"
-                        width={10}
-                        height={10}
-                        alt=""
-                      />
-                    </button>
-                    <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">
-                        선택
-                      </li>
-                      <li className="select__option" data-value="value2">
-                        1
-                      </li>
-                      <li className="select__option" data-value="value3">
-                        2
-                      </li>
-                      <li className="select__option" data-value="value4">
-                        99
-                      </li>
-                      <li className="select__option" data-value="value4">
-                        100
-                      </li>
-                    </ul>
+                    <div className="input__utils">
+                      <button
+                        type="button"
+                        className="jsInputClear input__clear ico ico--input-delete"
+                        onClick={() => handleUpdateBuyerCustomer(customer.id, 'customerName', '')}
+                      >
+                        고객명
+                      </button>
+                    </div>
                   </div>
-                  <span className="input-help">%</span>
-                </div>
-              </td>
-              <td>
-                <button type="button" className="btn btn--ico">
-                  <span className="ico ico--trash"></span>
-                </button>
-              </td>
-            </tr>
+                </td>
+                <td>
+                  <div className="input">
+                    <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="주민(법인)등록번호"
+                      value={customer.residentNumber}
+                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'residentNumber', e.target.value)}
+                    />
+                    <div className="input__utils">
+                      <button
+                        type="button"
+                        className="jsInputClear input__clear ico ico--input-delete"
+                        onClick={() => handleUpdateBuyerCustomer(customer.id, 'residentNumber', '')}
+                      >
+                        주민(법인)등록번호
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="input">
+                    <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="사업자등록번호"
+                      value={customer.businessNumber}
+                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'businessNumber', e.target.value)}
+                    />
+                    <div className="input__utils">
+                      <button
+                        type="button"
+                        className="jsInputClear input__clear ico ico--input-delete"
+                        onClick={() => handleUpdateBuyerCustomer(customer.id, 'businessNumber', '')}
+                      >
+                        사업자등록번호
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="input">
+                    <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="연락처"
+                      value={customer.phone}
+                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'phone', e.target.value)}
+                    />
+                    <div className="input__utils">
+                      <button
+                        type="button"
+                        className="jsInputClear input__clear ico ico--input-delete"
+                        onClick={() => handleUpdateBuyerCustomer(customer.id, 'phone', '')}
+                      >
+                        연락처
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="input">
+                    <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="주소"
+                      value={customer.address}
+                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'address', e.target.value)}
+                    />
+                    <div className="input__utils">
+                      <button
+                        type="button"
+                        className="jsInputClear input__clear ico ico--input-delete"
+                        onClick={() => handleUpdateBuyerCustomer(customer.id, 'address', '')}
+                      >
+                        주소
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="input">
+                    <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="특이사항"
+                      value={customer.memo}
+                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'memo', e.target.value)}
+                    />
+                    <div className="input__utils">
+                      <button
+                        type="button"
+                        className="jsInputClear input__clear ico ico--input-delete"
+                        onClick={() => handleUpdateBuyerCustomer(customer.id, 'memo', '')}
+                      >
+                        특이사항
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="input-group">
+                    <div className="select w200">
+                      <input
+                        className="select__input"
+                        type="hidden"
+                        name={`shareRate_${customer.id}`}
+                        value={customer.shareRate}
+                      />
+                      <button className="select__toggle" type="button">
+                        <span className="select__text">{customer.shareRate || '선택'}</span>
+                        <Image
+                          className="select__arrow"
+                          src="/images/ico-dropdown.svg"
+                          width={10}
+                          height={10}
+                          alt=""
+                        />
+                      </button>
+                      <ul className="select__menu">
+                        <li 
+                          className={`select__option ${!customer.shareRate ? 'select__option--selected' : ''}`}
+                          onClick={() => handleUpdateBuyerCustomer(customer.id, 'shareRate', '')}
+                        >
+                          선택
+                        </li>
+                        <li 
+                          className={`select__option ${customer.shareRate === '1' ? 'select__option--selected' : ''}`}
+                          onClick={() => handleUpdateBuyerCustomer(customer.id, 'shareRate', '1')}
+                        >
+                          1
+                        </li>
+                        <li 
+                          className={`select__option ${customer.shareRate === '2' ? 'select__option--selected' : ''}`}
+                          onClick={() => handleUpdateBuyerCustomer(customer.id, 'shareRate', '2')}
+                        >
+                          2
+                        </li>
+                        <li 
+                          className={`select__option ${customer.shareRate === '99' ? 'select__option--selected' : ''}`}
+                          onClick={() => handleUpdateBuyerCustomer(customer.id, 'shareRate', '99')}
+                        >
+                          99
+                        </li>
+                        <li 
+                          className={`select__option ${customer.shareRate === '100' ? 'select__option--selected' : ''}`}
+                          onClick={() => handleUpdateBuyerCustomer(customer.id, 'shareRate', '100')}
+                        >
+                          100
+                        </li>
+                      </ul>
+                    </div>
+                    <span className="input-help">%</span>
+                  </div>
+                </td>
+                <td>
+                  <button 
+                    type="button" 
+                    className="btn btn--ico"
+                    onClick={() => handleDeleteBuyerCustomer(customer.id)}
+                    disabled={buyerCustomers.length === 1}
+                  >
+                    <span className="ico ico--trash"></span>
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
