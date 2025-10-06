@@ -1,100 +1,133 @@
-import * as React from "react"
-import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button";
+import React from 'react';
 
-const Pagination = ({
-  className,
-  ...props
-}) => (
-  <nav
-    role="navigation"
-    aria-label="pagination"
-    className={cn("mx-auto flex w-full justify-center", className)}
-    {...props} />
-)
-Pagination.displayName = "Pagination"
+const Pagination = ({ 
+  currentPage = 1, 
+  totalPages = 10, 
+  onPageChange,
+  showPrevNext = true,
+  showEllipsis = true,
+  maxVisiblePages = 5 
+}) => {
+  // 페이지 번호 배열 생성
+  const getPageNumbers = () => {
+    const pages = [];
+    
+    if (totalPages <= maxVisiblePages) {
+      // 전체 페이지가 maxVisiblePages보다 적으면 모든 페이지 표시
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // 현재 페이지를 중심으로 페이지 번호 생성
+      const half = Math.floor(maxVisiblePages / 2);
+      let start = Math.max(1, currentPage - half);
+      let end = Math.min(totalPages, start + maxVisiblePages - 1);
+      
+      // 끝에서 시작점 조정
+      if (end - start + 1 < maxVisiblePages) {
+        start = Math.max(1, end - maxVisiblePages + 1);
+      }
+      
+      // 시작 페이지가 1이 아니면 1과 ... 추가
+      if (start > 1) {
+        pages.push(1);
+        if (start > 2 && showEllipsis) {
+          pages.push('...');
+        }
+      }
+      
+      // 중간 페이지들 추가
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      
+      // 끝 페이지가 totalPages가 아니면 ...과 마지막 페이지 추가
+      if (end < totalPages) {
+        if (end < totalPages - 1 && showEllipsis) {
+          pages.push('...');
+        }
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
 
-const PaginationContent = React.forwardRef(({ className, ...props }, ref) => (
-  <ul
-    ref={ref}
-    className={cn("flex flex-row items-center gap-1", className)}
-    {...props} />
-))
-PaginationContent.displayName = "PaginationContent"
+  const handlePageClick = (page) => {
+    if (typeof page === 'number' && page !== currentPage && onPageChange) {
+      onPageChange(page);
+    }
+  };
 
-const PaginationItem = React.forwardRef(({ className, ...props }, ref) => (
-  <li ref={ref} className={cn("", className)} {...props} />
-))
-PaginationItem.displayName = "PaginationItem"
+  const handlePrevClick = () => {
+    if (onPageChange) {
+      onPageChange(currentPage - 1);
+    }
+  };
 
-const PaginationLink = ({
-  className,
-  isActive,
-  size = "icon",
-  ...props
-}) => (
-  <a
-    aria-current={isActive ? "page" : undefined}
-    className={cn(buttonVariants({
-      variant: isActive ? "outline" : "ghost",
-      size,
-    }), className)}
-    {...props} />
-)
-PaginationLink.displayName = "PaginationLink"
+  const handleNextClick = () => {
+    if (onPageChange) {
+      onPageChange(currentPage + 1);
+    }
+  };
 
-const PaginationPrevious = ({
-  className,
-  ...props
-}) => (
-  <PaginationLink
-    aria-label="Go to previous page"
-    size="default"
-    className={cn("gap-1 pl-2.5", className)}
-    {...props}>
-    <ChevronLeft className="h-4 w-4" />
-    <span>Previous</span>
-  </PaginationLink>
-)
-PaginationPrevious.displayName = "PaginationPrevious"
+  const pageNumbers = getPageNumbers();
 
-const PaginationNext = ({
-  className,
-  ...props
-}) => (
-  <PaginationLink
-    aria-label="Go to next page"
-    size="default"
-    className={cn("gap-1 pr-2.5", className)}
-    {...props}>
-    <span>Next</span>
-    <ChevronRight className="h-4 w-4" />
-  </PaginationLink>
-)
-PaginationNext.displayName = "PaginationNext"
+  return (
+    <div className="pagination">
+      {showPrevNext && (
+        <a 
+          href="#" 
+          className="pagination__btn pagination__btn--prev"
+          onClick={(e) => {
+            e.preventDefault();
+            handlePrevClick();
+          }}
+        >
+          이전
+        </a>
+      )}
+      
+      {pageNumbers.map((page, index) => {
+        if (page === '...') {
+          return (
+            <a key={`ellipsis-${index}`} href="#" className="pagination__btn">
+              ...
+            </a>
+          );
+        }
+        
+        return (
+          <a
+            key={page}
+            href="#"
+            className={`pagination__btn ${page === currentPage ? 'on' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              handlePageClick(page);
+            }}
+          >
+            {page}
+          </a>
+        );
+      })}
+      
+      {showPrevNext && (
+        <a 
+          href="#" 
+          className="pagination__btn pagination__btn--next"
+          onClick={(e) => {
+            e.preventDefault();
+            handleNextClick();
+          }}
+        >
+          다음
+        </a>
+      )}
+    </div>
+  );
+};
 
-const PaginationEllipsis = ({
-  className,
-  ...props
-}) => (
-  <span
-    aria-hidden
-    className={cn("flex h-9 w-9 items-center justify-center", className)}
-    {...props}>
-    <MoreHorizontal className="h-4 w-4" />
-    <span className="sr-only">More pages</span>
-  </span>
-)
-PaginationEllipsis.displayName = "PaginationEllipsis"
-
-export {
-  Pagination,
-  PaginationContent,
-  PaginationLink,
-  PaginationItem,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-}
+export default Pagination;

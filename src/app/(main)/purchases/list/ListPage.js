@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import PaginationComponent from "@/components/utils/PaginationComponent";
 import PurchaseRemoveModal from "@/components/modal/PurchaseRemoveModal";
+import Pagination from "@/components/ui/pagination";
+import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import { useRouter } from "next/navigation";
 
 export default function ListPage(props) {
@@ -172,6 +173,53 @@ export default function ListPage(props) {
   // setSearchBtn
   const [searchBtn, setSearchBtn] = useState(1);
 
+  // 모든 토글을 닫는 함수
+  const closeAllToggles = () => {
+    setIsDealerSelectOpen(false);
+    setIsDtGubunSelectOpen(false);
+    setIsOrdItemSelectOpen(false);
+    setIsOrdAscDescSelectOpen(false);
+    setIsListCountSelectOpen(false);
+    setIsDtlDealerSelectOpen(false);
+    setIsDtlDtGubunSelectOpen(false);
+    setIsDtlCustGubunSelectOpen(false);
+    setIsDtlEvdcGubunSelectOpen(false);
+    setIsDtlPrsnGubunSelectOpen(false);
+    setIsOrdItemSelectOpenDtl(false);
+    setIsOrdAscDescSelectOpenDtl(false);
+    setIsListCountSelectOpenDtl(false);
+  };
+
+  // 외부 클릭 및 ESC 키 감지
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 토글 버튼이나 메뉴 내부 클릭인지 확인
+      const isToggleButton = event.target.closest('.select__toggle');
+      const isMenuContent = event.target.closest('.select__menu');
+      
+      // 토글 버튼이나 메뉴 내부가 아닌 곳을 클릭했을 때만 토글 닫기
+      if (!isToggleButton && !isMenuContent) {
+        closeAllToggles();
+      }
+    };
+
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        closeAllToggles();
+      }
+    };
+
+    // 이벤트 리스너 등록
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 검색 영역
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -304,6 +352,24 @@ export default function ListPage(props) {
     await handleSearch(page);
   };
 
+  // 엑셀 다운로드용 컬럼 정의
+  const excelColumns = [
+    { accessorKey: "CAR_PUR_DT", header: "제시일" },
+    { accessorKey: "PRSN_SCT_CD", header: "구분" },
+    { accessorKey: "CAR_NO", header: "차량번호" },
+    { accessorKey: "CAR_NM", header: "차명" },
+    { accessorKey: "PUR_AMT", header: "제시금액" },
+    { accessorKey: "DLR_NM", header: "담당딜러" },
+    { accessorKey: "CAR_LOAN_AMT", header: "재고금융" },
+    { accessorKey: "TOT_CMRC_COST_FEE", header: "상품화비용" },
+    { accessorKey: "AGENT_PUR_CST", header: "상사매입비" },
+    { accessorKey: "TXBL_ISSU_DT", header: "조합매도일" }
+  ];
+
+  // 숫자 형식으로 처리할 컬럼들
+  const numericColumns = ["PUR_AMT", "CAR_LOAN_AMT", "TOT_CMRC_COST_FEE", "AGENT_PUR_CST"];
+
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
@@ -363,7 +429,10 @@ export default function ListPage(props) {
                   <button
                     className="select__toggle"
                     type="button"
-                    onClick={() => setIsDealerSelectOpen(!isDealerSelectOpen)}
+                    onClick={() => {
+                      closeAllToggles();
+                      setIsDealerSelectOpen(!isDealerSelectOpen);
+                    }}
                   >
                     <span className="select__text">
                       {selectedDealer
@@ -421,7 +490,10 @@ export default function ListPage(props) {
                     <button
                       className="select__toggle"
                       type="button"
-                      onClick={() => setIsDtGubunSelectOpen(!isDtGubunSelectOpen)}
+                      onClick={() => {
+                        closeAllToggles();
+                        setIsDtGubunSelectOpen(!isDtGubunSelectOpen);
+                      }}
                     >
                       <span className="select__text">
                         {dtGubun === "01"
@@ -535,7 +607,10 @@ export default function ListPage(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
+                }}
               >
                 <span className="select__text">{ordItemDtl || "제시일"}</span>
                 <Image
@@ -600,7 +675,10 @@ export default function ListPage(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl);
+                }}
               >
                 <span className="select__text">
                   {ordAscDescDtl === "desc" ? "내림차순" : ordAscDescDtl === "asc" ? "오름차순" : "선택"}
@@ -652,7 +730,10 @@ export default function ListPage(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl);
+                }}
               >
                 <span className="select__text">{listCountDtl}건씩</span>
                 <Image
@@ -745,7 +826,10 @@ export default function ListPage(props) {
                         <button
                           className="select__toggle"
                           type="button"
-                          onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlDealer
@@ -803,7 +887,10 @@ export default function ListPage(props) {
                           <button
                             className="select__toggle"
                             type="button"
-                            onClick={() => setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen)}
+                            onClick={() => {
+                              closeAllToggles();
+                              setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen);
+                            }}
                           >
                             <span className="select__text">
                               {dtlDtGubun === "01"
@@ -935,7 +1022,10 @@ export default function ListPage(props) {
                         <button
                           className="select__toggle"
                           type="button"
-                          onClick={() => setIsDtlCustGubunSelectOpen(!isDtlCustGubunSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlCustGubunSelectOpen(!isDtlCustGubunSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlCustGubun === "01"
@@ -1002,7 +1092,10 @@ export default function ListPage(props) {
                         <button
                           className="select__toggle"
                           type="button"
-                          onClick={() => setIsDtlEvdcGubunSelectOpen(!isDtlEvdcGubunSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlEvdcGubunSelectOpen(!isDtlEvdcGubunSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlEvdcGubun
@@ -1217,7 +1310,10 @@ export default function ListPage(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdItemSelectOpen(!isOrdItemSelectOpen)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpen(!isOrdItemSelectOpen);
+                }}
               >
                 <span className="select__text">{ordItem || "제시일"}</span>
                 <Image
@@ -1282,7 +1378,10 @@ export default function ListPage(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen);
+                }}
               >
                 <span className="select__text">
                   {ordAscDesc === "desc" ? "내림차순" : "오름차순"}
@@ -1334,7 +1433,10 @@ export default function ListPage(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsListCountSelectOpen(!isListCountSelectOpen)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpen(!isListCountSelectOpen);
+                }}
               >
                 <span className="select__text">{listCount}건씩</span>
                 <Image
@@ -1380,9 +1482,15 @@ export default function ListPage(props) {
               </ul>
             </div>
 
-            <button className="btn btn--white" type="button">
-              <span className="ico ico--download"></span>다운로드
-            </button>
+            <SimpleTableDownloadButton 
+              data={carList}
+              columns={excelColumns}
+              numericColumns={numericColumns}
+              filePrefix="매입리스트"
+              className="btn btn--white"
+              text="다운로드"
+              sheetName="매입리스트"
+            />
           </div>
         </div>
 
@@ -1552,17 +1660,11 @@ export default function ListPage(props) {
           </tbody>
         </table>
 
-        {/* 페이지네이션 */}
-        {carList && carList.length > 0 && (
-          <div>
-            <PaginationComponent
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              show={totalPages > 1}
-            />
-          </div>
-        )}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       <div className="table-wrap">

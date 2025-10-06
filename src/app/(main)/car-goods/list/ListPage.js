@@ -2,8 +2,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import PaginationComponent from "@/components/utils/PaginationComponent";
+import Pagination from "@/components/ui/pagination";
 import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
+import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import Image from "next/image";
 
 export default function ProductCostList(props) {
@@ -283,6 +284,24 @@ export default function ProductCostList(props) {
   const handlePageChange = async page => {
     await handleSearch(page);
   };
+
+  // 엑셀 다운로드용 컬럼 정의
+  const excelColumns = [
+    { accessorKey: "CAR_NO", header: "차량번호" },
+    { accessorKey: "DLR_NM", header: "담당딜러" },
+    { accessorKey: "CAR_NM", header: "차량명" },
+    { accessorKey: "CAR_PUR_DT", header: "매입일" },
+    { accessorKey: "PUR_AMT", header: "매입금액" },
+    { accessorKey: "CNT", header: "상품화건수" },
+    { accessorKey: "EXPD_AMT", header: "상품화금액" },
+    { accessorKey: "EXPD_SUP_PRC", header: "공급가" },
+    { accessorKey: "EXPD_VAT", header: "부가세" },
+    { accessorKey: "CAR_STAT_CD", header: "상태" },
+    { accessorKey: "CAR_SEL_DT", header: "매도일" }
+  ];
+
+  // 숫자 형식으로 처리할 컬럼들
+  const numericColumns = ["PUR_AMT", "EXPD_AMT", "EXPD_SUP_PRC", "EXPD_VAT"];
 
 
 
@@ -1363,9 +1382,15 @@ export default function ProductCostList(props) {
               </ul>
             </div>
 
-            <button className="btn btn--white btn--padding--r30" type="button">
-              <span className="ico ico--download"></span>다운로드
-            </button>
+            <SimpleTableDownloadButton 
+              data={carList}
+              columns={excelColumns}
+              numericColumns={numericColumns}
+              filePrefix="차량상품리스트"
+              className="btn btn--white btn--padding--r30"
+              text="다운로드"
+              sheetName="차량상품리스트"
+            />
           </div>
         </div>
 
@@ -1490,33 +1515,11 @@ export default function ProductCostList(props) {
         </table>
         {/* 차량별 리스트 e */}
 
-        <div className="pagination">
-          <a href="#" className="pagination__btn pagination__btn--prev">
-            이전
-          </a>
-          {/* MEMO: <a> 태그에 .on 추가 시, selected 상태 적용 */}
-          <a href="#" className="pagination__btn on">
-            1
-          </a>
-          <a href="#" className="pagination__btn">
-            2
-          </a>
-          <a href="#" className="pagination__btn">
-            3
-          </a>
-          <a href="#" className="pagination__btn">
-            ...
-          </a>
-          <a href="#" className="pagination__btn">
-            9
-          </a>
-          <a href="#" className="pagination__btn">
-            10
-          </a>
-          <a href="#" className="pagination__btn pagination__btn--next">
-            다음
-          </a>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       <div className="table-wrap">

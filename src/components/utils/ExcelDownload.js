@@ -107,14 +107,58 @@ export const excelDownload = ({
       type: "array",
       cellStyles: true
     });
-    const dataBlob = new Blob([excelBuffer], {
-      type: "application/octet-stream",
-    });
-
+    
     const fileName = `${filePrefix}_${
       new Date().toISOString().split("T")[0]
     }.xlsx`;
-    saveAs(dataBlob, fileName);
+
+    // Arc 브라우저 호환성을 위한 다중 다운로드 방식
+    try {
+      // 방법 1: file-saver 사용
+      const dataBlob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(dataBlob, fileName);
+    } catch (error) {
+      console.warn("file-saver 방식 실패, 대체 방식 시도:", error);
+      
+      try {
+        // 방법 2: 직접 URL.createObjectURL 사용
+        const blob = new Blob([excelBuffer], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        const url = URL.createObjectURL(blob);
+        
+        // 임시 링크 생성하여 다운로드
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        link.style.display = 'none';
+        
+        // DOM에 추가하고 클릭 후 제거
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // URL 해제
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      } catch (error2) {
+        console.warn("URL.createObjectURL 방식도 실패, 최종 방식 시도:", error2);
+        
+        // 방법 3: Data URL 사용 (최후의 수단)
+        const base64 = btoa(String.fromCharCode(...excelBuffer));
+        const dataUrl = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${base64}`;
+        
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = fileName;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
 
     console.log("엑셀 다운로드 완료:", fileName);
     return true;
