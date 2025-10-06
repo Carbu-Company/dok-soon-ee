@@ -106,13 +106,15 @@ export default async function CarTaxList() {
 
   const carTaxList = await searchCarTaxList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
-  const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
+  const saleItemList = await getCDList('21');   // 매출품명목록
+  const crStatList = await getCDList('22');   // 현금영수증 전송 상태 목록 
   const carTaxSummary = await searchCarTaxSummary({ ...defaultParams, ...searchParams });
 
   return <ListPage session={session}
                    carList={carTaxList}
                    dealerList={dealerList.data}
-                   evdcCdList={evdcCDList.data}
+                   saleItemList={saleItemList.data}
+                   crStatList={crStatList.data}
                    searchAction={searchCarTaxListAndSummary}
                    carSummary={carTaxSummary}
    />;

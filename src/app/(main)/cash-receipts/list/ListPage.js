@@ -676,7 +676,7 @@ props
                   50건씩
                 </li>
               </ul>
-            </div>
+              </div>
             </div>
           </div>
 
@@ -695,22 +695,22 @@ props
                   <tr>
                     <th>차량번호(신)</th>
                     <td>
-                    <div className="input">
-                        <input
-                          type="text"
-                          className="input__field"
-                          placeholder="차량번호(신)"
-                          value={dtlNewCarNo}
-                          onChange={e => setDtlNewCarNo(e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button
-                            type="button"
-                            className="jsInputClear input__clear ico ico--input-delete"
-                          >
-                            삭제
-                          </button>
-                        </div>
+                      <div className="input">
+                          <input
+                            type="text"
+                            className="input__field"
+                            placeholder="차량번호(신)"
+                            value={dtlNewCarNo}
+                            onChange={e => setDtlNewCarNo(e.target.value)}
+                          />
+                          <div className="input__utils">
+                            <button
+                              type="button"
+                              className="jsInputClear input__clear ico ico--input-delete"
+                            >
+                              삭제
+                            </button>
+                          </div>
                       </div>
                     </td>
                     <th>담당딜러</th>

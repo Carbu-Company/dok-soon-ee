@@ -128,8 +128,6 @@ export default function ListPage(props) {
     console.log("listCount", listCountDtl);
   }, [ordItemDtl, ordAscDescDtl, listCountDtl]);
 
-
-
   // 상세 검색 차량번호
   const [dtlCarNo, setDtlCarNo] = useState("");
   // 상세 검색 담당 딜러
@@ -360,7 +358,7 @@ export default function ListPage(props) {
                     className="select__input"
                     type="hidden"
                     name="dealer"
-                    defaultValue="선택1"
+                    defaultValue="선택"
                   />
                   <button
                     className="select__toggle"
@@ -417,7 +415,7 @@ export default function ListPage(props) {
                     <input
                       className="select__input"
                       type="hidden"
-                      name="dealer"
+                      name="searchTerm"
                       defaultValue="제시(매입)일"
                     />
                     <button
@@ -531,9 +529,9 @@ export default function ListPage(props) {
                 <span className="ico ico--reset"></span>선택 초기화
               </button>
 
-            {/* 딜러명 */}
+            {/* 정렬 항목 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="제시일" />
+              <input className="select__input" type="hidden" name="ordItemDtl" defaultValue="제시일" />
               <button
                 className="select__toggle"
                 type="button"
@@ -598,7 +596,7 @@ export default function ListPage(props) {
 
             {/* 정렬순서 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
+              <input className="select__input" type="hidden" name="ordAscDescDtl" defaultValue="desc" />
               <button
                 className="select__toggle"
                 type="button"
@@ -648,7 +646,7 @@ export default function ListPage(props) {
               <input
                 className="select__input"
                 type="hidden"
-                name="dealer"
+                name="listCountDtl"
                 defaultValue={listCountDtl}
               />
               <button
