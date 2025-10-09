@@ -12,7 +12,7 @@ async function searchCarConcilList(searchParamsWithPage) {
     const result = await getCarConcilList(searchParamsWithPage);
 
     console.log('서버 액션 결과*******************:', { 
-      carConcilListLength: result?.data?.carConcilList?.length, 
+      carConcilListLength: result?.data?.carlist?.length, 
       totalCount: result?.data?.pagination?.totalCount,
       page: searchParamsWithPage.page,
       pageSize: searchParamsWithPage.pageSize 
@@ -92,15 +92,13 @@ export default async function CarConcilList() {
     dtGubun: '',  
     startDt: '',  
     endDt: '',  
-    dtlCustomerName: '', 
-    dtlCustGubun: '', 
-    dtlEvdcGubun: '', 
-    dtlPrsnGubun: '', 
-    dtlOwnerBrno: '', 
-    dtlOwnerSsn: '', 
-    dtlCtshNo: '' , 
-    dtlCarNoBefore: '', 
-    orderItem: '제시일', 
+    dtlBrkTradeItemCd: '',
+    dtlBrkAgentNm: '',
+    dtlCarNm: '',
+    dtlCustNm: '',
+    dtlEvdcGubun: '',
+    dtlBrkMemo: '',
+    orderItem: '01', 
     ordAscDesc: 'desc'
   };
 

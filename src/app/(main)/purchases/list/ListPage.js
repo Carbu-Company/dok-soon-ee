@@ -716,183 +716,183 @@ export default function ListPage(props) {
                 <span className="ico ico--reset"></span>선택 초기화
               </button>
 
-            {/* 정렬 항목 */}
-            <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="ordItemDtl" defaultValue="제시일" />
-              <button
-                className="select__toggle"
-                type="button"
-                onClick={() => {
-                  closeAllToggles();
-                  setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
-                }}
-              >
-                <span className="select__text">{ordItemDtl || "제시일"}</span>
-                <Image
-                  className="select__arrow"
-                  src="/images/ico-dropdown.svg"
-                  alt=""
-                  width={10}
-                  height={10}
+              {/* 정렬 항목 */}
+              <div className="select select--dark w160">
+                <input className="select__input" type="hidden" name="ordItemDtl" defaultValue="제시일" />
+                <button
+                  className="select__toggle"
+                  type="button"
+                  onClick={() => {
+                    closeAllToggles();
+                    setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
+                  }}
+                >
+                  <span className="select__text">{ordItemDtl || "제시일"}</span>
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
+                </button>
+
+                <ul
+                  className="select__menu"
+                  style={{ display: isOrdItemSelectOpenDtl ? "block" : "none" }}
+                  >
+                  <li
+                    className={`select__option ${ordItemDtl === "제시일" ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setOrdItemDtl("제시일");
+                      setIsOrdItemSelectOpenDtl(false);
+                      handleSearch(1);
+                    }}
+                  >
+                    제시일
+                  </li>
+                  <li
+                    className={`select__option ${ordItemDtl === "담당딜러" ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setOrdItemDtl("담당딜러");
+                      setIsOrdItemSelectOpenDtl(false);
+                      handleSearch(1);
+                    }}
+                  >
+                    담당딜러
+                  </li>
+                  <li
+                    className={`select__option ${ordItemDtl === "제시구분" ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setOrdItemDtl("제시구분");
+                      setIsOrdItemSelectOpenDtl(false);
+                      handleSearch(1);
+                    }}
+                  >
+                    제시구분
+                  </li>
+                  <li
+                    className={`select__option ${ordItemDtl === "고객유형" ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setOrdItemDtl("고객유형");
+                      setIsOrdItemSelectOpenDtl(false);
+                      handleSearch(1);
+                    }}
+                  >
+                    고객유형
+                  </li>
+                </ul>
+              </div>
+
+              {/* 정렬순서 */}
+              <div className="select select--dark w160">
+                <input className="select__input" type="hidden" name="ordAscDescDtl" defaultValue="desc" />
+                <button
+                  className="select__toggle"
+                  type="button"
+                  onClick={() => {
+                    closeAllToggles();
+                    setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl);
+                  }}
+                >
+                  <span className="select__text">
+                    {ordAscDescDtl === "desc" ? "내림차순" : ordAscDescDtl === "asc" ? "오름차순" : "선택"}
+                  </span>
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
+                </button>
+
+                <ul
+                  className="select__menu"
+                  style={{ display: isOrdAscDescSelectOpenDtl ? "block" : "none" }}
+                >
+                  <li
+                    className={`select__option ${ordAscDescDtl === "desc" ? "select__option--selected" : ordAscDescDtl === "asc" ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setOrdAscDescDtl("desc");
+                      setIsOrdAscDescSelectOpenDtl(false);
+                      handleSearch(1);
+                    }}
+                  >
+                    내림차순
+                  </li>
+                  <li
+                    className={`select__option ${ordAscDescDtl === "asc" ? "select__option--selected" : ordAscDescDtl === "desc" ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setOrdAscDescDtl("asc");
+                      setIsOrdAscDescSelectOpenDtl(false);
+                      handleSearch(1);
+                    }}
+                  >
+                    오름차순
+                  </li>
+                </ul>
+              </div>
+
+              {/* 건수 */}
+              <div className="select select--dark w160">
+                <input
+                  className="select__input"
+                  type="hidden"
+                  name="listCountDtl"
+                  defaultValue={listCountDtl}
                 />
-              </button>
+                <button
+                  className="select__toggle"
+                  type="button"
+                  onClick={() => {
+                    closeAllToggles();
+                    setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl);
+                  }}
+                >
+                  <span className="select__text">{listCountDtl}건씩</span>
+                  <Image
+                    className="select__arrow"
+                    src="/images/ico-dropdown.svg"
+                    alt=""
+                    width={10}
+                    height={10}
+                  />
+                </button>
 
-              <ul
-                className="select__menu"
-                style={{ display: isOrdItemSelectOpenDtl ? "block" : "none" }}
+                <ul
+                  className="select__menu"
+                  style={{ display: isListCountSelectOpenDtl ? "block" : "none" }}
                 >
-                <li
-                  className={`select__option ${ordItemDtl === "제시일" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItemDtl("제시일");
-                    setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
-                  }}
-                >
-                  제시일
-                </li>
-                <li
-                  className={`select__option ${ordItemDtl === "담당딜러" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItemDtl("담당딜러");
-                    setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
-                  }}
-                >
-                  담당딜러
-                </li>
-                <li
-                  className={`select__option ${ordItemDtl === "제시구분" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItemDtl("제시구분");
-                    setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
-                  }}
-                >
-                  제시구분
-                </li>
-                <li
-                  className={`select__option ${ordItemDtl === "고객유형" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItemDtl("고객유형");
-                    setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
-                  }}
-                >
-                  고객유형
-                </li>
-              </ul>
-            </div>
-
-            {/* 정렬순서 */}
-            <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="ordAscDescDtl" defaultValue="desc" />
-              <button
-                className="select__toggle"
-                type="button"
-                onClick={() => {
-                  closeAllToggles();
-                  setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl);
-                }}
-              >
-                <span className="select__text">
-                  {ordAscDescDtl === "desc" ? "내림차순" : ordAscDescDtl === "asc" ? "오름차순" : "선택"}
-                </span>
-                <Image
-                  className="select__arrow"
-                  src="/images/ico-dropdown.svg"
-                  alt=""
-                  width={10}
-                  height={10}
-                />
-              </button>
-
-              <ul
-                className="select__menu"
-                style={{ display: isOrdAscDescSelectOpenDtl ? "block" : "none" }}
-              >
-                <li
-                  className={`select__option ${ordAscDescDtl === "desc" ? "select__option--selected" : ordAscDescDtl === "asc" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdAscDescDtl("desc");
-                    setIsOrdAscDescSelectOpenDtl(false);
-                    handleSearch(1);
-                  }}
-                >
-                  내림차순
-                </li>
-                <li
-                  className={`select__option ${ordAscDescDtl === "asc" ? "select__option--selected" : ordAscDescDtl === "desc" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdAscDescDtl("asc");
-                    setIsOrdAscDescSelectOpenDtl(false);
-                    handleSearch(1);
-                  }}
-                >
-                  오름차순
-                </li>
-              </ul>
-            </div>
-
-            {/* 건수 */}
-            <div className="select select--dark w160">
-              <input
-                className="select__input"
-                type="hidden"
-                name="listCountDtl"
-                defaultValue={listCountDtl}
-              />
-              <button
-                className="select__toggle"
-                type="button"
-                onClick={() => {
-                  closeAllToggles();
-                  setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl);
-                }}
-              >
-                <span className="select__text">{listCountDtl}건씩</span>
-                <Image
-                  className="select__arrow"
-                  src="/images/ico-dropdown.svg"
-                  alt=""
-                  width={10}
-                  height={10}
-                />
-              </button>
-
-              <ul
-                className="select__menu"
-                style={{ display: isListCountSelectOpenDtl ? "block" : "none" }}
-              >
-                <li
-                  className={`select__option ${listCountDtl === 10 ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setListCountDtl(10);
-                    setIsListCountSelectOpenDtl(false);
-                  }}
-                >
-                  10건씩
-                </li>
-                <li
-                  className={`select__option ${listCountDtl === 30 ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setListCountDtl(30);
-                    setIsListCountSelectOpenDtl(false);
-                  }}
-                >
-                  30건씩
-                </li>
-                <li
-                  className={`select__option ${listCountDtl === 50 ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setListCountDtl(50);
-                    setIsListCountSelectOpenDtl(false);
-                  }}
-                >
-                  50건씩
-                </li>
-              </ul>
-            </div>
+                  <li
+                    className={`select__option ${listCountDtl === 10 ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setListCountDtl(10);
+                      setIsListCountSelectOpenDtl(false);
+                    }}
+                  >
+                    10건씩
+                  </li>
+                  <li
+                    className={`select__option ${listCountDtl === 30 ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setListCountDtl(30);
+                      setIsListCountSelectOpenDtl(false);
+                    }}
+                  >
+                    30건씩
+                  </li>
+                  <li
+                    className={`select__option ${listCountDtl === 50 ? "select__option--selected" : ""}`}
+                    onClick={() => {
+                      setListCountDtl(50);
+                      setIsListCountSelectOpenDtl(false);
+                    }}
+                  >
+                    50건씩
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 

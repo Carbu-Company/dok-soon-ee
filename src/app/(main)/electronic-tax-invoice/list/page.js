@@ -92,15 +92,15 @@ export default async function CarTaxList() {
     dtGubun: '',  
     startDt: '',  
     endDt: '',  
-    dtlCustomerName: '', 
-    dtlCustGubun: '', 
-    dtlEvdcGubun: '', 
-    dtlPrsnGubun: '', 
-    dtlOwnerBrno: '', 
-    dtlOwnerSsn: '', 
-    dtlCtshNo: '' , 
-    dtlCarNoBefore: '', 
-    orderItem: '제시일', 
+    dtlOldCarNo: '',  
+    dtlTaxTargetTpNm: '', 
+    dtlNmNoGubun: '',
+    dtlNmNoValue: '', 
+    dtlCrStat: '',    
+    dtlWriteTpNm: '',
+    dtlNtsNo: '',
+    dtlMemo: '',
+    orderItem: '01', // 발행일
     ordAscDesc: 'desc'
   };
 

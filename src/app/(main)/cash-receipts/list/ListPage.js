@@ -71,7 +71,7 @@ props
   // 페이지 정렬 순서 항목
 
   // 정렬순서 항목
-  const [ordItem, setOrdItem] = useState("제시일");
+  const [ordItem, setOrdItem] = useState("발행일");
   const [isOrdItemSelectOpen, setIsOrdItemSelectOpen] = useState(false);
 
   // 정렬순서
@@ -90,7 +90,7 @@ props
   // 페이지 정렬 순서 항목
 
   // 정렬순서 항목
-  const [ordItemDtl, setOrdItemDtl] = useState("제시일");
+  const [ordItemDtl, setOrdItemDtl] = useState("발행일");
   useEffect(() => {
     setOrdItem(ordItemDtl);
   }, [ordItemDtl]);
@@ -351,16 +351,16 @@ props
                     className="select__input"
                     type="hidden"
                     name="dealer"
-                    defaultValue="선택"
+                    defaultValue="선택1"
                   />
                   <button
                     className="select__toggle"
                     type="button"
-                    onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                    onClick={() => setIsDealerSelectOpen(!isDealerSelectOpen)}
                   >
                     <span className="select__text">
-                      {dtlDealer
-                        ? dealerList.find(d => d.USR_ID === dtlDealer)?.USR_NM || "선택"
+                      {selectedDealer
+                        ? dealerList.find(d => d.USR_ID === selectedDealer)?.USR_NM || "선택"
                         : "선택"}
                     </span>
                     <Image
@@ -374,13 +374,13 @@ props
 
                   <ul
                     className="select__menu"
-                    style={{ display: isDtlDealerSelectOpen ? "block" : "none" }}
+                    style={{ display: isDealerSelectOpen ? "block" : "none" }}
                   >
                     <li
-                      className={`select__option ${!dtlDealer ? "select__option--selected" : ""}`}
+                      className={`select__option ${!selectedDealer ? "select__option--selected" : ""}`}
                       onClick={() => {
-                        setDtlDealer("");
-                        setIsDtlDealerSelectOpen(false);
+                        setSelectedDealer("");
+                        setIsDealerSelectOpen(false);
                       }}
                     >
                       선택
@@ -388,11 +388,11 @@ props
                     {dealerList.map((dealer, index) => (
                       <li
                         key={index}
-                        className={`select__option ${dtlDealer === dealer.USR_ID ? "select__option--selected" : ""}`}
+                        className={`select__option ${selectedDealer === dealer.USR_ID ? "select__option--selected" : ""}`}
                         data-value={dealer.USR_ID}
                         onClick={() => {
-                          setDtlDealer(dealer.USR_ID);
-                          setIsDtlDealerSelectOpen(false);
+                          setSelectedDealer(dealer.USR_ID);
+                          setIsDealerSelectOpen(false);
                         }}
                       >
                         {dealer.USR_NM}
@@ -521,13 +521,13 @@ props
 
               {/* 정렬항목 */}
               <div className="select select--dark w160">
-                <input className="select__input" type="hidden" name="dealer" defaultValue="거래일" />
+                <input className="select__input" type="hidden" name="ordItemHiddenInputDtl" defaultValue="거래일" />
                 <button
                 className="select__toggle"
                 type="button"
                 onClick={() => setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl)}
               >
-                  <span className="select__text">{ordItemDtl || "거래일"}</span>
+                  <span className="select__text">{ordItemDtl || "발행일"}</span>
                   <Image
                   className="select__arrow"
                   src="/images/ico-dropdown.svg"
@@ -542,34 +542,24 @@ props
                 style={{ display: isOrdItemSelectOpenDtl ? "block" : "none" }}
                 >
                 <li
-                  className={`select__option ${ordItemDtl === "거래일" ? "select__option--selected" : ""}`}
+                  className={`select__option ${ordItemDtl === "01" ? "select__option--selected" : ""}`}
                   onClick={() => {
-                    setOrdItemDtl("거래일");
+                    setOrdItemDtl("01");
                     setIsOrdItemSelectOpenDtl(false);
                     // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
-                  거래일
+                  발행일
                 </li>
                 <li
-                  className={`select__option ${ordItemDtl === "담당딜러" ? "select__option--selected" : ""}`}
+                  className={`select__option ${ordItemDtl === "02" ? "select__option--selected" : ""}`}
                   onClick={() => {
-                    setOrdItemDtl("담당딜러");
+                    setOrdItemDtl("02");
                     setIsOrdItemSelectOpenDtl(false);
                     // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   담당딜러
-                </li>
-                <li
-                  className={`select__option ${ordItemDtl === "차량번호" ? "select__option--selected" : ""}`}
-                  onClick={() => {
-                    setOrdItemDtl("차량번호");
-                    setIsOrdItemSelectOpenDtl(false);
-                    // handleSearch(1); // 자동 검색 비활성화
-                  }}
-                >
-                  차량번호
                 </li>
               </ul>
               </div>

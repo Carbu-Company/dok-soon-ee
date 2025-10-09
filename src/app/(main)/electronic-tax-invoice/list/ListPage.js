@@ -19,15 +19,15 @@ export default function ElectronicTaxInvoicePage(props) {
   // 초기 데이터: 서버에서 전달된 데이터 구조 처리
   const initialCarListData = props.carList?.data?.carlist || [];
   const initialPagination = props.carList?.data?.pagination || {};
-
+  
   // Summary 데이터
-  const initialCarCashSummary = props.carSummary?.data || [];
+  const initialCarTaxSummary = props.carSummary?.data || [];
 
   const [carList, setCarList] = useState(initialCarListData);
   const [pagination, setPagination] = useState(initialPagination);
   const [totalPages, setTotalPages] = useState(initialPagination.totalPages || 1);
 
-  const [carCashSummary, setCarCashSummary] = useState(initialCarCashSummary);
+  const [carTaxSummary, setCarTaxSummary] = useState(initialCarTaxSummary);
 
   const [dealerList, setDealerList] = useState(props.dealerList || []);
   const [saleItemList, setSaleItemList] = useState(props.saleItemList || []);
@@ -1289,19 +1289,20 @@ export default function ElectronicTaxInvoicePage(props) {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>123가1234 / 홍길동 / 쏘나타 / 2025-07-01 / 100,000,000</td>
+              {carList.map((item, index) => (
+              <tr key={item.TAX_MGMTKEY}>
+                <td>{item.CAR_NO} / {item.DLR_NM} / {item.CAR_NM} / {item.CAR_PUR_DT} / {item.PUR_AMT?.toLocaleString()}</td>
                 <td>일반</td>
-                <td>2025-09-11</td>
-                <td>2025-09-11</td>
-                <td>차산사람</td>
-                <td>111-11-11111</td>
-                <td>홍길동</td>
-                <td>그랜저 123가4567 차량매도 외</td>
-                <td>100,000,000</td>
-                <td>100,000,000</td>
-                <td>100,000,000</td>
-                <td>전송성공</td>
+                <td>{item.MK_DT}</td>
+                <td>{item.TRADE_DTIME}</td>
+                <td>{item.BUYR_MTL_NM}</td>
+                <td>{item.BUYR_BRNO}</td>
+                <td>{item.SEL_DLR_NM}</td>
+                <td>{item.ITEM_NM}</td>
+                <td>{item.TOT_SUP_PRC?.toLocaleString()}</td>
+                <td>{item.TOT_VAT?.toLocaleString()}</td>
+                <td>{item.TOT_AMT?.toLocaleString()}</td>
+                <td>{item.TXBL_TRNS_STAT_NM}</td>
   
                 <td>
                   <div className="input-group input-group--sm input-group--center">
@@ -1341,12 +1342,13 @@ export default function ElectronicTaxInvoicePage(props) {
                   <button
                     type="button"
                     className="btn btn--light btn--sm"
-                    onClick={() => router.push("/detail/electronic-tax-invoice/1")}
+                    onClick={() => router.push(`/detail/electronic-tax-invoice/${item.TAX_MGMTKEY}`)}
                   >
                     상세보기
                   </button>
                 </td>
               </tr>
+              ))}
             </tbody>
           </table>
   
@@ -1377,32 +1379,32 @@ export default function ElectronicTaxInvoicePage(props) {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>사업자번호 발급분</td>
-                <td>17</td>
-                <td>17</td>
-                <td>1,200,000</td>
-                <td>1,100,000</td>
-                <td>100,000</td>
-              </tr>
-              <tr>
-                <td>주민번호 발급분</td>
-                <td>17</td>
-                <td>17</td>
-                <td>1,200,000</td>
-                <td>1,100,000</td>
-                <td>100,000</td>
-              </tr>
+              {carTaxSummary?.map((item, index) => (
+                index < 2 && (
+                  <tr key={index}>
+                    <td>{item.TRADE_TP_NM || '-'}</td>
+                    <td>{item.TAX_CNT?.toLocaleString() || 0}</td>
+                    <td>{item.BUYR_CNT?.toLocaleString() || 0}</td>
+                    <td>{item.TRADE_AMT?.toLocaleString() || 0}</td>
+                    <td>{item.SUP_PRC?.toLocaleString() || 0}</td>
+                    <td>{item.VAT?.toLocaleString() || 0}</td>
+                  </tr>
+                )
+              ))}
             </tbody>
             <tfoot>
-              <tr>
-                <th>합계</th>
-                <th>17</th>
-                <th>17</th>
-                <th>1,200,000</th>
-                <th>100,000</th>
-                <th>1,100,000</th>
-              </tr>
+              {carTaxSummary?.map((item, index) => (
+                index === 2 && (
+                  <tr key={index}>
+                    <th>{item.TRADE_TP_NM || '합계'}</th>
+                    <th>{item.TAX_CNT?.toLocaleString() || 0}</th>
+                    <th>{item.BUYR_CNT?.toLocaleString() || 0}</th>
+                    <th>{item.TRADE_AMT?.toLocaleString() || 0}</th>
+                    <th>{item.SUP_PRC?.toLocaleString() || 0}</th>
+                    <th>{item.VAT?.toLocaleString() || 0}</th>
+                  </tr>
+                )
+              ))}
             </tfoot>
           </table>
         </div>
