@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import PaginationComponent from "@/components/utils/PaginationComponent";
+import Pagination from "@/components/ui/pagination";
 import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
 import Image from "next/image";
 
@@ -32,7 +32,6 @@ export default function ProductCostList(props) {
   const [dealerList, setDealerList] = useState(props.dealerList || []);
   const [expdItemList, setExpdItemList] = useState(props.expdItemList || []);
   const [expdEvdcList, setExpdEvdcList] = useState(props.expdEvdcList || []);
-
   
   const [currentPage, setCurrentPage] = useState(initialPagination.currentPage || 1);
   const [pageSize, setPageSize] = useState(initialPagination.pageSize || 10);
@@ -85,7 +84,7 @@ export default function ProductCostList(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCount);
-    handleSearch(1);
+    // handleSearch(1); // 자동 검색 비활성화
     console.log("pageSize", pageSize);
     console.log("listCount", listCount);
   }, [ordItem, ordAscDesc, listCount]);
@@ -121,7 +120,7 @@ export default function ProductCostList(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCountDtl);
-    handleSearch(1);
+    // handleSearch(1); // 자동 검색 비활성화
     console.log("pageSize", pageSize);
     console.log("listCount", listCountDtl);
   }, [ordItemDtl, ordAscDescDtl, listCountDtl]);
@@ -171,6 +170,56 @@ export default function ProductCostList(props) {
 
   // setSearchBtn
   const [searchBtn, setSearchBtn] = useState(1);
+
+  // 상세검색 영역 표시/숨김 상태
+  const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
+
+  // 모든 토글을 닫는 함수
+  const closeAllToggles = () => {
+    setIsDealerSelectOpen(false);
+    setIsDtGubunSelectOpen(false);
+    setIsOrdItemSelectOpen(false);
+    setIsOrdAscDescSelectOpen(false);
+    setIsListCountSelectOpen(false);
+    setIsDtlDealerSelectOpen(false);
+    setIsDtlDtGubunSelectOpen(false);
+    setIsDtlTaxGubunSelectOpen(false);
+    setIsDtlExpdItemSelectOpen(false);
+    setIsDtlExpdEvdcSelectOpen(false);
+    setIsOrdItemSelectOpenDtl(false);
+    setIsOrdAscDescSelectOpenDtl(false);
+    setIsListCountSelectOpenDtl(false);
+  };
+
+  // 외부 클릭 및 ESC 키 감지
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 토글 버튼이나 메뉴 내부 클릭인지 확인
+      const isToggleButton = event.target.closest('.select__toggle');
+      const isMenuContent = event.target.closest('.select__menu');
+      
+      // 토글 버튼이나 메뉴 내부가 아닌 곳을 클릭했을 때만 토글 닫기
+      if (!isToggleButton && !isMenuContent) {
+        closeAllToggles();
+      }
+    };
+
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        closeAllToggles();
+      }
+    };
+
+    // 이벤트 리스너 등록
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 검색 영역
@@ -395,7 +444,10 @@ export default function ProductCostList(props) {
                     <button
                       className="select__toggle"
                       type="button"
-                      onClick={() => setIsDtGubunSelectOpen(!isDtGubunSelectOpen)}
+                      onClick={() => {
+                        closeAllToggles();
+                        setIsDtGubunSelectOpen(!isDtGubunSelectOpen);
+                      }}
                     >
                       <span className="select__text">
                         {dtGubun === "01"
@@ -483,7 +535,11 @@ export default function ProductCostList(props) {
                   >
                     <span className="ico ico--search"></span>차량검색
                   </button>
-                  <button type="button" className="jsSearchboxBtn btn btn--type02">
+                  <button 
+                    type="button" 
+                    className="jsSearchboxBtn btn btn--type02"
+                    onClick={() => setIsDetailSearchOpen(!isDetailSearchOpen)}
+                  >
                     <span className="ico ico--search_detail"></span>
                     상세조건검색
                   </button>
@@ -494,7 +550,7 @@ export default function ProductCostList(props) {
         </table>
 
         {/* 상세 검색 영역 */}
-        <div className="jsSearchbox searchbox">
+        <div className="jsSearchbox searchbox" style={{ display: isDetailSearchOpen ? "block" : "none" }}>
           <div className="searchbox__head">
             <h3 className="searchbox__title">상세검색</h3>
 
@@ -509,7 +565,10 @@ export default function ProductCostList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
+                }}
               >
                 <span className="select__text">{ordItemDtl || "제시(매입)일"}</span>
                 <Image
@@ -530,7 +589,7 @@ export default function ProductCostList(props) {
                   onClick={() => {
                     setOrdItemDtl("제시(매입)일");
                     setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   제시(매입)일
@@ -540,7 +599,7 @@ export default function ProductCostList(props) {
                   onClick={() => {
                     setOrdItemDtl("차량번호");
                     setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   차량번호
@@ -550,7 +609,7 @@ export default function ProductCostList(props) {
                   onClick={() => {
                     setOrdItemDtl("상품화등록일");
                     setIsOrdItemSelectOpenDtl(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   상품화등록일
@@ -564,7 +623,10 @@ export default function ProductCostList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl);
+                }}
               >
                 <span className="select__text">
                   {ordAscDescDtl === "desc" ? "내림차순" : ordAscDescDtl === "asc" ? "오름차순" : "선택"}
@@ -587,7 +649,7 @@ export default function ProductCostList(props) {
                   onClick={() => {
                     setOrdAscDescDtl("desc");
                     setIsOrdAscDescSelectOpenDtl(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   내림차순
@@ -597,7 +659,7 @@ export default function ProductCostList(props) {
                   onClick={() => {
                     setOrdAscDescDtl("asc");
                     setIsOrdAscDescSelectOpenDtl(false);
-                    handleSearch(1);
+                    // handleSearch(1); // 자동 검색 비활성화
                   }}
                 >
                   오름차순
@@ -616,7 +678,10 @@ export default function ProductCostList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl);
+                }}
               >
                 <span className="select__text">{listCountDtl}건씩</span>
                 <Image
@@ -709,7 +774,10 @@ export default function ProductCostList(props) {
                         <button
                           className="select__toggle"
                           type="button"
-                          onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlDealer
@@ -767,7 +835,10 @@ export default function ProductCostList(props) {
                           <button
                             className="select__toggle"
                             type="button"
-                            onClick={() => setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen)}
+                            onClick={() => {
+                              closeAllToggles();
+                              setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen);
+                            }}
                           >
                             <span className="select__text">
                               {dtlDtGubun === "01"
@@ -879,7 +950,10 @@ export default function ProductCostList(props) {
                         <button 
                           className="select__toggle" 
                           type="button"
-                          onClick={() => setIsDtlExpdItemSelectOpen(!isDtlExpdItemSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlExpdItemSelectOpen(!isDtlExpdItemSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlExpdItem 
@@ -1017,7 +1091,10 @@ export default function ProductCostList(props) {
                         <button 
                           className="select__toggle" 
                           type="button"
-                          onClick={() => setIsDtlExpdEvdcSelectOpen(!isDtlExpdEvdcSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlExpdEvdcSelectOpen(!isDtlExpdEvdcSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlExpdEvdc ? expdEvdcList.find(item => item.CD === dtlExpdEvdc)?.CD_NM : '선택'}
@@ -1158,7 +1235,13 @@ export default function ProductCostList(props) {
                 <button className="jsSearchboxBtn btn btn--light" type="button">
                   취소
                 </button>
-                <button className="btn btn--primary" type="button" onClick={handleDtlSearch}>
+                <button   
+                  className="btn btn--primary" type="button" 
+                  onClick={() => {
+                    handleDtlSearch();
+                    setIsDetailSearchOpen(false);
+                  }}
+                >
                   <span className="ico ico--search"></span>검색
                 </button>
               </div>
@@ -1169,7 +1252,7 @@ export default function ProductCostList(props) {
 
       <div className="table-wrap">
         <h2 className="table-wrap__title">
-          리스트<span>Total 100건</span>
+          리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span>
         </h2>
         <div className="table-wrap__head table-wrap__title">
           <button
@@ -1184,25 +1267,74 @@ export default function ProductCostList(props) {
             <span className="ico ico--add"></span>상품화비용 등록
           </button>
           <div className="input-group">
-            {/* 딜러명 */}
+            {/* 정렬 항목 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="" />
-              <button className="select__toggle" type="button">
-                <span className="select__text">등록일</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+              <input className="select__input" type="hidden" name="dealer" defaultValue={ordItem} />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpen(!isOrdItemSelectOpen);
+                }}
+              >
+                <span className="select__text">
+                  {ordItem === "01" ? "등록일" : 
+                   ordItem === "02" ? "결제일" :
+                   ordItem === "03" ? "지출구분" :
+                   ordItem === "04" ? "과세구분" : "등록일"}
+                </span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
-              <ul className="select__menu">
-                <li className="select__option select__option--selected" data-value="">
+              <ul
+                className="select__menu"
+                style={{ display: isOrdItemSelectOpen ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${ordItem === "01" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("01");
+                    setIsOrdItemSelectOpen(false);
+                    // handleSearch(1); // 자동 검색 비활성화
+                  }}
+                >
                   등록일
                 </li>
-                <li className="select__option" data-value="">
+                <li
+                  className={`select__option ${ordItem === "02" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("02");
+                    setIsOrdItemSelectOpen(false);
+                    // handleSearch(1); // 자동 검색 비활성화
+                  }}
+                >
                   결제일
                 </li>
-                <li className="select__option" data-value="">
+                <li
+                  className={`select__option ${ordItem === "03" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("03");
+                    setIsOrdItemSelectOpen(false);
+                    // handleSearch(1); // 자동 검색 비활성화
+                  }}
+                >
                   지출구분
                 </li>
-                <li className="select__option" data-value="">
+                <li
+                  className={`select__option ${ordItem === "04" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("04");
+                    setIsOrdItemSelectOpen(false);
+                    // handleSearch(1); // 자동 검색 비활성화
+                  }}
+                >
                   과세구분
                 </li>
               </ul>
@@ -1211,16 +1343,48 @@ export default function ProductCostList(props) {
             {/* 정렬순서 */}
             <div className="select select--dark w160">
               <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
-              <button className="select__toggle" type="button">
-                <span className="select__text">내림차순</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen);
+                }}
+              >
+                <span className="select__text">
+                  {ordAscDesc === "desc" ? "내림차순" : "오름차순"}
+                </span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
-              <ul className="select__menu">
-                <li className="select__option select__option--selected" data-value="desc">
+              <ul
+                className="select__menu"
+                style={{ display: isOrdAscDescSelectOpen ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${ordAscDesc === "desc" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdAscDesc("desc");
+                    setIsOrdAscDescSelectOpen(false);
+                    // handleSearch(1); // 자동 검색 비활성화
+                  }}
+                >
                   내림차순
                 </li>
-                <li className="select__option" data-value="asc">
+                <li
+                  className={`select__option ${ordAscDesc === "asc" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdAscDesc("asc");
+                    setIsOrdAscDescSelectOpen(false);
+                    // handleSearch(1); // 자동 검색 비활성화
+                  }}
+                >
                   오름차순
                 </li>
               </ul>
@@ -1228,20 +1392,59 @@ export default function ProductCostList(props) {
 
             {/* 건수 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
-              <button className="select__toggle" type="button">
-                <span className="select__text">10건씩</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+              <input
+                className="select__input"
+                type="hidden"
+                name="dealer"
+                defaultValue={listCount}
+              />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpen(!isListCountSelectOpen);
+                }}
+              >
+                <span className="select__text">{listCount}건씩</span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
-              <ul className="select__menu">
-                <li className="select__option select__option--selected" data-value="10">
+              <ul
+                className="select__menu"
+                style={{ display: isListCountSelectOpen ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${listCount === 10 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCount(10);
+                    setIsListCountSelectOpen(false);
+                  }}
+                >
                   10건씩
                 </li>
-                <li className="select__option" data-value="30">
+                <li
+                  className={`select__option ${listCount === 30 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCount(30);
+                    setIsListCountSelectOpen(false);
+                  }}
+                >
                   30건씩
                 </li>
-                <li className="select__option" data-value="50">
+                <li
+                  className={`select__option ${listCount === 50 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCount(50);
+                    setIsListCountSelectOpen(false);
+                  }}
+                >
                   50건씩
                 </li>
               </ul>
@@ -1345,33 +1548,11 @@ export default function ProductCostList(props) {
         </table>
         {/* 차량별 리스트 e */}
 
-        <div className="pagination">
-          <a href="#" className="pagination__btn pagination__btn--prev">
-            이전
-          </a>
-          {/* MEMO: <a> 태그에 .on 추가 시, selected 상태 적용 */}
-          <a href="#" className="pagination__btn on">
-            1
-          </a>
-          <a href="#" className="pagination__btn">
-            2
-          </a>
-          <a href="#" className="pagination__btn">
-            3
-          </a>
-          <a href="#" className="pagination__btn">
-            ...
-          </a>
-          <a href="#" className="pagination__btn">
-            9
-          </a>
-          <a href="#" className="pagination__btn">
-            10
-          </a>
-          <a href="#" className="pagination__btn pagination__btn--next">
-            다음
-          </a>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       <div className="table-wrap">

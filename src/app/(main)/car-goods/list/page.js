@@ -106,7 +106,8 @@ export default async function CarSelList() {
 
   const goodsFeeCarSumList = await searchGoodsFeeCarSumList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
-  const capitalList = await getCDList('05');   // 캐피탈 코드목록
+  const expdItemList = await getCDList('08');   // 지출 항목 코드목록
+  const expdEvdcList = await getCDList('07');   // 지출 증빙 코드목록
   const goodsFeeCarSummary = await searchGoodsFeeCarSummary({ ...defaultParams, ...searchParams });
 
   console.log(goodsFeeCarSumList.data.carlist);
@@ -114,7 +115,8 @@ export default async function CarSelList() {
   return <ListPage session={session}
                    carList={goodsFeeCarSumList}
                    dealerList={dealerList.data}
-                   capitalList={capitalList.data}
+                   expdItemList={expdItemList.data}
+                   expdEvdcList={expdEvdcList.data}
                    searchAction={searchGoodsFeeCarSumListAndSummary}
                    carSummary={goodsFeeCarSummary}
    />;

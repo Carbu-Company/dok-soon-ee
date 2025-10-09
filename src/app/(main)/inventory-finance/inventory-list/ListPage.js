@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import PaginationComponent from "@/components/utils/PaginationComponent";
+import Pagination from "@/components/ui/pagination";
 
 export default function InventoryFinanceList(props) {
   const router = useRouter();
@@ -148,7 +148,6 @@ export default function InventoryFinanceList(props) {
   const [dtlStartDt, setDtlStartDt] = useState("");
   const [dtlEndDt, setDtlEndDt] = useState("");
 
-
   // 상세 검색 차량번호(신)
   const [dtlNewCarNo, setDtlNewCarNo] = useState("");
 
@@ -170,6 +169,54 @@ export default function InventoryFinanceList(props) {
 
   // setSearchBtn
   const [searchBtn, setSearchBtn] = useState(1);
+
+  // 상세검색 영역 표시/숨김 상태
+  const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
+
+  // 모든 토글을 닫는 함수
+  const closeAllToggles = () => {
+    setIsDealerSelectOpen(false);
+    setIsDtGubunSelectOpen(false);
+    setIsOrdItemSelectOpen(false);
+    setIsOrdAscDescSelectOpen(false);
+    setIsListCountSelectOpen(false);
+    setIsDtlDealerSelectOpen(false);
+    setIsDtlDtGubunSelectOpen(false);
+    setIsDtlCapitalSelectOpen(false);
+    setIsOrdItemSelectOpenDtl(false);
+    setIsOrdAscDescSelectOpenDtl(false);
+    setIsListCountSelectOpenDtl(false);
+  };
+
+  // 외부 클릭 및 ESC 키 감지
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 토글 버튼이나 메뉴 내부 클릭인지 확인
+      const isToggleButton = event.target.closest('.select__toggle');
+      const isMenuContent = event.target.closest('.select__menu');
+      
+      // 토글 버튼이나 메뉴 내부가 아닌 곳을 클릭했을 때만 토글 닫기
+      if (!isToggleButton && !isMenuContent) {
+        closeAllToggles();
+      }
+    };
+
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        closeAllToggles();
+      }
+    };
+
+    // 이벤트 리스너 등록
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 검색 영역
@@ -218,7 +265,7 @@ export default function InventoryFinanceList(props) {
 
         if (result && result.success) {
           //console.log('result.data', result.data);
-          const responseData = result.data?.list?.carlist || [];
+          const responseData = result.data?.list?.loanList || [];
           const paginationInfo = result.data?.list?.pagination || {};
           const summaryData = result.data?.summary || [];
 
@@ -328,7 +375,10 @@ export default function InventoryFinanceList(props) {
                   <button
                     className="select__toggle"
                     type="button"
-                    onClick={() => setIsDealerSelectOpen(!isDealerSelectOpen)}
+                    onClick={() => {
+                      closeAllToggles();
+                      setIsDealerSelectOpen(!isDealerSelectOpen);
+                    }}
                   >
                     <span className="select__text">
                       {selectedDealer
@@ -386,7 +436,10 @@ export default function InventoryFinanceList(props) {
                     <button
                       className="select__toggle"
                       type="button"
-                      onClick={() => setIsDtGubunSelectOpen(!isDtGubunSelectOpen)}
+                      onClick={() => {
+                        closeAllToggles();
+                        setIsDtGubunSelectOpen(!isDtGubunSelectOpen);
+                      }}
                     >
                       <span className="select__text">
                         {dtGubun === "01"
@@ -463,7 +516,11 @@ export default function InventoryFinanceList(props) {
                   >
                     <span className="ico ico--search"></span>차량검색
                   </button>
-                  <button type="button" className="jsSearchboxBtn btn btn--type02">
+                  <button 
+                    type="button" 
+                    className="jsSearchboxBtn btn btn--type02"
+                    onClick={() => setIsDetailSearchOpen(!isDetailSearchOpen)}
+                  >
                     <span className="ico ico--search_detail"></span>
                     상세조건검색
                   </button>
@@ -474,7 +531,7 @@ export default function InventoryFinanceList(props) {
         </table>
 
         {/* 상세 검색 영역 */}
-        <div className="jsSearchbox searchbox">
+        <div className="jsSearchbox searchbox" style={{ display: isDetailSearchOpen ? "block" : "none" }}>
           <div className="searchbox__head">
             <h3 className="searchbox__title">상세검색</h3>
 
@@ -489,7 +546,10 @@ export default function InventoryFinanceList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
+                }}
               >
                 <span className="select__text">{ordItemDtl || "제시일"}</span>
                 <Image
@@ -534,7 +594,10 @@ export default function InventoryFinanceList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl);
+                }}
               >
                 <span className="select__text">
                   {ordAscDescDtl === "desc" ? "내림차순" : ordAscDescDtl === "asc" ? "오름차순" : "선택"}
@@ -586,7 +649,10 @@ export default function InventoryFinanceList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl);
+                }}
               >
                 <span className="select__text">{listCountDtl}건씩</span>
                 <Image
@@ -679,7 +745,10 @@ export default function InventoryFinanceList(props) {
                         <button
                           className="select__toggle"
                           type="button"
-                          onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlDealer
@@ -737,7 +806,10 @@ export default function InventoryFinanceList(props) {
                           <button
                             className="select__toggle"
                             type="button"
-                            onClick={() => setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen)}
+                            onClick={() => {
+                              closeAllToggles();
+                              setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen);
+                            }}
                           >
                             <span className="select__text">
                               {dtlDtGubun === "01"
@@ -837,7 +909,10 @@ export default function InventoryFinanceList(props) {
                         <button 
                           className="select__toggle" 
                           type="button"
-                          onClick={() => setIsDtlCapitalSelectOpen(!isDtlCapitalSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlCapitalSelectOpen(!isDtlCapitalSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlCapital
@@ -986,10 +1061,21 @@ export default function InventoryFinanceList(props) {
               </table>
 
               <div className="searchbox__btns container__btns">
-                <button className="jsSearchboxBtn btn btn--light" type="button">
+                <button 
+                  className="jsSearchboxBtn btn btn--light" 
+                  type="button"
+                  onClick={() => setIsDetailSearchOpen(false)}
+                >
                   취소
                 </button>
-                <button className="btn btn--primary" type="button" onClick={handleDtlSearch}>
+                <button 
+                  className="btn btn--primary" 
+                  type="button" 
+                  onClick={() => {
+                    handleDtlSearch();
+                    setIsDetailSearchOpen(false);
+                  }}
+                >
                   <span className="ico ico--search"></span>검색
                 </button>
               </div>
@@ -1000,7 +1086,7 @@ export default function InventoryFinanceList(props) {
 
       <div className="table-wrap">
         <h2 className="table-wrap__title">
-          리스트<span>Total 100건</span>
+          리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span>
         </h2>
         <div className="table-wrap__head table-wrap__title">
           <button
@@ -1017,7 +1103,10 @@ export default function InventoryFinanceList(props) {
               <button 
                 className="select__toggle" 
                 type="button"
-                onClick={() => setIsOrdItemSelectOpen(!isOrdItemSelectOpen)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpen(!isOrdItemSelectOpen);
+                }}
               >
                 <span className="select__text">
                   {ordItem === "01" ? "실행일" : 
@@ -1073,7 +1162,10 @@ export default function InventoryFinanceList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen);
+                }}
               >
                 <span className="select__text">
                   {ordAscDesc === "desc" ? "내림차순" : "오름차순"}
@@ -1125,7 +1217,10 @@ export default function InventoryFinanceList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsListCountSelectOpen(!isListCountSelectOpen)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpen(!isListCountSelectOpen);
+                }}
               >
                 <span className="select__text">{listCount}건씩</span>
                 <Image
@@ -1296,33 +1391,11 @@ export default function InventoryFinanceList(props) {
         </table>
         {/* 차량별 리스트 e */}
 
-        <div className="pagination">
-          <a href="#" className="pagination__btn pagination__btn--prev">
-            이전
-          </a>
-          {/* MEMO: <a> 태그에 .on 추가 시, selected 상태 적용 */}
-          <a href="#" className="pagination__btn on">
-            1
-          </a>
-          <a href="#" className="pagination__btn">
-            2
-          </a>
-          <a href="#" className="pagination__btn">
-            3
-          </a>
-          <a href="#" className="pagination__btn">
-            ...
-          </a>
-          <a href="#" className="pagination__btn">
-            9
-          </a>
-          <a href="#" className="pagination__btn">
-            10
-          </a>
-          <a href="#" className="pagination__btn pagination__btn--next">
-            다음
-          </a>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       <div className="table-wrap">

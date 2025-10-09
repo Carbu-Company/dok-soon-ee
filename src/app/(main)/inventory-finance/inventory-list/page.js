@@ -122,6 +122,7 @@ export default async function CarLoanCarSumList() {
   const carLoanCarSumList = await searchCarLoanCarSumList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
+  const capitalList = await getCDList('05');   // 캐피탈 코드목록
   const carLoanSummary = await searchCarLoanSummary({ ...defaultParams, ...searchParams });
   
 
@@ -131,6 +132,7 @@ export default async function CarLoanCarSumList() {
                    carList={carLoanCarSumList}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
+                   capitalList={capitalList.data}
                    searchAction={searchCarLoanCarSumListAndSummary}
                    carSummary={carLoanSummary}
    />;

@@ -950,7 +950,7 @@ export default function OtherDealerMediationSalesPage(props) {
 
       <div className="table-wrap">
         <h2 className="table-wrap__title">
-          리스트<span>Total 100건</span>
+          리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span>
         </h2>
         <div className="table-wrap__head table-wrap__title">
           <button

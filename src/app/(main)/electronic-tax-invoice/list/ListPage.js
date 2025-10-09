@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import PaginationComponent from "@/components/utils/PaginationComponent";
+import Pagination from "@/components/ui/pagination";
 import Image from "next/image";
 
 export default function ElectronicTaxInvoicePage(props) {
@@ -1121,7 +1121,7 @@ export default function ElectronicTaxInvoicePage(props) {
         </div>
   
         <div className="table-wrap">
-          <h2 className="table-wrap__title">발행 리스트<span>Total 100건</span></h2>
+          <h2 className="table-wrap__title">발행 리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span></h2>
           <div className="table-wrap__head table-wrap__title">
             <button
               type="button"
@@ -1352,17 +1352,11 @@ export default function ElectronicTaxInvoicePage(props) {
             </tbody>
           </table>
   
-          <div className="pagination">
-            <a href="#" className="pagination__btn pagination__btn--prev">이전</a>
-            {/* MEMO: <a> 태그에 .on 추가 시, selected 상태 적용 */}
-            <a href="#" className="pagination__btn on">1</a>
-            <a href="#" className="pagination__btn">2</a>
-            <a href="#" className="pagination__btn">3</a>
-            <a href="#" className="pagination__btn">...</a>
-            <a href="#" className="pagination__btn">9</a>
-            <a href="#" className="pagination__btn">10</a>
-            <a href="#" className="pagination__btn pagination__btn--next">다음</a>
-          </div>
+          <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
         </div>
   
         <div className="table-wrap">

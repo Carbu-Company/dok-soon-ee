@@ -172,6 +172,53 @@ export default function ProductCostList(props) {
 
   // setSearchBtn
   const [searchBtn, setSearchBtn] = useState(1);
+  
+  // 모든 토글을 닫는 함수
+  const closeAllToggles = () => {
+    setIsDealerSelectOpen(false);
+    setIsDtGubunSelectOpen(false);
+    setIsOrdItemSelectOpen(false);
+    setIsOrdAscDescSelectOpen(false);
+    setIsListCountSelectOpen(false);
+    setIsDtlDealerSelectOpen(false);
+    setIsDtlDtGubunSelectOpen(false);
+    setIsDtlTaxGubunSelectOpen(false);
+    setIsDtlExpdItemSelectOpen(false);
+    setIsDtlExpdEvdcSelectOpen(false);
+    setIsOrdItemSelectOpenDtl(false);
+    setIsOrdAscDescSelectOpenDtl(false);
+    setIsListCountSelectOpenDtl(false);
+  };
+
+  // 외부 클릭 및 ESC 키 감지
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 토글 버튼이나 메뉴 내부 클릭인지 확인
+      const isToggleButton = event.target.closest('.select__toggle');
+      const isMenuContent = event.target.closest('.select__menu');
+      
+      // 토글 버튼이나 메뉴 내부가 아닌 곳을 클릭했을 때만 토글 닫기
+      if (!isToggleButton && !isMenuContent) {
+        closeAllToggles();
+      }
+    };
+
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        closeAllToggles();
+      }
+    };
+
+    // 이벤트 리스너 등록
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 검색 영역
@@ -414,8 +461,6 @@ export default function ProductCostList(props) {
   // 숫자 형식으로 처리할 컬럼들
   const numericColumns = ["PUR_AMT", "EXPD_AMT", "EXPD_SUP_PRC", "EXPD_VAT"];
 
-
-
   return (
     <main className="container container--page">
       <div className="container__head">
@@ -472,7 +517,10 @@ export default function ProductCostList(props) {
                   <button
                     className="select__toggle"
                     type="button"
-                    onClick={() => setIsDealerSelectOpen(!isDealerSelectOpen)}
+                    onClick={() => {
+                      closeAllToggles();
+                      setIsDealerSelectOpen(!isDealerSelectOpen);
+                    }}
                   >
                     <span className="select__text">
                       {selectedDealer
@@ -530,7 +578,10 @@ export default function ProductCostList(props) {
                     <button
                       className="select__toggle"
                       type="button"
-                      onClick={() => setIsDtGubunSelectOpen(!isDtGubunSelectOpen)}
+                      onClick={() => {
+                        closeAllToggles();
+                        setIsDtGubunSelectOpen(!isDtGubunSelectOpen);
+                      }}
                     >
                       <span className="select__text">
                         {dtGubun === "01"
@@ -648,7 +699,10 @@ export default function ProductCostList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
+                }}
               >
                 <span className="select__text">{ordItemDtl || "제시(매입)일"}</span>
                 <Image
@@ -703,7 +757,10 @@ export default function ProductCostList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl);
+                }}
               >
                 <span className="select__text">
                   {ordAscDescDtl === "desc" ? "내림차순" : ordAscDescDtl === "asc" ? "오름차순" : "선택"}
@@ -755,7 +812,10 @@ export default function ProductCostList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl);
+                }}
               >
                 <span className="select__text">{listCountDtl}건씩</span>
                 <Image
@@ -848,7 +908,10 @@ export default function ProductCostList(props) {
                         <button
                           className="select__toggle"
                           type="button"
-                          onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlDealer
@@ -906,7 +969,10 @@ export default function ProductCostList(props) {
                           <button
                             className="select__toggle"
                             type="button"
-                            onClick={() => setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen)}
+                            onClick={() => {
+                              closeAllToggles();
+                              setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen);
+                            }}
                           >
                             <span className="select__text">
                               {dtlDtGubun === "01"
@@ -1018,7 +1084,10 @@ export default function ProductCostList(props) {
                         <button 
                           className="select__toggle" 
                           type="button"
-                          onClick={() => setIsDtlExpdItemSelectOpen(!isDtlExpdItemSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlExpdItemSelectOpen(!isDtlExpdItemSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlExpdItem 
@@ -1156,7 +1225,10 @@ export default function ProductCostList(props) {
                         <button 
                           className="select__toggle" 
                           type="button"
-                          onClick={() => setIsDtlExpdEvdcSelectOpen(!isDtlExpdEvdcSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlExpdEvdcSelectOpen(!isDtlExpdEvdcSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlExpdEvdc ? expdEvdcList.find(item => item.CD === dtlExpdEvdc)?.CD_NM : '선택'}
@@ -1319,7 +1391,7 @@ export default function ProductCostList(props) {
 
       <div className="table-wrap">
         <h2 className="table-wrap__title">
-          리스트<span>Total 100건</span>
+          리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span>
         </h2>
         <div className="table-wrap__head table-wrap__title">
           <button
@@ -1334,13 +1406,16 @@ export default function ProductCostList(props) {
             <span className="ico ico--add"></span>상품화비용 등록
           </button>
           <div className="input-group">
-            {/* 딜러명 */}
+            {/* 정렬 항목 */}
             <div className="select select--dark w160">
               <input className="select__input" type="hidden" name="dealer" defaultValue={ordItem} />
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdItemSelectOpen(!isOrdItemSelectOpen)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpen(!isOrdItemSelectOpen);
+                }}
               >
                 <span className="select__text">
                   {ordItem === "01" ? "등록일" : 
@@ -1410,7 +1485,10 @@ export default function ProductCostList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen);
+                }}
               >
                 <span className="select__text">
                   {ordAscDesc === "desc" ? "내림차순" : "오름차순"}
@@ -1462,7 +1540,10 @@ export default function ProductCostList(props) {
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsListCountSelectOpen(!isListCountSelectOpen)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpen(!isListCountSelectOpen);
+                }}
               >
                 <span className="select__text">{listCount}건씩</span>
                 <Image
@@ -1640,7 +1721,6 @@ export default function ProductCostList(props) {
           </tbody>
         </table>
         {/* 차량별 리스트 e */}
-
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

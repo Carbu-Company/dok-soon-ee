@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import PaginationComponent from "@/components/utils/PaginationComponent";
+import Pagination from "@/components/ui/pagination";
 import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
 import Image from "next/image";
 
@@ -159,6 +159,55 @@ props
 
   const [searchBtn, setSearchBtn] = useState(0);
 
+  
+  // 상세검색 영역 표시/숨김 상태
+  const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
+
+  // 모든 토글을 닫는 함수
+  const closeAllToggles = () => {
+    setIsDealerSelectOpen(false);
+    setIsDtGubunSelectOpen(false);
+    setIsOrdItemSelectOpen(false);
+    setIsOrdAscDescSelectOpen(false);
+    setIsListCountSelectOpen(false);
+    setIsDtlDealerSelectOpen(false);
+    setIsDtlDtGubunSelectOpen(false);
+    setIsDtlSaleItemSelectOpen(false);
+    setIsOrdItemSelectOpenDtl(false);
+    setIsOrdAscDescSelectOpenDtl(false);
+    setIsListCountSelectOpenDtl(false);
+  };
+
+  // 외부 클릭 및 ESC 키 감지
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 토글 버튼이나 메뉴 내부 클릭인지 확인
+      const isToggleButton = event.target.closest('.select__toggle');
+      const isMenuContent = event.target.closest('.select__menu');
+      
+      // 토글 버튼이나 메뉴 내부가 아닌 곳을 클릭했을 때만 토글 닫기
+      if (!isToggleButton && !isMenuContent) {
+        closeAllToggles();
+      }
+    };
+
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        closeAllToggles();
+      }
+    };
+
+    // 이벤트 리스너 등록
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 검색 영역
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -214,15 +263,15 @@ props
           const paginationInfo = result.data?.list?.pagination || {};
           const summaryData = result.data?.summary || [];
 
-          // console.log('응답 데이터:', {
-          //   responseDataLength: responseData.length,
-          //   paginationInfo,
-          //   summaryData
-          // });
+          console.log('응답 데이터:', {
+            responseDataLength: result.data?.list?.carlist?.length,
+            paginationInfo,
+            summaryData
+          });
 
           setCarList(responseData);
           setPagination(paginationInfo);
-          setGoodsFeeCarSummary(summaryData);
+          setCarCashSummary(summaryData);
 
           // 서버에서 제공하는 페이지네이션 정보 사용
           setTotalPages(paginationInfo.totalPages || 1);
@@ -356,7 +405,10 @@ props
                   <button
                     className="select__toggle"
                     type="button"
-                    onClick={() => setIsDealerSelectOpen(!isDealerSelectOpen)}
+                    onClick={() => {
+                      closeAllToggles();
+                      setIsDealerSelectOpen(!isDealerSelectOpen);
+                    }}
                   >
                     <span className="select__text">
                       {selectedDealer
@@ -414,7 +466,10 @@ props
                       <button
                         className="select__toggle"
                         type="button"
-                        onClick={() => setIsDtGubunSelectOpen(!isDtGubunSelectOpen)}
+                        onClick={() => {
+                          closeAllToggles();
+                          setIsDtGubunSelectOpen(!isDtGubunSelectOpen);
+                        }}
                       >
                         <span className="select__text">
                           {dtGubun === "01"
@@ -500,8 +555,13 @@ props
                   >
                     <span className="ico ico--search"></span>차량검색
                   </button>
-                  <button type="button" className="jsSearchboxBtn btn btn--type02">
-                    <span className="ico ico--search_detail"></span>상세조건검색
+                  <button 
+                    type="button" 
+                    className="jsSearchboxBtn btn btn--type02"
+                    onClick={() => setIsDetailSearchOpen(!isDetailSearchOpen)}
+                  >
+                    <span className="ico ico--search_detail"></span>
+                    상세조건검색
                   </button>
                 </div>
               </td>
@@ -510,7 +570,7 @@ props
         </table>
 
         {/* 상세 검색 영역 */}
-        <div className="jsSearchbox searchbox">
+        <div className="jsSearchbox searchbox" style={{ display: isDetailSearchOpen ? "block" : "none" }}>
           <div className="searchbox__head">
             <h3 className="searchbox__title">상세검색</h3>
 
@@ -525,7 +585,10 @@ props
                 <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
+                }}
               >
                   <span className="select__text">{ordItemDtl || "발행일"}</span>
                   <Image
@@ -570,7 +633,10 @@ props
                 <button
                   className="select__toggle"
                   type="button"
-                  onClick={() => setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl)}
+                  onClick={() => {
+                    closeAllToggles();
+                    setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl);
+                  }}
                 >
                   <span className="select__text">
                     {ordAscDescDtl === "desc" ? "내림차순" : ordAscDescDtl === "asc" ? "오름차순" : "선택"}
@@ -622,7 +688,10 @@ props
               <button
                 className="select__toggle"
                 type="button"
-                onClick={() => setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl)}
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl);
+                }}
               >
                 <span className="select__text">{listCountDtl}건씩</span>
                 <Image
@@ -715,7 +784,10 @@ props
                         <button
                           className="select__toggle"
                           type="button"
-                          onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtlDealer
@@ -773,7 +845,10 @@ props
                           <button
                             className="select__toggle"
                             type="button"
-                            onClick={() => setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen)}
+                            onClick={() => {
+                              closeAllToggles();
+                              setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen);
+                            }}
                           >
                             <span className="select__text">
                               {dtlDtGubun === "01"
@@ -899,7 +974,10 @@ props
                         <button 
                           className="select__toggle" 
                           type="button"
-                          onClick={() => setIsDtlSaleItemSelectOpen(!isDtlSaleItemSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtlSaleItemSelectOpen(!isDtlSaleItemSelectOpen);
+                          }}
                         >
                           <span className="select__text">{dtlSaleItem || "선택"}</span>
                           <Image
@@ -1124,13 +1202,20 @@ props
               </table>
 
               <div className="searchbox__btns container__btns">
-                <button className="jsSearchboxBtn btn btn--light" type="button">
+                <button 
+                  className="jsSearchboxBtn btn btn--light" 
+                  type="button"
+                  onClick={() => setIsDetailSearchOpen(false)}
+                >
                   취소
                 </button>
-                <button
-                  className="btn btn--primary"
-                  type="button"
-                  onClick={handleDtlSearch}
+                <button 
+                  className="btn btn--primary" 
+                  type="button" 
+                  onClick={() => {
+                    handleDtlSearch();
+                    setIsDetailSearchOpen(false);
+                  }}
                 >
                   <span className="ico ico--search"></span>검색
                 </button>
@@ -1142,7 +1227,7 @@ props
 
       <div className="table-wrap">
         <h2 className="table-wrap__title">
-          발행 리스트<span>Total 100건</span>
+          발행 리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span>
         </h2>
         <div className="table-wrap__head table-wrap__title">
           <button
@@ -1312,33 +1397,11 @@ props
           </tbody>
         </table>
 
-        <div className="pagination">
-          <a href="#" className="pagination__btn pagination__btn--prev">
-            이전
-          </a>
-          {/* MEMO: <a> 태그에 .on 추가 시, selected 상태 적용 */}
-          <a href="#" className="pagination__btn on">
-            1
-          </a>
-          <a href="#" className="pagination__btn">
-            2
-          </a>
-          <a href="#" className="pagination__btn">
-            3
-          </a>
-          <a href="#" className="pagination__btn">
-            ...
-          </a>
-          <a href="#" className="pagination__btn">
-            9
-          </a>
-          <a href="#" className="pagination__btn">
-            10
-          </a>
-          <a href="#" className="pagination__btn pagination__btn--next">
-            다음
-          </a>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
 
       <div className="table-wrap">

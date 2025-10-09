@@ -12,7 +12,7 @@ async function searchCarLoanList(searchParamsWithPage) {
     const result = await getCarLoanList(searchParamsWithPage);
 
     console.log('서버 액션 결과*******************:', { 
-      carCashListLength: result?.data?.carCashList?.length, 
+      carLoanListLength: result?.data?.loanList?.length, 
       totalCount: result?.data?.pagination?.totalCount,
       page: searchParamsWithPage.page,
       pageSize: searchParamsWithPage.pageSize 
@@ -103,12 +103,14 @@ export default async function CarLoanList() {
   const carLoanList = await searchCarLoanList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
+  const capitalList = await getCDList('05');   // 캐피탈 코드목록
   const carLoanSummary = await searchCarLoanSummary({ ...defaultParams, ...searchParams });
 
   return <ListPage session={session}
                    carList={carLoanList}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
+                   capitalList={capitalList.data}
                    searchAction={searchCarLoanListAndSummary}
                    carSummary={carLoanSummary}
    />;

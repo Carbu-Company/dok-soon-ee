@@ -12,7 +12,7 @@ async function searchCarSelList(searchParamsWithPage) {
     const result = await getCarSelList(searchParamsWithPage);
 
     console.log('서버 액션 결과*******************:', { 
-      carSelListLength: result?.data?.carSelList?.length, 
+      carSelListLength: result?.data?.carlist?.length, 
       totalCount: result?.data?.pagination?.totalCount,
       page: searchParamsWithPage.page,
       pageSize: searchParamsWithPage.pageSize 

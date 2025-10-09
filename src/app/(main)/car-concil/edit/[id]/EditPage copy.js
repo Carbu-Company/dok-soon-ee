@@ -1,6 +1,19 @@
 "use client";
 
-export default function BrokerageSalesEditPage() {
+import Image from 'next/image'
+import { useState, useEffect, useCallback } from 'react';
+import { updateCarConcil } from "@/app/(main)/car-concil/edit/[id]/api";
+
+export default function EditPage({ 
+  session = null, 
+  dealerList = [], 
+  carKndList = [], 
+  evdcCdList = [], 
+  tradeItemCDList = [], 
+  carConcilDetail = [] 
+}) {
+  console.log('carConcilDetail**********', carConcilDetail);
+  
     return (
       <main className="container container--page">
         <div className="container__head">
