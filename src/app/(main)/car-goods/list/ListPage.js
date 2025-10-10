@@ -404,13 +404,14 @@ export default function ProductCostList(props) {
 
   // 선택 초기화 함수
   const handleResetSearch = () => {
+
     // 기본 검색 필드 초기화
     setCarNo("");
     setSelectedDealer("");
     setDtGubun("");
     setStartDt("");
     setEndDt("");
-
+    
     // 상세 검색 필드 초기화
     setDtlCarNo("");
     setDtlDealer("");
@@ -427,10 +428,10 @@ export default function ProductCostList(props) {
     setDtlAdjInclusYN("");
 
     // 정렬 옵션 초기화
-    setOrdItem("제시일");
+    setOrdItem("제시(매입)일");
     setOrdAscDesc("desc");
     setListCount(10);
-    setOrdItemDtl("제시일");
+    setOrdItemDtl("제시(매입)일");
     setOrdAscDescDtl("desc");
     setListCountDtl(10);
 
@@ -1593,10 +1594,10 @@ export default function ProductCostList(props) {
               data={carList}
               columns={excelColumns}
               numericColumns={numericColumns}
-              filePrefix="차량상품리스트"
+              filePrefix="상품화비용리스트"
               className="btn btn--white btn--padding--r30"
               text="다운로드"
-              sheetName="차량상품리스트"
+              sheetName="상품화비용"
             />
           </div>
         </div>

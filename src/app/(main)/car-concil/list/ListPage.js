@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import PaginationComponent from "@/components/utils/PaginationComponent";
 import Pagination from "@/components/ui/pagination";
+import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import Image from "next/image";
 
 export default function OtherDealerMediationSalesPage(props) {
@@ -315,6 +316,66 @@ export default function OtherDealerMediationSalesPage(props) {
     console.log("listCount", listCountDtl);
   }, [ordItem, ordAscDesc, listCount]);
 
+
+  // 선택 초기화 함수
+  const handleResetSearch = () => {
+
+    // 기본 검색 필드 초기화
+    setCarNo("");
+    setSelectedDealer("");
+    setDtGubun("");
+    setStartDt("");
+    setEndDt("");
+
+    // 상세 검색 필드 초기화
+    setDtlCarNo("");
+    setDtlDealer("");
+    setDtlDtGubun("");
+    setDtlStartDt("");
+    setDtlEndDt("");
+
+    setDtlBrkTradeItemCd("");
+    setDtlBrkAgentNm("");
+    setDtlCarNm("");
+    setDtlCustNm("");
+    setDtlEvdcGubun("");
+    setDtlBrkMemo("");
+
+    // 정렬 옵션 초기화
+    setOrdItem("매도(판매)일");
+    setOrdAscDesc("desc");
+    setListCount(10);
+    setOrdItemDtl("매도(판매)일");
+    setOrdAscDescDtl("desc");
+    setListCountDtl(10);
+
+    // 검색 버튼을 기본 검색으로 설정
+    setSearchBtn(1);
+
+    console.log("검색 조건이 초기화되었습니다.");
+  };
+
+
+  // 엑셀 다운로드용 컬럼 정의
+  const excelColumns = [
+    { accessorKey: "CAR_NO", header: "차량번호" },
+    { accessorKey: "BRK_SALE_DT", header: "알선판매일" },
+    { accessorKey: "BRK_TRADE_ITEM_NM", header: "거래항목" },
+    { accessorKey: "BRK_AMT", header: "금액" },
+    { accessorKey: "DEDT_AMT", header: "공제금액" },
+    { accessorKey: "TAX_AMT", header: "세액합계" },
+    { accessorKey: "PAY_AMT", header: "지급액" },
+    { accessorKey: "BRK_EVDC_NM", header: "증빙" },
+    { accessorKey: "TXBL_ISSU_DT", header: "발행일" },
+    { accessorKey: "OWNER_NM", header: "상사/고객명" }
+  ];
+
+  // 숫자 형식으로 처리할 컬럼들
+  const numericColumns = ["BRK_AMT", "DEDT_AMT", "TAX_AMT", "PAY_AMT"];
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+ 
   return (
     <main className="container container--page">
       <div className="container__head">
@@ -539,7 +600,7 @@ export default function OtherDealerMediationSalesPage(props) {
             <h3 className="searchbox__title">상세검색</h3>
 
             <div className="input-group">
-              <button className="btn btn--white" type="button">
+              <button className="btn btn--white" type="button" onClick={handleResetSearch}>
                 <span className="ico ico--reset"></span>선택 초기화
               </button>
             </div>
@@ -1067,9 +1128,15 @@ export default function OtherDealerMediationSalesPage(props) {
               </ul>
             </div>
 
-            <button className="btn btn--white btn--padding--r30" type="button">
-              <span className="ico ico--download"></span>다운로드
-            </button>
+            <SimpleTableDownloadButton 
+              data={carList}
+              columns={excelColumns}
+              numericColumns={numericColumns}
+              filePrefix="알선판매리스트"
+              className="btn btn--white"
+              text="다운로드"
+              sheetName="알선판매"
+            />
           </div>
         </div>
 
@@ -1139,7 +1206,7 @@ export default function OtherDealerMediationSalesPage(props) {
                   발행등록
                 </button>
               </td>
-              <td>상사/차산사람</td>
+              <td>{car.OWNER_NM}</td>
               <td>
                 <div className="input-group input-group--sm input-group--center">
                   <div className="select select--utils">

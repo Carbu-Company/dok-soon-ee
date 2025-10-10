@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
 import Image from "next/image";
+import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 
 export default function ElectronicTaxInvoicePage(props) {
   
@@ -335,6 +336,75 @@ export default function ElectronicTaxInvoicePage(props) {
     console.log("listCount", listCountDtl);
   }, [ordItem, ordAscDesc, listCount]);
 
+  // 선택 초기화 함수
+  const handleResetSearch = () => {
+
+    // 기본 검색 필드 초기화
+    setCarNo("");
+    setSelectedDealer("");
+    setDtGubun("");
+    setStartDt("");
+    setEndDt("");
+    
+    // 상세 검색 필드 초기화
+    setDtlCarNo("");
+    setDtlDealer("");
+    setDtlDtGubun("");
+    setDtlStartDt("");
+    setDtlEndDt("");
+
+    setDtlOldCarNo("");
+    setDtlNmNoGubun("");
+    setDtlNmNoValue("");
+    setDtlTaxTargetTpNm("");
+    setDtlMemo("");
+    setDtlCrStat([]);
+    setDtlWriteTpNm("");
+    setDtlNtsNo("");
+
+      // 정렬 옵션 초기화
+    setOrdItem("거래일");
+    setOrdAscDesc("desc");
+    setListCount(10);
+    setOrdItemDtl("거래일");
+    setOrdAscDescDtl("desc");
+    setListCountDtl(10);
+
+    // 검색 버튼을 기본 검색으로 설정
+    setSearchBtn(1);
+
+    console.log("검색 조건이 초기화되었습니다.");
+  };
+
+
+  // 엑셀 다운로드용 컬럼 정의
+  const excelColumns = [
+    { accessorKey: "CAR_NO", header: "차량번호" },
+    { accessorKey: "DLR_NM", header: "담당딜러" },
+    { accessorKey: "CAR_NM", header: "차량명" },
+    { accessorKey: "CAR_PUR_DT", header: "매입일" },
+    { accessorKey: "PUR_AMT", header: "매입금액" },
+
+    { accessorKey: "DLR_NM", header: "문서" },                // 컬럼 지정 필요요
+    { accessorKey: "MK_DT", header: "작성일자" },
+    { accessorKey: "TRADE_DTIME", header: "발행일자" },
+    { accessorKey: "BUYR_MTL_NM", header: "거래처" },
+    { accessorKey: "BUYR_BRNO", header: "등록번호" },
+    { accessorKey: "SEL_DLR_NM", header: "판매딜러" },
+    { accessorKey: "ITEM_NM", header: "품목명" },
+    { accessorKey: "TOT_SUP_PRC", header: "공급가액" },
+    { accessorKey: "TOT_VAT", header: "세액" },
+    { accessorKey: "TOT_AMT", header: "합계금액" },
+    { accessorKey: "TXBL_TRNS_STAT_NM", header: "상태" }
+
+  ];
+
+  // 숫자 형식으로 처리할 컬럼들
+  const numericColumns = ["PUR_AMT", "TOT_SUP_PRC", "TOT_VAT", "TOT_AMT"];
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     return (
       <main className="container container--page">
         <div className="container__head">
@@ -579,7 +649,7 @@ export default function ElectronicTaxInvoicePage(props) {
               <h3 className="searchbox__title">상세검색</h3>
   
               <div className="input-group">
-                <button className="btn btn--white" type="button">
+                <button className="btn btn--white" type="button" onClick={handleResetSearch}>
                   <span className="ico ico--reset"></span>선택 초기화
                 </button>
   
@@ -1337,7 +1407,15 @@ export default function ElectronicTaxInvoicePage(props) {
                 </ul>
               </div>
   
-              <button className="btn btn--white btn--padding--r30" type="button"><span className="ico ico--download"></span>다운로드</button>
+              <SimpleTableDownloadButton 
+              data={carList}
+              columns={excelColumns}
+              numericColumns={numericColumns}
+              filePrefix="전자세금계산서리스트"
+              className="btn btn--white"
+              text="다운로드"
+              sheetName="전자세금계산서"
+            />
             </div>
           </div>
   

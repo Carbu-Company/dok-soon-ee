@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
+import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 
 export default function SalesVehicleList(props) {
   const router = useRouter();
@@ -366,6 +367,70 @@ export default function SalesVehicleList(props) {
     await handleSearch(page);
   };
 
+  // 선택 초기화 함수
+  const handleResetSearch = () => {
+
+    // 기본 검색 필드 초기화
+    setCarNo("");
+    setSelectedDealer("");
+    setDtGubun("");
+    setStartDt("");
+    setEndDt("");
+
+    // 상세 검색 필드 초기화
+    setDtlCarNo("");
+    setDtlDealer("");
+    setDtlDtGubun("");
+    setDtlStartDt("");
+    setDtlEndDt("");
+
+    setDtlCustomerName("");
+    setDtlCustGubun("");
+    setDtlEvdcGubun("");
+    setDtlPrsnGubun("");
+    setDtlOwnerBrno("");
+    setDtlOwnerSsn("");
+    setDtlCtshNo("");
+    setDtlCarNoBefore("");
+
+    // 정렬 옵션 초기화
+    setOrdItem("매도(판매)일");
+    setOrdAscDesc("desc");
+    setListCount(10);
+    setOrdItemDtl("매도(판매)일");
+    setOrdAscDescDtl("desc");
+    setListCountDtl(10);
+
+    // 검색 버튼을 기본 검색으로 설정
+    setSearchBtn(1);
+
+    console.log("검색 조건이 초기화되었습니다.");
+  };
+
+
+  // 엑셀 다운로드용 컬럼 정의
+  const excelColumns = [
+    { accessorKey: "CAR_NO", header: "차량번호" },
+    { accessorKey: "DLR_NM", header: "담당딜러" },
+    { accessorKey: "CAR_NM", header: "차량명" },
+    { accessorKey: "CAR_PUR_DT", header: "매입일" },
+    { accessorKey: "PUR_AMT", header: "매입금액" },
+
+    { accessorKey: "CAR_STAT_NM", header: "제시구분" },
+    { accessorKey: "SALE_TP_NM", header: "매도유형" },
+    { accessorKey: "SEL_DLR_NM", header: "판매딜러" },
+    { accessorKey: "BUYER_NM", header: "고객명" },
+    { accessorKey: "SALE_AMT", header: "판매금액" },
+    { accessorKey: "PERF_INFE_AMT", header: "성능보험료" },
+    { accessorKey: "AGENT_SEL_COST", header: "상사매도비" },
+    { accessorKey: "CAR_SALE_DT", header: "판매일" },
+    { accessorKey: "SALE_REG_DT", header: "매출등록일" },
+    { accessorKey: "ADJ_FIN_DT", header: "정산일" }
+  ];
+
+  // 숫자 형식으로 처리할 컬럼들
+  const numericColumns = ["PUR_AMT", "SALE_AMT", "PERF_INFE_AMT", "AGENT_SEL_COST"];
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
@@ -617,7 +682,7 @@ export default function SalesVehicleList(props) {
             <h3 className="searchbox__title">상세검색</h3>
 
             <div className="input-group">
-              <button className="btn btn--white" type="button">
+              <button className="btn btn--white" type="button" onClick={handleResetSearch}>
                 <span className="ico ico--reset"></span>선택 초기화
               </button>
 
@@ -1483,9 +1548,15 @@ export default function SalesVehicleList(props) {
               </ul>
             </div>
 
-            <button className="btn btn--white btn--padding--r30" type="button">
-              <span className="ico ico--download"></span>다운로드
-            </button>
+            <SimpleTableDownloadButton 
+              data={carList}
+              columns={excelColumns}
+              numericColumns={numericColumns}
+              filePrefix="판매리스트"
+              className="btn btn--white"
+              text="다운로드"
+              sheetName="판매"
+            />
           </div>
         </div>
 

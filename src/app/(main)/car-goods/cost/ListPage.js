@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
 import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
+import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import Image from "next/image";
 
 export default function ProductCostList(props) {
@@ -332,6 +333,34 @@ export default function ProductCostList(props) {
   const handlePageChange = async page => {
     await handleSearch(page);
   };
+
+
+  // 엑셀 다운로드용 컬럼 정의
+  const excelColumns = [
+    { accessorKey: "CAR_NO", header: "차량번호" },
+    { accessorKey: "DLR_NM", header: "담당딜러" },
+    { accessorKey: "CAR_NM", header: "차량명" },
+    { accessorKey: "CAR_PUR_DT", header: "매입일" },
+    { accessorKey: "PUR_AMT", header: "매입금액" },
+
+    { accessorKey: "TAX_SCT_NM", header: "비용항목" },
+    { accessorKey: "EXPD_SCT_NM", header: "지출구분" },
+    { accessorKey: "TAX_SCT_NM", header: "과세구분" },
+
+
+    { accessorKey: "EXPD_AMT", header: "금액" },
+    { accessorKey: "EXPD_SUP_PRC", header: "공급가" },
+    { accessorKey: "EXPD_VAT", header: "부가세" },
+    { accessorKey: "ADJ_INCLUS_YN", header: "정산반영" },
+    { accessorKey: "EXPD_DT", header: "결제일" },
+    { accessorKey: "EXPD_EVDC_NM", header: "지출증빙" }
+  ];
+
+  // 숫자 형식으로 처리할 컬럼들
+  const numericColumns = ["EXPD_AMT", "EXPD_SUP_PRC", "EXPD_VAT"];
+
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
     <main className="container container--page">
@@ -1450,9 +1479,15 @@ export default function ProductCostList(props) {
               </ul>
             </div>
 
-            <button className="btn btn--white btn--padding--r30" type="button">
-              <span className="ico ico--download"></span>다운로드
-            </button>
+            <SimpleTableDownloadButton 
+              data={carList}
+              columns={excelColumns}
+              numericColumns={numericColumns}
+              filePrefix="상품화비용(비용별)리스트"
+              className="btn btn--white"
+              text="다운로드"
+              sheetName="상품화비용"
+            />
           </div>
         </div>
 

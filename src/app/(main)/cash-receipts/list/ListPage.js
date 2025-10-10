@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
+import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
 import Image from "next/image";
 
@@ -158,7 +159,6 @@ props
   const [dtlNtsConfNo, setDtlNtsConfNo] = useState("");
 
   const [searchBtn, setSearchBtn] = useState(0);
-
   
   // 상세검색 영역 표시/숨김 상태
   const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
@@ -341,6 +341,67 @@ props
     console.log("pageSize", pageSize);
     console.log("listCount", listCountDtl);
   }, [ordItem, ordAscDesc, listCount]);
+
+
+  // 선택 초기화 함수
+  const handleResetSearch = () => {
+
+    // 기본 검색 필드 초기화
+    setCarNo("");
+    setSelectedDealer("");
+    setDtGubun("");
+    setStartDt("");
+    setEndDt("");
+
+    // 상세 검색 필드 초기화
+    setDtlCarNo("");
+    setDtlDealer("");
+    setDtlDtGubun("");
+    setDtlStartDt("");
+    setDtlEndDt("");
+    setDtlCustomerName("");
+    setDtlSaleItem("");
+    setDtlMemo("");
+    setDtlTradeProcNm("");
+    setDtlTradeSctGubun("");
+    setDtlCrStat([]);
+    setDtlRcgnNo("");
+    setDtlNtsConfNo("");
+
+    // 정렬 옵션 초기화
+    setOrdItem("발행일");
+    setOrdAscDesc("desc");
+    setListCount(10);
+    setOrdItemDtl("발행일");
+    setOrdAscDescDtl("desc");
+    setListCountDtl(10);
+
+    // 검색 버튼을 기본 검색으로 설정
+    setSearchBtn(1);
+
+    console.log("검색 조건이 초기화되었습니다.");
+  };
+
+
+  // 엑셀 다운로드용 컬럼 정의
+  const excelColumns = [
+    { accessorKey: "TRADE_SCT_NM", header: "문서" },
+    { accessorKey: "TRADE_DT", header: "거래일시" },
+    { accessorKey: "NTS_CONF_NO", header: "국세청승인번호" },
+    { accessorKey: "TRADE_TP_NM", header: "거래구분" },
+    { accessorKey: "RCGN_NO", header: "식별번호" },
+    { accessorKey: "CUST_NM", header: "고객명" },
+    { accessorKey: "DLR_NM", header: "담당딜러" },
+    { accessorKey: "CAR_NM", header: "품명" },
+    { accessorKey: "TRADE_AMT", header: "거래금액" },
+    { accessorKey: "CR_TRNS_STAT_NM", header: "상태" }
+  ];
+
+  // 숫자 형식으로 처리할 컬럼들
+  const numericColumns = ["TRADE_AMT"];
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
   return (
     <main className="container container--page">
@@ -575,7 +636,7 @@ props
             <h3 className="searchbox__title">상세검색</h3>
 
             <div className="input-group">
-              <button className="btn btn--white" type="button">
+              <button className="btn btn--white" type="button" onClick={handleResetSearch}>
                 <span className="ico ico--reset"></span>선택 초기화
               </button>
 
@@ -1398,9 +1459,15 @@ props
               </ul>
             </div>
 
-            <button className="btn btn--white" type="button">
-              <span className="ico ico--download"></span>다운로드
-            </button>
+            <SimpleTableDownloadButton 
+              data={carList}
+              columns={excelColumns}
+              numericColumns={numericColumns}
+              filePrefix="현금영수증리스트"
+              className="btn btn--white"
+              text="다운로드"
+              sheetName="현금영수증"
+            />
           </div>
         </div>
 

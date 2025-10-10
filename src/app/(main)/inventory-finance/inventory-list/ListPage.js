@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
+import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 
 export default function InventoryFinanceList(props) {
   const router = useRouter();
@@ -316,6 +317,66 @@ export default function InventoryFinanceList(props) {
     await handleSearch(page);
   };
 
+  // 선택 초기화 함수
+  const handleResetSearch = () => {
+ 
+    // 기본 검색 필드 초기화
+    setCarNo("");
+    setSelectedDealer("");
+    setDtGubun("");
+    setStartDt("");
+    setEndDt("");
+
+    // 상세 검색 필드 초기화
+    setDtlCarNo("");
+    setDtlDealer("");
+    setDtlDtGubun("");
+    setDtlStartDt("");
+    setDtlEndDt("");
+    setDtlNewCarNo("");
+    setDtlOldCarNo("");
+    setDtlCapital("");
+    setDtlLoanMemo("");
+
+    // 정렬 옵션 초기화
+    setOrdItem("대출실행일");
+    setOrdAscDesc("desc");
+    setListCount(10);
+    setOrdItemDtl("대출실행일");
+    setOrdAscDescDtl("desc");
+    setListCountDtl(10);
+
+    // 검색 버튼을 기본 검색으로 설정
+    setSearchBtn(1);
+
+    console.log("검색 조건이 초기화되었습니다.");
+  };
+
+
+  // 엑셀 다운로드용 컬럼 정의
+  const excelColumns = [
+    { accessorKey: "CAR_PUR_DT", header: "차량번호" },
+    { accessorKey: "PRSN_SCT_CD", header: "담당딜러" },
+    { accessorKey: "CAR_NO", header: "차량명" },
+    { accessorKey: "CAR_NM", header: "매입일" },
+    { accessorKey: "PUR_AMT", header: "매입금액" },
+
+    { accessorKey: "LOAN_CORP_NM", header: "캐피탈사" },
+    { accessorKey: "LOAN_SCT_NM", header: "유형" },
+    { accessorKey: "LOAN_AMT", header: "대출금액" },
+    { accessorKey: "LOAN_DT", header: "실행일" },
+    { accessorKey: "LOAN_MM_CNT", header: "대출기간" },
+    { accessorKey: "DLR_APLY_INTR_RT", header: "딜러이율" },
+    { accessorKey: "MM_INTR_AMT", header: "월이자" },
+    { accessorKey: "TOT_INTR_AMT", header: "총이자" },
+    { accessorKey: "INTR_PAY_AMT", header: "총납입이자" },
+    { accessorKey: "INTR_PAY_DT", header: "최근이자납일" },
+    { accessorKey: "LOAN_STAT_NM", header: "진행상태" }
+  ];
+
+  // 숫자 형식으로 처리할 컬럼들
+  const numericColumns = ["LOAN_MM_CNT", "DLR_APLY_INTR_RT", "MM_INTR_AMT", "TOT_INTR_AMT", "INTR_PAY_AMT"];
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   return (
@@ -536,7 +597,7 @@ export default function InventoryFinanceList(props) {
             <h3 className="searchbox__title">상세검색</h3>
 
             <div className="input-group">
-              <button className="btn btn--white" type="button">
+              <button className="btn btn--white" type="button" onClick={handleResetSearch}>
                 <span className="ico ico--reset"></span>선택 초기화
               </button>
 
@@ -1266,9 +1327,15 @@ export default function InventoryFinanceList(props) {
               </ul>
             </div>
 
-            <button className="btn btn--white" type="button">
-              <span className="ico ico--download"></span>다운로드
-            </button>
+            <SimpleTableDownloadButton 
+              data={carList}
+              columns={excelColumns}
+              numericColumns={numericColumns}
+              filePrefix="재고금융리스트"
+              className="btn btn--white"
+              text="다운로드"
+              sheetName="재고금융"
+            />
           </div>
         </div>
 
