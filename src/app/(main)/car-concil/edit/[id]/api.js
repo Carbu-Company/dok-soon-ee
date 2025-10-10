@@ -1,6 +1,6 @@
-export const getCarConcilDetail  = async (mgtKey) => {
+export const getCarConcilDetail  = async (brkSeq) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarConcilDetail?car_regid=${mgtKey}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarConcilDetail?brkSeq=${brkSeq}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

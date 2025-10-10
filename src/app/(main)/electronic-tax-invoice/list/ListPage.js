@@ -150,7 +150,58 @@ export default function ElectronicTaxInvoicePage(props) {
   // 상세 검색 문서번호
   const [dtlNtsNo, setDtlNtsNo] = useState("");
 
+  
   const [searchBtn, setSearchBtn] = useState(0);
+
+  // 상세검색 영역 표시/숨김 상태
+  const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
+
+  // 모든 토글을 닫는 함수
+  const closeAllToggles = () => {
+    setIsDealerSelectOpen(false);
+    setIsDtGubunSelectOpen(false);
+    setIsOrdItemSelectOpen(false);
+    setIsOrdAscDescSelectOpen(false);
+    setIsListCountSelectOpen(false);
+    setIsDtlDealerSelectOpen(false);
+    setIsDtlDtGubunSelectOpen(false);
+    setIsDtlNmNoGubunSelectOpen(false);
+    setIsDtlTaxTargetTpNmSelectOpen(false);
+    setIsDtlWriteTpNmSelectOpen(false);
+    setIsOrdItemSelectOpenDtl(false);
+    setIsOrdAscDescSelectOpenDtl(false);
+    setIsListCountSelectOpenDtl(false);
+  };
+
+  // 외부 클릭 및 ESC 키 감지
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // 토글 버튼이나 메뉴 내부 클릭인지 확인
+      const isToggleButton = event.target.closest('.select__toggle');
+      const isMenuContent = event.target.closest('.select__menu');
+      
+      // 토글 버튼이나 메뉴 내부가 아닌 곳을 클릭했을 때만 토글 닫기
+      if (!isToggleButton && !isMenuContent) {
+        closeAllToggles();
+      }
+    };
+
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        closeAllToggles();
+      }
+    };
+
+    // 이벤트 리스너 등록
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, []);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 검색 영역
@@ -213,7 +264,7 @@ export default function ElectronicTaxInvoicePage(props) {
 
           setCarList(responseData);
           setPagination(paginationInfo);
-          setGoodsFeeCarSummary(summaryData);
+          setCarTaxSummary(summaryData);
 
           // 서버에서 제공하는 페이지네이션 정보 사용
           setTotalPages(paginationInfo.totalPages || 1);
@@ -347,11 +398,14 @@ export default function ElectronicTaxInvoicePage(props) {
                     <button
                       className="select__toggle"
                       type="button"
-                      onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                      onClick={() => {
+                        closeAllToggles();
+                        setIsDealerSelectOpen(!isDealerSelectOpen);
+                      }}
                     >
                       <span className="select__text">
-                        {dtlDealer
-                          ? dealerList.find(d => d.USR_ID === dtlDealer)?.USR_NM || "선택"
+                        {selectedDealer
+                          ? dealerList.find(d => d.USR_ID === selectedDealer)?.USR_NM || "선택"
                           : "선택"}
                       </span>
                       <Image
@@ -365,13 +419,13 @@ export default function ElectronicTaxInvoicePage(props) {
 
                     <ul
                       className="select__menu"
-                      style={{ display: isDtlDealerSelectOpen ? "block" : "none" }}
+                      style={{ display: isDealerSelectOpen ? "block" : "none" }}
                     >
                       <li
-                        className={`select__option ${!dtlDealer ? "select__option--selected" : ""}`}
+                        className={`select__option ${!selectedDealer ? "select__option--selected" : ""}`}
                         onClick={() => {
-                          setDtlDealer("");
-                          setIsDtlDealerSelectOpen(false);
+                          setSelectedDealer("");
+                          setIsDealerSelectOpen(false);
                         }}
                       >
                         선택
@@ -379,11 +433,11 @@ export default function ElectronicTaxInvoicePage(props) {
                       {dealerList.map((dealer, index) => (
                         <li
                           key={index}
-                          className={`select__option ${dtlDealer === dealer.USR_ID ? "select__option--selected" : ""}`}
+                          className={`select__option ${selectedDealer === dealer.USR_ID ? "select__option--selected" : ""}`}
                           data-value={dealer.USR_ID}
                           onClick={() => {
-                            setDtlDealer(dealer.USR_ID);
-                            setIsDtlDealerSelectOpen(false);
+                            setSelectedDealer(dealer.USR_ID);
+                            setIsDealerSelectOpen(false);
                           }}
                         >
                           {dealer.USR_NM}
@@ -405,7 +459,10 @@ export default function ElectronicTaxInvoicePage(props) {
                         <button
                           className="select__toggle"
                           type="button"
-                          onClick={() => setIsDtGubunSelectOpen(!isDtGubunSelectOpen)}
+                          onClick={() => {
+                            closeAllToggles();
+                            setIsDtGubunSelectOpen(!isDtGubunSelectOpen);
+                          }}
                         >
                           <span className="select__text">
                             {dtGubun === "01"
@@ -504,7 +561,10 @@ export default function ElectronicTaxInvoicePage(props) {
                     >
                       <span className="ico ico--search"></span>차량검색
                     </button>
-                    <button type="button" className="jsSearchboxBtn btn btn--type02">
+                    <button type="button" 
+                      className="jsSearchboxBtn btn btn--type02"
+                      onClick={() => setIsDetailSearchOpen(!isDetailSearchOpen)}
+                    >
                       <span className="ico ico--search_detail"></span>상세조건검색
                     </button>
                   </div>
@@ -514,7 +574,7 @@ export default function ElectronicTaxInvoicePage(props) {
           </table>
   
           {/* 상세 검색 영역 */}
-          <div className="jsSearchbox searchbox">
+          <div className="jsSearchbox searchbox" style={{ display: isDetailSearchOpen ? "block" : "none" }}>
             <div className="searchbox__head">
               <h3 className="searchbox__title">상세검색</h3>
   
@@ -529,7 +589,10 @@ export default function ElectronicTaxInvoicePage(props) {
                   <button
                     className="select__toggle"
                     type="button"
-                    onClick={() => setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl)}
+                    onClick={() => {
+                      closeAllToggles();
+                      setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
+                    }}
                   >
                     <span className="select__text">{ordItemDtl === "01" ? "거래일" : ordItemDtl === "02" ? "작성일일" : "선택"}</span>
                     <Image
@@ -572,7 +635,10 @@ export default function ElectronicTaxInvoicePage(props) {
                 <button
                   className="select__toggle"
                   type="button"
-                  onClick={() => setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl)}
+                  onClick={() => {
+                    closeAllToggles();
+                    setIsOrdAscDescSelectOpenDtl(!isOrdAscDescSelectOpenDtl);
+                  }}
                 >
                   <span className="select__text">
                     {ordAscDescDtl === "desc" ? "내림차순" : ordAscDescDtl === "asc" ? "오름차순" : "선택"}
@@ -624,7 +690,10 @@ export default function ElectronicTaxInvoicePage(props) {
                   <button
                     className="select__toggle"
                     type="button"
-                    onClick={() => setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl)}
+                    onClick={() => {
+                      closeAllToggles();
+                      setIsListCountSelectOpenDtl(!isListCountSelectOpenDtl);
+                    }}
                   >
                     <span className="select__text">{listCountDtl}건씩</span>
                     <Image
@@ -717,7 +786,10 @@ export default function ElectronicTaxInvoicePage(props) {
                           <button
                             className="select__toggle"
                             type="button"
-                            onClick={() => setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen)}
+                            onClick={() => {
+                              closeAllToggles();
+                              setIsDtlDealerSelectOpen(!isDtlDealerSelectOpen);
+                            }}
                           >
                             <span className="select__text">
                               {dtlDealer
@@ -775,7 +847,10 @@ export default function ElectronicTaxInvoicePage(props) {
                           <button
                             className="select__toggle"
                             type="button"
-                            onClick={() => setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen)}
+                            onClick={() => {
+                              closeAllToggles();
+                              setIsDtlDtGubunSelectOpen(!isDtlDtGubunSelectOpen);
+                            }}
                           >
                             <span className="select__text">
                             {dtlDtGubun === "01"
@@ -945,7 +1020,10 @@ export default function ElectronicTaxInvoicePage(props) {
                             <button 
                               className="select__toggle" 
                               type="button"
-                              onClick={() => setIsDtlNmNoGubunSelectOpen(!isDtlNmNoGubunSelectOpen)}
+                              onClick={() => {
+                                closeAllToggles();
+                                setIsDtlNmNoGubunSelectOpen(!isDtlNmNoGubunSelectOpen);
+                              }}
                             >
                               <span className="select__text">
                                 {dtlNmNoGubun === "01" ? "거래처/고객명" : dtlNmNoGubun === "02" ? "사업자/주민등록번호" : "선택"}
@@ -1112,8 +1190,23 @@ export default function ElectronicTaxInvoicePage(props) {
                 </table>
   
                 <div className="searchbox__btns container__btns">
-                  <button className="jsSearchboxBtn btn btn--light" type="button">취소</button>
-                  <button className="btn btn--primary" type="button" onClick={handleDtlSearch}><span className="ico ico--search"></span>검색</button>
+                <button 
+                  className="jsSearchboxBtn btn btn--light" 
+                  type="button"
+                  onClick={() => setIsDetailSearchOpen(false)}
+                >
+                  취소
+                </button>
+                <button 
+                  className="btn btn--primary" 
+                  type="button" 
+                  onClick={() => {
+                    handleDtlSearch();
+                    setIsDetailSearchOpen(false);
+                  }}
+                >
+                  <span className="ico ico--search"></span>검색
+                </button>
                 </div>
               </form>
             </div>
@@ -1137,7 +1230,10 @@ export default function ElectronicTaxInvoicePage(props) {
                 <button 
                   className="select__toggle" 
                   type="button"
-                  onClick={() => setIsOrdItemSelectOpen(!isOrdItemSelectOpen)}
+                  onClick={() => {
+                    closeAllToggles();
+                    setIsOrdItemSelectOpen(!isOrdItemSelectOpen);
+                  }}
                 >
                   <span className="select__text">{ordItem === "01" ? "발행일" : "담당딜러"}</span>
                   <img className="select__arrow" src="/images/ico-dropdown.svg" alt="" />
@@ -1169,7 +1265,10 @@ export default function ElectronicTaxInvoicePage(props) {
                 <button 
                   className="select__toggle" 
                   type="button"
-                  onClick={() => setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen)}
+                  onClick={() => {
+                    closeAllToggles();
+                    setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen);
+                  }}
                 >
                   <span className="select__text">{ordAscDesc === "desc" ? "내림차순" : "오름차순"}</span>
                   <img className="select__arrow" src="/images/ico-dropdown.svg" alt="" />
@@ -1201,7 +1300,10 @@ export default function ElectronicTaxInvoicePage(props) {
                 <button 
                   className="select__toggle" 
                   type="button"
-                  onClick={() => setIsListCountSelectOpen(!isListCountSelectOpen)}
+                  onClick={() => {
+                    closeAllToggles();
+                    setIsListCountSelectOpen(!isListCountSelectOpen);
+                  }}
                 >
                   <span className="select__text">{listCount}건씩</span>
                   <img className="select__arrow" src="/images/ico-dropdown.svg" alt="" />

@@ -145,6 +145,8 @@ export default function OtherDealerMediationSalesPage(props) {
 
   const [searchBtn, setSearchBtn] = useState(0);
 
+  // 상세검색 영역 표시/숨김 상태
+  const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
 
   
   // 모든 토글을 닫는 함수
@@ -253,7 +255,7 @@ export default function OtherDealerMediationSalesPage(props) {
 
           setCarList(responseData);
           setPagination(paginationInfo);
-          setGoodsFeeCarSummary(summaryData);
+          setCarConcilSummary(summaryData);
 
           // 서버에서 제공하는 페이지네이션 정보 사용
           setTotalPages(paginationInfo.totalPages || 1);
@@ -306,6 +308,12 @@ export default function OtherDealerMediationSalesPage(props) {
     }
   };
 
+  useEffect(() => {
+    setPageSize(listCountDtl);
+    if (searchBtn === 1 || searchBtn === 2) handleSearch(1); // 자동 검색 비활성화
+    console.log("pageSize", pageSize);
+    console.log("listCount", listCountDtl);
+  }, [ordItem, ordAscDesc, listCount]);
 
   return (
     <main className="container container--page">
@@ -420,108 +428,113 @@ export default function OtherDealerMediationSalesPage(props) {
               </td>
               <th>검색기간</th>
               <td>
-                  <div className="input-group">
-                    <div className="select w140">
-                        <input
-                          className="select__input"
-                          type="hidden"
-                          name="searchTerm"
-                          defaultValue="알선판매일"
+                <div className="input-group">
+                  <div className="select w140">
+                      <input
+                        className="select__input"
+                        type="hidden"
+                        name="searchTerm"
+                        defaultValue="알선판매일"
+                      />
+                      <button
+                        className="select__toggle"
+                        type="button"
+                        onClick={() => {
+                          closeAllToggles();
+                          setIsDtGubunSelectOpen(!isDtGubunSelectOpen);
+                        }}
+                      >
+                        <span className="select__text">
+                          {dtGubun === "01"
+                            ? "알선판매일"
+                            : dtGubun === "02"
+                              ? "등록일" 
+                                : "알선판매일"}
+                        </span>
+                        <Image
+                          className="select__arrow"
+                          src="/images/ico-dropdown.svg"
+                          alt=""
+                          width={10}
+                          height={10}
                         />
-                        <button
-                          className="select__toggle"
-                          type="button"
+                      </button>
+
+                      <ul
+                        className="select__menu"
+                        style={{ display: isDtGubunSelectOpen ? "block" : "none" }}
+                      >
+                        <li
+                          className={`select__option ${dtGubun === "01" || !dtGubun ? "select__option--selected" : ""}`}
                           onClick={() => {
-                            closeAllToggles();
-                            setIsDtGubunSelectOpen(!isDtGubunSelectOpen);
+                            setDtGubun("01");
+                            setIsDtGubunSelectOpen(false);
                           }}
                         >
-                          <span className="select__text">
-                            {dtGubun === "01"
-                              ? "알선판매일"
-                              : dtGubun === "02"
-                                ? "등록일" 
-                                  : "알선판매일"}
-                          </span>
-                          <Image
-                            className="select__arrow"
-                            src="/images/ico-dropdown.svg"
-                            alt=""
-                            width={10}
-                            height={10}
-                          />
-                        </button>
-
-                        <ul
-                          className="select__menu"
-                          style={{ display: isDtGubunSelectOpen ? "block" : "none" }}
+                          알선판매일
+                        </li>
+                        <li
+                          className={`select__option ${dtGubun === "02" ? "select__option--selected" : ""}`}
+                          onClick={() => {
+                            setDtGubun("02");
+                            setIsDtGubunSelectOpen(false);
+                          }}
                         >
-                          <li
-                            className={`select__option ${dtGubun === "01" || !dtGubun ? "select__option--selected" : ""}`}
-                            onClick={() => {
-                              setDtGubun("01");
-                              setIsDtGubunSelectOpen(false);
-                            }}
-                          >
-                            알선판매일
-                          </li>
-                          <li
-                            className={`select__option ${dtGubun === "02" ? "select__option--selected" : ""}`}
-                            onClick={() => {
-                              setDtGubun("02");
-                              setIsDtGubunSelectOpen(false);
-                            }}
-                          >
-                            등록일
-                          </li>
-                        </ul>
-                    </div>
-
-                    <div className="input w140">
-                      <input
-                        type="text"
-                        className="jsStartDate input__field input__field--date"
-                        placeholder="시작일"
-                        autoComplete="off"
-                        value={startDt}
-                        onChange={e => setStartDt(e.target.value)}
-                      />
-                    </div>
-                    <span className="input-group__dash">-</span>
-                    <div className="input w140">
-                      <input
-                        type="text"
-                        className="jsEndDate input__field input__field--date"
-                        placeholder="종료일"
-                        autoComplete="off"
-                        value={endDt}
-                        onChange={e => setEndDt(e.target.value)}
-                      />
-                    </div>
-
-                    {/* disabled 속성 제거 시, 활성화 상태 적용 */}
-                    <button
-                      type="button"
-                      className="btn btn--type03"
-                      onClick={() => {
-                        setSearchBtn(1);
-                        handleSearch(1);
-                      }}
-                      disabled={loading}
-                    >
-                      <span className="ico ico--search"></span>차량검색
-                    </button>
-                    <button type="button" className="jsSearchboxBtn btn btn--type02">
-                      <span className="ico ico--search_detail"></span>상세조건검색
-                    </button>
+                          등록일
+                        </li>
+                      </ul>
                   </div>
-                </td>
+
+                  <div className="input w140">
+                    <input
+                      type="text"
+                      className="jsStartDate input__field input__field--date"
+                      placeholder="시작일"
+                      autoComplete="off"
+                      value={startDt}
+                      onChange={e => setStartDt(e.target.value)}
+                    />
+                  </div>
+                  <span className="input-group__dash">-</span>
+                  <div className="input w140">
+                    <input
+                      type="text"
+                      className="jsEndDate input__field input__field--date"
+                      placeholder="종료일"
+                      autoComplete="off"
+                      value={endDt}
+                      onChange={e => setEndDt(e.target.value)}
+                    />
+                  </div>
+
+                  {/* disabled 속성 제거 시, 활성화 상태 적용 */}
+                  <button
+                    type="button"
+                    className="btn btn--type03"
+                    onClick={() => {
+                      setSearchBtn(1);
+                      handleSearch(1);
+                    }}
+                    disabled={loading}
+                  >
+                    <span className="ico ico--search"></span>차량검색
+                  </button>
+                  <button 
+                    type="button" 
+                    className="jsSearchboxBtn btn btn--type02"
+                    onClick={() => setIsDetailSearchOpen(!isDetailSearchOpen)}
+                  >
+                    <span className="ico ico--search_detail"></span>
+                    상세조건검색
+                  </button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
 
         {/* 상세 검색 영역 */}
-        <div className="jsSearchbox searchbox">
+        <div className="jsSearchbox searchbox" style={{ display: isDetailSearchOpen ? "block" : "none" }}>
           <div className="searchbox__head">
             <h3 className="searchbox__title">상세검색</h3>
 
@@ -936,10 +949,21 @@ export default function OtherDealerMediationSalesPage(props) {
               </table>
 
               <div className="searchbox__btns container__btns">
-                <button className="jsSearchboxBtn btn btn--light" type="button">
+                <button 
+                  className="jsSearchboxBtn btn btn--light" 
+                  type="button"
+                  onClick={() => setIsDetailSearchOpen(false)}
+                >
                   취소
                 </button>
-                <button className="btn btn--primary" type="button" onClick={handleDtlSearch}>
+                <button 
+                  className="btn btn--primary" 
+                  type="button" 
+                  onClick={() => {
+                    handleDtlSearch();
+                    setIsDetailSearchOpen(false);
+                  }}
+                >
                   <span className="ico ico--search"></span>검색
                 </button>
               </div>
@@ -1124,7 +1148,7 @@ export default function OtherDealerMediationSalesPage(props) {
                     </button>
                     <ul className="select__menu">
                       <li className="select__option">
-                        <Link href="/car-concil/modify">알선매출 수정</Link>
+                        <Link href={`/car-concil/edit/${car.BRK_SEQ}`}>알선매출 수정</Link>
                       </li>
                       <li className="select__option">
                         <a

@@ -124,7 +124,7 @@ export default function ListPage(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCountDtl);
-    handleSearch(1);
+    if (searchBtn === 1 || searchBtn === 2) handleSearch(1);
     console.log("pageSize", pageSize);
     console.log("listCount", listCountDtl);
   }, [ordItemDtl, ordAscDescDtl, listCountDtl]);
@@ -1430,7 +1430,7 @@ export default function ListPage(props) {
             <span className="ico ico--add"></span>매입차량 직접등록
           </button>
           <div className="input-group">
-            {/* 딜러명 */}
+            {/* 정렬 항목 */}
             <div className="select select--dark w160">
               <input className="select__input" type="hidden" name="dealer" defaultValue="제시일" />
               <button

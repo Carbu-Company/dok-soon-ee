@@ -86,7 +86,7 @@ export default function ProductCostList(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCount);
-    handleSearch(1);
+    if (searchBtn === 1 || searchBtn === 2) handleSearch(1);
     console.log("pageSize", pageSize);
     console.log("listCount", listCount);
   }, [ordItem, ordAscDesc, listCount]);
@@ -1235,7 +1235,7 @@ export default function ProductCostList(props) {
                           </span>
                           <img
                             className="select__arrow"
-                            src="../assets/images/ico-dropdown.svg"
+                            src="/images/ico-dropdown.svg"
                             alt=""
                           />
                         </button>

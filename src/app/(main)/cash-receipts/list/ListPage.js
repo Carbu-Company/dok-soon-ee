@@ -90,7 +90,7 @@ props
   // 페이지 정렬 순서 항목
 
   // 정렬순서 항목
-  const [ordItemDtl, setOrdItemDtl] = useState("발행일");
+  const [ordItemDtl, setOrdItemDtl] = useState("01");
   useEffect(() => {
     setOrdItem(ordItemDtl);
   }, [ordItemDtl]);
@@ -264,7 +264,7 @@ props
           const summaryData = result.data?.summary || [];
 
           console.log('응답 데이터:', {
-            responseDataLength: result.data?.list?.carlist?.length,
+            responseDataLength: result,
             paginationInfo,
             summaryData
           });
@@ -400,7 +400,7 @@ props
                     className="select__input"
                     type="hidden"
                     name="dealer"
-                    defaultValue="선택1"
+                    defaultValue="선택"
                   />
                   <button
                     className="select__toggle"
@@ -590,7 +590,7 @@ props
                   setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
                 }}
               >
-                  <span className="select__text">{ordItemDtl || "발행일"}</span>
+                  <span className="select__text">{ordItemDtl === "01" ? "발행일" : ordItemDtl}</span>
                   <Image
                   className="select__arrow"
                   src="/images/ico-dropdown.svg"
@@ -1240,19 +1240,49 @@ props
             <span className="ico ico--add"></span>건별 발행 등록
           </button>
           <div className="input-group">
-            {/* 정렬항목 */}
+            {/* 정렬 항목 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="발행일" />
-              <button className="select__toggle" type="button">
-                <span className="select__text">발행일</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+              <input className="select__input" type="hidden" name="dealer" defaultValue="제시일" />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdItemSelectOpen(!isOrdItemSelectOpen);
+                }}
+              >
+                <span className="select__text">{ordItem === "01" ? "발행일" : ordItem}</span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
-              <ul className="select__menu">
-                <li className="select__option select__option--selected" data-value="발행일">
+              <ul
+                className="select__menu"
+                style={{ display: isOrdItemSelectOpen ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${ordItem === "01" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("01");
+                    setIsOrdItemSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   발행일
                 </li>
-                <li className="select__option" data-value="담당딜러">
+                <li
+                  className={`select__option ${ordItem === "02" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdItem("02");
+                    setIsOrdItemSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   담당딜러
                 </li>
               </ul>
@@ -1261,16 +1291,48 @@ props
             {/* 정렬순서 */}
             <div className="select select--dark w160">
               <input className="select__input" type="hidden" name="dealer" defaultValue="desc" />
-              <button className="select__toggle" type="button">
-                <span className="select__text">내림차순</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => {
+                  closeAllToggles();
+                  setIsOrdAscDescSelectOpen(!isOrdAscDescSelectOpen);
+                }}
+              >
+                <span className="select__text">
+                  {ordAscDesc === "desc" ? "내림차순" : "오름차순"}
+                </span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
-              <ul className="select__menu">
-                <li className="select__option select__option--selected" data-value="desc">
+              <ul
+                className="select__menu"
+                style={{ display: isOrdAscDescSelectOpen ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${ordAscDesc === "desc" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdAscDesc("desc");
+                    setIsOrdAscDescSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   내림차순
                 </li>
-                <li className="select__option" data-value="asc">
+                <li
+                  className={`select__option ${ordAscDesc === "asc" ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setOrdAscDesc("asc");
+                    setIsOrdAscDescSelectOpen(false);
+                    handleSearch(1);
+                  }}
+                >
                   오름차순
                 </li>
               </ul>
@@ -1278,20 +1340,59 @@ props
 
             {/* 건수 */}
             <div className="select select--dark w160">
-              <input className="select__input" type="hidden" name="dealer" defaultValue="10" />
-              <button className="select__toggle" type="button">
-                <span className="select__text">10건씩</span>
-                <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
+              <input
+                className="select__input"
+                type="hidden"
+                name="dealer"
+                defaultValue={listCount}
+              />
+              <button
+                className="select__toggle"
+                type="button"
+                onClick={() => {
+                  closeAllToggles();
+                  setIsListCountSelectOpen(!isListCountSelectOpen);
+                }}
+              >
+                <span className="select__text">{listCount}건씩</span>
+                <Image
+                  className="select__arrow"
+                  src="/images/ico-dropdown.svg"
+                  alt=""
+                  width={10}
+                  height={10}
+                />
               </button>
 
-              <ul className="select__menu">
-                <li className="select__option select__option--selected" data-value="10">
+              <ul
+                className="select__menu"
+                style={{ display: isListCountSelectOpen ? "block" : "none" }}
+              >
+                <li
+                  className={`select__option ${listCount === 10 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCount(10);
+                    setIsListCountSelectOpen(false);
+                  }}
+                >
                   10건씩
                 </li>
-                <li className="select__option" data-value="30">
+                <li
+                  className={`select__option ${listCount === 30 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCount(30);
+                    setIsListCountSelectOpen(false);
+                  }}
+                >
                   30건씩
                 </li>
-                <li className="select__option" data-value="50">
+                <li
+                  className={`select__option ${listCount === 50 ? "select__option--selected" : ""}`}
+                  onClick={() => {
+                    setListCount(50);
+                    setIsListCountSelectOpen(false);
+                  }}
+                >
                   50건씩
                 </li>
               </ul>

@@ -1101,7 +1101,7 @@ export default function ProductCostList(props) {
                           </span>
                           <img
                             className="select__arrow"
-                            src="../assets/images/ico-dropdown.svg"
+                            src="/images/ico-dropdown.svg"
                             alt=""
                           />
                         </button>

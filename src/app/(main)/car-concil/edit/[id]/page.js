@@ -25,7 +25,12 @@ export default async function EditorPage({ params }) {
   const carKndList = await getCDList('92');   // 차량 종류 코드 목록
 
   const { id } = await params;
+
+  console.log('id', id);
   const carConcilDetail = await getCarConcilDetail(id);
+
+
+  //console.log('carConcilDetail', carConcilDetail);
 
   // 차량 등록 번호
   /** 
