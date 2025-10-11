@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import ListPage from "@/app/(main)/bank-account/list/ListPage";
-import { getCarAcctList, getCarAcctSummary } from "./api";
+import { getCarAcctList, getCarAcctSummary, getAgentAcctList } from "./api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
 // Server Action 정의
@@ -92,27 +92,31 @@ export default async function CarAcctList() {
     dtGubun: '',  
     startDt: '',  
     endDt: '',  
-    dtlCustomerName: '', 
-    dtlCustGubun: '', 
-    dtlEvdcGubun: '', 
-    dtlPrsnGubun: '', 
-    dtlOwnerBrno: '', 
-    dtlOwnerSsn: '', 
-    dtlCtshNo: '' , 
-    dtlCarNoBefore: '', 
-    orderItem: '제시일', 
+    dtlCarNm: '',
+    dtlTradeSctNm: '',
+    dtlTradeItemCd: '',
+    dtlAgentAcct: '',
+    dtlTradeMemo: '',
+    dtlDtlMemo: '',
+    orderItem: '01', 
     ordAscDesc: 'desc'
   };
 
   const carAcctList = await searchCarAcctList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
+  const tradeInItemCDList = await getCDList('80');   // 거래항목 코드 목록
+  const tradeOutItemCDList = await getCDList('81');   // 거래항목 코드 목록
+  const agentAcctList = await getAgentAcctList(session.agentId);
   const carAcctSummary = await searchCarAcctSummary({ ...defaultParams, ...searchParams });
 
   return <ListPage session={session}
                    carList={carAcctList}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
+                   tradeInItemCDList={tradeInItemCDList.data}
+                   tradeOutItemCDList={tradeOutItemCDList.data}
+                   agentAcctList={agentAcctList.data}
                    searchAction={searchCarAcctListAndSummary}
                    carSummary={carAcctSummary}
    />;

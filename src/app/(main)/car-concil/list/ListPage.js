@@ -342,10 +342,10 @@ export default function OtherDealerMediationSalesPage(props) {
     setDtlBrkMemo("");
 
     // 정렬 옵션 초기화
-    setOrdItem("매도(판매)일");
+    setOrdItem("알선판매일");
     setOrdAscDesc("desc");
     setListCount(10);
-    setOrdItemDtl("매도(판매)일");
+    setOrdItemDtl("알선판매일");
     setOrdAscDescDtl("desc");
     setListCountDtl(10);
 

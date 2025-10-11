@@ -30,3 +30,18 @@ export const getCarAcctList = async (params) => {
     }
   };
   
+  /** 계좌 정보 조회 */
+  export const getAgentAcctList = async (carAgent) => {
+    try {
+        const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getAgentAcctList?carAgent=${carAgent}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+        }).then(res => res.json());
+        return { success: true, data, error: null };
+    } catch (error) {
+        console.error("getAgentAcctList Error:", error);
+        return { success: false, data: [], error: error.message };
+    }
+  };
