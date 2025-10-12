@@ -1324,6 +1324,13 @@ export default function SalesRegisterPage({
                 </td>
                 <td>
                   <div className="input">
+                  <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="우편번호"
+                      value={customer.zip}
+                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'zip', e.target.value)}
+                    />
                     <input 
                       type="text" 
                       className="input__field" 
@@ -1340,6 +1347,7 @@ export default function SalesRegisterPage({
                         주소
                       </button>
                     </div>
+                    <button className="btn btn--dark" type="button">검색</button>
                   </div>
                 </td>
                 <td>
