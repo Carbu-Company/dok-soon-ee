@@ -1161,7 +1161,7 @@ export default function BankCashLedgerPage(props) {
                   type="button"
                   className="btn btn--light btn--sm"
                   onClick={() => {
-                    if (typeof window !== 'undefined') window.location.href = 'm8_w.jsp';
+                    router.push('/bank-account/register');
                   }}
                 >
                   상세등록
