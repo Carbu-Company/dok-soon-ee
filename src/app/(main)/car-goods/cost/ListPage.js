@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
-import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
+import CarSearchModal from "@/components/modal/CarSearchModal";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import Image from "next/image";
 

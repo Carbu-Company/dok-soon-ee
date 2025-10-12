@@ -5,8 +5,13 @@ import { useRouter } from 'next/navigation';
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber, handleImageUpload } from '@/lib/util.js'
 import { getAcqTax } from '@/app/(main)/common/script.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
+import CarSearchModal from "@/components/modal/CarSearchModal"
 
-export default function RegPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = []}) {
+export default function RegPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = [], carPurDetail = [] }) {
+
+  // 차량 검색 모달 관련 상태
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCar, setSelectedCar] = useState(null);
 
   // 매입딜러 선택 상태 관리 (콤보 박스)
   const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
@@ -32,6 +37,17 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
   const [purAmt, setPurAmt] = useState('0');
   const [purSupPrc, setPurSupPrc] = useState('0');
   const [purVat, setPurVat] = useState('0');
+
+  // 페이지 로드 시 모달 자동 열기 (한 번만 실행)
+  useEffect(() => {
+    // 차량 정보가 없으면 모달을 자동으로 열기 (페이지 로드 시에만)
+    if (!carPurDetail || !carPurDetail.CAR_REG_ID) {
+      console.log('차량 정보 없음 - 모달 열기');
+      setIsModalOpen(true);
+    } else {
+      console.log('차량 정보 있음 - 모달 열지 않음');
+    }
+  }, []); // 빈 의존성 배열로 변경하여 한 번만 실행
 
   // 매입금액이 변경될 때 공급가액과 부가세 계산
   useEffect(() => {
@@ -179,6 +195,21 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
   }, [prsnSctCd, purAmt, carKndCd]);
 
   const router = useRouter();
+
+  // 차량 선택 핸들러
+  const handleCarSelect = (car) => {
+    console.log('선택된 차량:', car);
+    setSelectedCar(car);
+    setIsModalOpen(false);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCarSearchClick = () => {
+    setIsModalOpen(true);
+  };
 
   // 주소 검색 핸들러
   const handleAddressSearch = () => {
@@ -433,6 +464,48 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
           <p className="guidebox__title">도움말</p>
           <p className="guidebox__desc">도움말 안내 텍스트 문구가 들어갑니다. 도움말 안내 텍스트 문구가 들어갑니다. 도움말 안내 텍스트 문구가 들어갑니다. 도움말 안내 텍스트 문구가 들어갑니다. 도움말 안내 텍스트 문구가 들어갑니다.</p>
         </div>
+      </div>
+
+      <div className="table-wrap">
+        <div className="table-wrap__head">
+          <h2 className="table-wrap__title">기준차량</h2>
+          <button
+            className="btn btn--dark btn--padding--r20"
+            type="button"
+            id="openBtn"
+            onClick={handleCarSearchClick}
+          >
+            <span className="ico ico--add"></span>차량검색
+          </button>
+        </div>
+        <table className="table">
+          <colgroup>
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "auto" }} />
+          </colgroup>
+          <tbody>
+            <tr>
+              <th>제시구분</th>
+              <td>{selectedCar?.CAR_STAT_NM || (carPurDetail && carPurDetail.CAR_STAT_NM) || ""}</td>
+              <th>차량번호</th>
+              <td>{selectedCar?.CAR_NO || (carPurDetail && carPurDetail.CAR_NO) || ""}</td>
+              <th>매입딜러</th>
+              <td>{selectedCar?.DLR_NM || (carPurDetail && carPurDetail.DLR_NM) || ""}</td>
+              <th>차량명</th>
+              <td>{selectedCar?.CAR_NM || (carPurDetail && carPurDetail.CAR_NM) || ""}</td>
+              <th>매입일</th>
+              <td>{selectedCar?.CAR_PUR_DT || (carPurDetail && carPurDetail.CAR_PUR_DT) || ""}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div className="table-wrap">
@@ -1455,6 +1528,14 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
         <button className="btn btn--primary" type="button">확인</button>
       </div>
       */}
+
+      {/* 차량 검색 모달 */}
+      <CarSearchModal 
+        open={isModalOpen} 
+        onClose={handleModalClose} 
+        onCarSelect={handleCarSelect}
+        agentId={session}
+      />
     </main>
   );
 }

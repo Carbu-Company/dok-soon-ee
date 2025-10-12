@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from 'next/navigation';
-import CarSearchModal from "@/components/modal/CarGoodsRegisterModal";
+import CarSearchModal from "@/components/modal/CarSearchModal";
 
 export default function SalesRegisterPage(
 

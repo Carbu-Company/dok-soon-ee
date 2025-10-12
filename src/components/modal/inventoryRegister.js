@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 
-export default function CarGoodsRegisterModal({ open, onClose, onSelect }) {
+export default function CarSearchModal({ open, onClose, onSelect }) {
   if (!open) return null;
 
   const handleClose = () => {

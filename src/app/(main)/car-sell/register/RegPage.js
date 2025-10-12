@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from 'next/navigation';
-import CarSearchModal from "@/components/modal/CarGoodsRegisterModal";
+import CarSearchModal from "@/components/modal/CarSearchModal";
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 import { getAcqTax } from '@/app/(main)/common/script.js'
@@ -31,8 +31,7 @@ const TAX_RECEIPT_STATUS = {
   NOT_APPLICABLE: 'E' // 해당없음
 };
 
-export default function SalesRegisterPage(
-
+export default function SalesRegisterPage({
   session, 
   dealerList = [], 
   carKndList = [], 
@@ -40,8 +39,7 @@ export default function SalesRegisterPage(
   parkingLocationList = [], 
   sellTpList = [],
   carPurDetail = []
-  
-) {
+}) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
@@ -53,32 +51,28 @@ export default function SalesRegisterPage(
     if (typeof window !== "undefined") {
       const urlParams = new URLSearchParams(window.location.search);
       const openModal = urlParams.get("openModal");
-      const carId = urlParams.get("carId");
 
       if (openModal === "true") {
         setIsModalOpen(true);
-        if (carId) {
-          setSelectedCarId(carId);
-        }
       }
     }
   }, []);
 
-  // 페이지 로드 시 모달 자동 열기
+  // 페이지 로드 시 모달 자동 열기 (한 번만 실행)
   useEffect(() => {
     console.log('=== RegPage useEffect 실행 ===');
     console.log('session:', session);
     console.log('session?.agentId:', session?.agentId);
     console.log('carPurDetail:', carPurDetail);
     
-    // 차량 정보가 없으면 모달을 자동으로 열기
+    // 차량 정보가 없으면 모달을 자동으로 열기 (페이지 로드 시에만)
     if (!carPurDetail || !carPurDetail.CAR_REG_ID) {
       console.log('차량 정보 없음 - 모달 열기');
       setIsModalOpen(true);
     } else {
       console.log('차량 정보 있음 - 모달 열지 않음');
     }
-  }, [carPurDetail]);
+  }, []); // 빈 의존성 배열로 변경하여 한 번만 실행
 
 
   // 차량 선택 핸들러
@@ -90,13 +84,6 @@ export default function SalesRegisterPage(
   
 
   const handleModalClose = () => {
-    // 차량이 선택되지 않았고 기존 차량 정보도 없으면 경고
-    if (!selectedCar && (!carPurDetail || !carPurDetail.CAR_REG_ID)) {
-      const confirmClose = window.confirm("차량을 선택하지 않으면 상품화비용을 등록할 수 없습니다. 정말 닫으시겠습니까?");
-      if (!confirmClose) {
-        return; // 사용자가 취소하면 모달을 닫지 않음
-      }
-    }
     setIsModalOpen(false);
   };
 
@@ -211,18 +198,18 @@ export default function SalesRegisterPage(
   const [isFctCndcYnOpen, setIsFctCndcYnOpen] = useState(false);
 
   // ===== 기본 정보 상태 =====
-  const [dealerId, setDealerId] = useState(carPurDetail.DLR_ID || '');
-  const [carKndCd, setCarKndCd] = useState(carPurDetail.CAR_KND_CD || '');
-  const [evdcCd, setEvdcCd] = useState(carPurDetail.PUR_EVDC_CD || '');
-  const [parkingCd, setParkingCd] = useState(carPurDetail.PARK_ZON_CD || '');
-  const [prsnSctCd, setPrsnSctCd] = useState(carPurDetail.PRSN_SCT_CD || PRESENTATION_TYPE.COMPANY_PURCHASE);
+  const [dealerId, setDealerId] = useState(carPurDetail?.DLR_ID || '');
+  const [carKndCd, setCarKndCd] = useState(carPurDetail?.CAR_KND_CD || '');
+  const [evdcCd, setEvdcCd] = useState(carPurDetail?.PUR_EVDC_CD || '');
+  const [parkingCd, setParkingCd] = useState(carPurDetail?.PARK_ZON_CD || '');
+  const [prsnSctCd, setPrsnSctCd] = useState(carPurDetail?.PRSN_SCT_CD || PRESENTATION_TYPE.COMPANY_PURCHASE);
 
   // ===== 금액 관련 상태 =====
   const [purAmt, setPurAmt] = useState(carPurDetail?.PUR_AMT ? carPurDetail.PUR_AMT.toString() : '0');
-  const [purSupPrc, setPurSupPrc] = useState(carPurDetail.PUR_SUP_PRC || 0);
-  const [purVat, setPurVat] = useState(carPurDetail.PUR_VAT || 0);
-  const [agentPurCst, setAgentPurCst] = useState(carPurDetail.AGENT_PUR_CST || '0');
-  const [gainTax, setGainTax] = useState(carPurDetail.GAIN_TAX || '0');
+  const [purSupPrc, setPurSupPrc] = useState(carPurDetail?.PUR_SUP_PRC || 0);
+  const [purVat, setPurVat] = useState(carPurDetail?.PUR_VAT || 0);
+  const [agentPurCst, setAgentPurCst] = useState(carPurDetail?.AGENT_PUR_CST || '0');
+  const [gainTax, setGainTax] = useState(carPurDetail?.GAIN_TAX || '0');
 
   // 매입금액이 변경될 때 공급가액과 부가세 계산
   useEffect(() => {
@@ -256,41 +243,41 @@ export default function SalesRegisterPage(
   }, [purAmt]); // purSupPrc, purVat 제거하여 무한 루프 방지
 
   // ===== 날짜 관련 상태 =====
-  const [carPurDt, setCarPurDt] = useState(carPurDetail.CAR_PUR_DT || '');
-  const [brokerageDate, setBrokerageDate] = useState(carPurDetail.AGENT_PUR_CST_PAY_DT || '');
-  const [carRegDt, setCarRegDt] = useState(carPurDetail.CAR_REG_DT || '');
-  const [txblIssuDt, setTxblIssuDt] = useState(carPurDetail.TXBL_ISSU_DT || '');
+  const [carPurDt, setCarPurDt] = useState(carPurDetail?.CAR_PUR_DT || '');
+  const [brokerageDate, setBrokerageDate] = useState(carPurDetail?.AGENT_PUR_CST_PAY_DT || '');
+  const [carRegDt, setCarRegDt] = useState(carPurDetail?.CAR_REG_DT || '');
+  const [txblIssuDt, setTxblIssuDt] = useState(carPurDetail?.TXBL_ISSU_DT || '');
 
   // ===== 차량 정보 상태 =====
-  const [carNm, setCarNm] = useState(carPurDetail.CAR_NM || '');
-  const [carNo, setCarNo] = useState(carPurDetail.CAR_NO || '');
-  const [purBefCarNo, setPurBefCarNo] = useState(carPurDetail.PUR_BEF_CAR_NO || '');
+  const [carNm, setCarNm] = useState(carPurDetail?.CAR_NM || '');
+  const [carNo, setCarNo] = useState(carPurDetail?.CAR_NO || '');
+  const [purBefCarNo, setPurBefCarNo] = useState(carPurDetail?.PUR_BEF_CAR_NO || '');
 
   // ===== 고객 정보 상태 =====
-  const [ownrNm, setOwnrNm] = useState(carPurDetail.OWNR_NM || '');
-  const [ownrTpCd, setOwnrTpCd] = useState(carPurDetail.OWNR_TP_CD || OWNER_TYPE.INDIVIDUAL);
-  const [ctshNo, setCtshNo] = useState(carPurDetail.CTSH_NO || '');
-  const [ownrSsn, setOwnrSsn] = useState(carPurDetail.OWNR_SSN || '');
-  const [ownrPhon, setOwnrPhon] = useState(carPurDetail.OWNR_PHON || '');
-  const [ownrBrno, setOwnrBrno] = useState(carPurDetail.OWNR_BRNO || '');
+  const [ownrNm, setOwnrNm] = useState(carPurDetail?.OWNR_NM || '');
+  const [ownrTpCd, setOwnrTpCd] = useState(carPurDetail?.OWNR_TP_CD || OWNER_TYPE.INDIVIDUAL);
+  const [ctshNo, setCtshNo] = useState(carPurDetail?.CTSH_NO || '');
+  const [ownrSsn, setOwnrSsn] = useState(carPurDetail?.OWNR_SSN || '');
+  const [ownrPhon, setOwnrPhon] = useState(carPurDetail?.OWNR_PHON || '');
+  const [ownrBrno, setOwnrBrno] = useState(carPurDetail?.OWNR_BRNO || '');
 
   // ===== 이메일 정보 상태 =====
-  const [ownrEmail, setOwnrEmail] = useState(carPurDetail.OWNR_EMAIL || '');
-  const [emailDomain, setEmailDomain] = useState(carPurDetail.OWNR_EMAIL_DOMAIN || '');
+  const [ownrEmail, setOwnrEmail] = useState(carPurDetail?.OWNR_EMAIL || '');
+  const [emailDomain, setEmailDomain] = useState(carPurDetail?.OWNR_EMAIL_DOMAIN || '');
 
   // ===== 주소 정보 상태 =====
-  const [ownrZip, setOwnrZip] = useState(carPurDetail.OWNR_ZIP || '');
-  const [ownrAddr1, setOwnrAddr1] = useState(carPurDetail.OWNR_ADDR1 || '');
-  const [ownrAddr2, setOwnrAddr2] = useState(carPurDetail.OWNR_ADDR2 || '');
+  const [ownrZip, setOwnrZip] = useState(carPurDetail?.OWNR_ZIP || '');
+  const [ownrAddr1, setOwnrAddr1] = useState(carPurDetail?.OWNR_ADDR1 || '');
+  const [ownrAddr2, setOwnrAddr2] = useState(carPurDetail?.OWNR_ADDR2 || '');
 
   // ===== 세금 및 서류 관련 상태 =====
-  const [txblRcvYn, setTxblRcvYn] = useState(carPurDetail.TXBL_RCV_YN || '');
-  const [fctCndcYn, setFctCndcYn] = useState(carPurDetail.FCT_CNDC_YN || '');
+  const [txblRcvYn, setTxblRcvYn] = useState(carPurDetail?.TXBL_RCV_YN || '');
+  const [fctCndcYn, setFctCndcYn] = useState(carPurDetail?.FCT_CNDC_YN || '');
 
   // ===== 기타 정보 상태 =====
-  const [purDesc, setPurDesc] = useState(carPurDetail.PUR_DESC || '');
-  const [parkingLocationDesc, setParkingLocationDesc] = useState(carPurDetail.PARK_ZON_DESC || '');
-  const [parkKeyNo, setParkKeyNo] = useState(carPurDetail.PARK_KEY_NO || '');
+  const [purDesc, setPurDesc] = useState(carPurDetail?.PUR_DESC || '');
+  const [parkingLocationDesc, setParkingLocationDesc] = useState(carPurDetail?.PARK_ZON_DESC || '');
+  const [parkKeyNo, setParkKeyNo] = useState(carPurDetail?.PARK_KEY_NO || '');
   const [attachedFiles, setAttachedFiles] = useState([]);
 
   // ===== UI 상태 =====
@@ -2369,6 +2356,14 @@ export default function SalesRegisterPage(
           매입정보 수정
         </button>
       </div>
+
+      {/* 차량 검색 모달 */}
+      <CarSearchModal 
+        open={isModalOpen} 
+        onClose={handleModalClose} 
+        onCarSelect={handleCarSelect}
+        agentId={session}
+      />
     </main>
   );
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
-import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
+import CarSearchModal from "@/components/modal/CarSearchModal";
 import Image from "next/image";
 
 export default function CashReceiptList(

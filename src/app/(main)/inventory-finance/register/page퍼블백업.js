@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import CarGoodsRegisterModal from "@/components/modal/inventoryRegister";
+import CarSearchModal from "@/components/modal/inventoryRegister";
 
 export default function InventoryFinanceRegisterPage() {
   const router = useRouter();
@@ -384,7 +384,7 @@ export default function InventoryFinanceRegisterPage() {
         */}
 
       {/* 차량 선택 모달 */}
-      <CarGoodsRegisterModal
+      <CarSearchModal
         open={isModalOpen}
         onClose={handleModalClose}
         onSelect={handleCarSelect}

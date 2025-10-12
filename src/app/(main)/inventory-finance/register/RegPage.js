@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import CarGoodsRegisterModal from "@/components/modal/inventoryRegister";
+import CarSearchModal from "@/components/modal/CarSearchModal";
 
 export default function InventoryFinanceRegisterPage({ session = null, carPurDetail = [], dealerList = [], loanCompList = [] }) {
   const router = useRouter();
@@ -62,6 +62,7 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
   };
 
   const handleCarSelect = carData => {
+    console.log('선택된 차량:', carData);
     setSelectedCar(carData);
     setIsModalOpen(false);
     router.replace("/inventory-finance/register");
@@ -532,10 +533,11 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
         */}
 
       {/* 차량 선택 모달 */}
-      <CarGoodsRegisterModal
+      <CarSearchModal
         open={isModalOpen}
         onClose={handleModalClose}
-        onSelect={handleCarSelect}
+        onCarSelect={handleCarSelect}
+        agentId={session}
       />
     </main>
   );

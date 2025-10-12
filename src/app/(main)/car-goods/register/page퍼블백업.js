@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
+import CarSearchModal from "@/components/modal/CarSearchModal";
 import Image from "next/image";
 
 export default function ProductCostRegisterPage() {
@@ -366,7 +366,7 @@ export default function ProductCostRegisterPage() {
       </div>
 
       {/* 차량 검색 모달 */}
-      <CarGoodsRegisterModal open={isModalOpen} onClose={handleModalClose} />
+      <CarSearchModal open={isModalOpen} onClose={handleModalClose} />
     </main>
   );
 }

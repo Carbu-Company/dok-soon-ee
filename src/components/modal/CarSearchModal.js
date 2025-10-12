@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getCarPurList, getDealerList } from "../../app/(main)/api/carApi";
 
-export default function CarGoodsRegisterModal({ open, onClose, onCarSelect, agentId }) {
+export default function CarSearchModal({ open, onClose, onCarSelect, agentId }) {
   const [carList, setCarList] = useState([]);
   const [dealerList, setDealerList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -25,12 +25,9 @@ export default function CarGoodsRegisterModal({ open, onClose, onCarSelect, agen
     if (onClose) onClose();
   };
 
-  // 취소 버튼 핸들러 - 차량 선택 확인 메시지 표시
+  // 취소 버튼 핸들러
   const handleCancel = () => {
-    const confirmMessage = "차량을 선택하지 않으면 상품화비용을 등록할 수 없습니다. 정말 닫으시겠습니까?";
-    if (window.confirm(confirmMessage)) {
-      if (onClose) onClose();
-    }
+    if (onClose) onClose();
   };
 
   // 초기 데이터 로드
@@ -43,6 +40,10 @@ export default function CarGoodsRegisterModal({ open, onClose, onCarSelect, agen
   // 딜러 리스트 로드
   const loadDealerList = async () => {
     try {
+      if (!agentId || !agentId.agentId) {
+        console.error("agentId가 없습니다:", agentId);
+        return;
+      }
       const response = await getDealerList(agentId.agentId);
       if (response.success && response.data) {
         setDealerList(response.data || []);
@@ -68,6 +69,10 @@ export default function CarGoodsRegisterModal({ open, onClose, onCarSelect, agen
   // 차량 목록 로드
   const loadCarList = async (params = {}) => {
     try {
+      if (!agentId || !agentId.agentId) {
+        console.error("agentId가 없습니다:", agentId);
+        return;
+      }
       // 딜러 필터링을 위해 서버에서는 딜러 파라미터를 제거하고 모든 데이터를 가져옴
       const payload = {
         carAgent: agentId.agentId, // 세션에서 carAgent 가져오기
@@ -170,17 +175,9 @@ export default function CarGoodsRegisterModal({ open, onClose, onCarSelect, agen
       if (onCarSelect) {
         onCarSelect(selectedCar);
       }
-      if (onClose) {
-        onClose();
-      }
-    } else {
-      // 차량이 선택되지 않은 경우 - 알림 표시
-      const confirmMessage = "차량을 선택하지 않으면 상품화비용을 등록할 수 없습니다. 정말 닫으시겠습니까?";
-      if (window.confirm(confirmMessage)) {
-        if (onClose) {
-          onClose();
-        }
-      }
+    }
+    if (onClose) {
+      onClose();
     }
   };
 
@@ -192,6 +189,7 @@ export default function CarGoodsRegisterModal({ open, onClose, onCarSelect, agen
       role="dialog"
       aria-modal="true"
       aria-labelledby="car-goods-register-modal-title"
+      style={{ zIndex: 10000 }}
     >
       <div className="modal__container">
         <div className="modal__header">

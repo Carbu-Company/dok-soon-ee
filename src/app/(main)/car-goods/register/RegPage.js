@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from 'next/navigation';
-import CarGoodsRegisterModal from "@/components/modal/CarGoodsRegisterModal";
+import CarSearchModal from "@/components/modal/CarSearchModal";
 import Image from "next/image";
 
 export default function ProductCostRegisterPage({ 
@@ -33,21 +33,16 @@ export default function ProductCostRegisterPage({
     }
   ]);
 
-  // 페이지 로드 시 모달 자동 열기
+  // 페이지 로드 시 모달 자동 열기 (한 번만 실행)
   useEffect(() => {
-    console.log('=== RegPage useEffect 실행 ===');
-    console.log('session:', session);
-    console.log('session?.agentId:', session?.agentId);
-    console.log('carPurDetail:', carPurDetail);
-    
-    // 차량 정보가 없으면 모달을 자동으로 열기
+    // 차량 정보가 없으면 모달을 자동으로 열기 (페이지 로드 시에만)
     if (!carPurDetail || !carPurDetail.CAR_REG_ID) {
       console.log('차량 정보 없음 - 모달 열기');
       setIsModalOpen(true);
     } else {
       console.log('차량 정보 있음 - 모달 열지 않음');
     }
-  }, [carPurDetail]);
+  }, []); // 빈 의존성 배열로 변경하여 한 번만 실행
 
   // 제시구분 코드를 텍스트로 변환하는 함수
   const getCarStatusText = (statusCode) => {
@@ -666,7 +661,7 @@ export default function ProductCostRegisterPage({
       </div>
 
       {/* 차량 검색 모달 */}
-      <CarGoodsRegisterModal 
+      <CarSearchModal 
         open={isModalOpen} 
         onClose={handleModalClose} 
         onCarSelect={handleCarSelect}
