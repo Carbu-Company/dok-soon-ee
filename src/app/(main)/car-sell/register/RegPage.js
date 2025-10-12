@@ -211,6 +211,14 @@ export default function SalesRegisterPage({
     }
   ]);
 
+  // 주소 검색 핸들러
+  const handleBuyerAddressSearch = useCallback(() => {
+    openPostcodeSearch((addressData) => {
+      setBuyerCustomers(addressData.zonecode);
+      setBuyerCustomers(addressData.address);
+    });
+  }, []);
+
   const handleSellSubmit = async () => {
     console.log('handleSellSubmit');
 
@@ -1223,12 +1231,12 @@ export default function SalesRegisterPage({
         </div>
         <table className="table table--xl" id="myTable">
           <colgroup>
-            <col style={{ width: "280px" }} />
+            <col style={{ width: "240px" }} />
             <col style={{ width: "220px" }} />
             <col style={{ width: "200px" }} />
             <col style={{ width: "200px" }} />
             <col style={{ width: "auto" }} />
-            <col style={{ width: "auto" }} />
+            <col style={{ width: "200px" }} />
             <col style={{ width: "200px" }} />
             <col style={{ width: "64px" }} />
           </colgroup>
@@ -1360,7 +1368,7 @@ export default function SalesRegisterPage({
                           </button>
                         </div>
                       </div>
-                      <button className="btn btn--dark" type="button">검색</button>
+                      <button className="btn btn--dark" type="button" onClick={handleBuyerAddressSearch}>검색</button>
                     </div>
                   </div>
                 </td>
