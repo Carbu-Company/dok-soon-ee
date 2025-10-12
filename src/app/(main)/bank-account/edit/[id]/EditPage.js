@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import CarSearchModal from '@/components/modal/CarSearchModal';
 
-export default function Page({ session = null }) {
+export default function Page({   
+    session = null, 
+    tradeInItemCDList = [], 
+    tradeOutItemCDList = [], 
+    carAcctDetail = []
+  }) {
   // 차량 검색 모달 상태
   const [isCarSearchModalOpen, setIsCarSearchModalOpen] = useState(false);  
   // 선택된 차량 정보 상태
