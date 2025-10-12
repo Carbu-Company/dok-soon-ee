@@ -1157,14 +1157,17 @@ export default function BankCashLedgerPage(props) {
               <td>{car.TRADE_MEMO}</td>
               <td>{car.DTL_MEMO}</td>
               <td>
-                <button
-                  type="button"
-                  className="btn btn--light btn--sm"
-                  onClick={() => {
-                    router.push('/bank-account/register');
-                  }}
-                >
-                  상세등록
+              <button
+                    type="button"
+                    className="btn btn--light btn--sm"
+                    onClick={e => e.stopPropagation()}
+                  >
+                  <Link
+                    href={`/bank-account/edit/${car.ACCT_DTL_SEQ}`}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    상세등록
+                  </Link>
                 </button>
               </td>
             </tr>

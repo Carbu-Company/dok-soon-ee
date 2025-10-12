@@ -1,11 +1,11 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import RegPage from "./RegPage";
+import RegPage from "./EditPage";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 import { getCarAcctDetail } from "./api";
 
-export default async function BankAccountRegisterPage({ searchParams }) {
+export default async function BankAccountRegisterPage({ params }) {
   const cookieStore = await cookies();
   const session = await verifySession(cookieStore.get("session")?.value).catch(console.error);
 
@@ -13,16 +13,16 @@ export default async function BankAccountRegisterPage({ searchParams }) {
     redirect("/login");
   }
 
-  const { acctDtlSeq, tradeSctNm } = await searchParams;
+  const { id } = await params;
 
   try {
 
     const dealerList = await getDealerList(session.agentId);
     const tradeInItemCDList = await getCDList('80');   // 거래항목 코드 목록
     const tradeOutItemCDList = await getCDList('81');   // 거래항목 코드 목록
-    const carAcctDetail = await getCarAcctDetail(acctDtlSeq);
+    const carAcctDetail = await getCarAcctDetail(id);
 
-    console.log("acctDtlSeq", acctDtlSeq);
+    console.log("carAcctDetail", carAcctDetail);
 
     return (
       <RegPage
