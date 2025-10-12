@@ -5,6 +5,8 @@ import { getCustomerList, getDealerList } from "../../app/(main)/api/carApi";
 import Pagination from "@/components/ui/pagination";
 
 export default function CustSearchModal({ open, onClose, onCarSelect, agentId }) {
+  const [ordItemDtl, setOrdItemDtl] = useState("");
+  const [isOrdItemSelectOpenDtl, setIsOrdItemSelectOpenDtl] = useState(false);
   const [customerList, setCustomerList] = useState([]);
   const [dealerList, setDealerList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -39,6 +41,8 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
       loadInitialData();
     }
   }, [open]);
+
+
 
   // 딜러 리스트 로드
   const loadDealerList = async () => {
@@ -92,7 +96,7 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
       console.log("고객 목록 응답:", response);
       
       if (response.success && response.data) {
-        let filteredList = response.data.customerlist || [];
+        let filteredList = response.data || [];
         
         // 딜러 필터링 (클라이언트 사이드)
         const dealerFilter = params.dealer !== undefined ? params.dealer : searchParams.dealer;
@@ -114,15 +118,15 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
     setLoading(true);
     try {
       // 현재 입력 필드의 실제 값을 가져옴
-      const currentCarNo = carNoInputRef.current?.value || "";
+      const currentCustNm = custNmInputRef.current?.value || "";
       
       const searchData = {
         ...searchParams,
-        carNo: currentCarNo,
+        custNm: currentCustNm,
         page: 1
       };
       
-      await loadCarList(searchData);
+      await loadCustomerList(searchData);
       setSearchParams(searchData);
     } finally {
       setLoading(false);
@@ -132,24 +136,24 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
   // 페이지 변경 핸들러
   const handlePageChange = (page) => {
     setSearchParams(prev => ({ ...prev, page }));
-    loadCarList({ ...searchParams, page });
+    loadCustomerList({ ...searchParams, page });
   };
 
   // 페이지 크기 변경 핸들러
   const handlePageSizeChange = (pageSize) => {
     setSearchParams(prev => ({ ...prev, pageSize, page: 1 }));
-    loadCarList({ ...searchParams, pageSize, page: 1 });
+    loadCustomerList({ ...searchParams, pageSize, page: 1 });
   };
 
   // 정렬 변경 핸들러
   const handleSortChange = (ordAscDesc) => {
     setSearchParams(prev => ({ ...prev, ordAscDesc, page: 1 }));
-    loadCarList({ ...searchParams, ordAscDesc, page: 1 });
+    loadCustomerList({ ...searchParams, ordAscDesc, page: 1 });
   };
 
-  // 차량 선택 핸들러
-  const handleCarSelect = (car) => {
-    setSelectedCar(car);
+  // 고객 선택 핸들러
+  const handleCustSelect = (customer) => {
+    setSelectedCustomer(customer);
   };
 
   // 딜러 선택 핸들러
@@ -157,31 +161,36 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
     setSearchParams(prev => ({ ...prev, dealer }));
   };
 
-  // 차량번호 입력 핸들러
+  // 고객명 입력 핸들러
   const handleCarNoChange = (e) => {
     const value = e.target.value;
-    setSearchParams(prev => ({ ...prev, carNo: value }));
+    setSearchParams(prev => ({ ...prev, custNm: value }));
   };
 
-  // 차량번호 삭제 핸들러
-  const handleCarNoClear = () => {
-    setSearchParams(prev => ({ ...prev, carNo: "" }));
-    if (carNoInputRef.current) {
-      carNoInputRef.current.value = "";
+  // 고객명 삭제 핸들러
+  const handleCustNmClear = () => {
+    setSearchParams(prev => ({ ...prev, custNm: "" }));
+    if (custNmInputRef.current) {
+      custNmInputRef.current.value = "";
     }
   };
 
   // 확인 버튼 핸들러
   const handleConfirm = () => {
-    if (selectedCar) {
-      // 차량이 선택된 경우 - 알림 없이 진행
+    if (selectedCustomer) {
+      // 고객이 선택된 경우 - 알림 없이 진행
       if (onCarSelect) {
-        onCarSelect(selectedCar);
+        onCarSelect(selectedCustomer);
       }
     }
     if (onClose) {
       onClose();
     }
+  };
+
+  // 모든 토글 닫기
+  const closeAllToggles = () => {
+    setIsOrdItemSelectOpenDtl(false);
   };
 
   if (!open) return null;
@@ -197,7 +206,7 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
       <div className="modal__container">
         <div className="modal__header">
           <h2 id="car-goods-register-modal-title" className="modal__title">
-            차량선택
+            고객선택
           </h2>
           <div className="modal__utils">
             {/* 
@@ -247,7 +256,7 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
                         ref={custNmInputRef}
                         type="text" 
                         className="input__field" 
-                        placeholder="차량 번호" 
+                        placeholder="고객명" 
                         value={searchParams.custNm}
                         onChange={handleCarNoChange}
                         onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -418,13 +427,13 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="8" style={{ textAlign: "center", padding: "20px" }}>
+                    <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
                       로딩 중...
                     </td>
                   </tr>
-                ) : carList.length === 0 ? (
+                ) : customerList.length === 0 ? (
                   <tr>
-                    <td colSpan="8" style={{ textAlign: "center", padding: "20px" }}>
+                    <td colSpan="7" style={{ textAlign: "center", padding: "20px" }}>
                       데이터가 없습니다.
                     </td>
                   </tr>
@@ -447,9 +456,9 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
                       <td>{customer.CUST_NO || "-"}</td>
                       <td>{customer.CUST_NM || "-"}</td>
                       <td>{customer.CUST_PHON || "-"}</td>
-                      <td>{customer.CUST_ZIP || "-"}</td>
-                      <td>{customer.CUST_ADDR || "-"}</td>
-                      <td>{customer.REGDATE || "-"}</td>
+                      <td>{customer.ZIP || "-"}</td>
+                      <td>{customer.ADDR1 && customer.ADDR2 ? `${customer.ADDR1} ${customer.ADDR2}` : customer.ADDR1 || customer.ADDR2 || "-"}</td>
+                      <td>{customer.MOD_DTIME ? new Date(customer.MOD_DTIME).toLocaleDateString() : "-"}</td>
                     </tr>
                   ))
                 )}

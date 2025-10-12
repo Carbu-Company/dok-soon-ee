@@ -1,24 +1,5 @@
 // lib/carApi.js
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-
-// 세션에서 agentId를 가져오는 함수
-async function getAgentId() {
-  try {
-    // 클라이언트 사이드에서는 localStorage에서 가져오기
-    if (typeof window !== 'undefined') {
-      const sessionData = localStorage.getItem('session');
-      if (sessionData) {
-        const session = JSON.parse(sessionData);
-        return session.agentId;
-      }
-    }
-    return null;
-  } catch (error) {
-    console.error('세션에서 agentId 가져오기 실패:', error);
-    return null;
-  }
-}
 
 function ok(data) {
   return { success: true, data, error: null };
@@ -39,7 +20,13 @@ async function apiGet(path, params) {
           }, {})
         ).toString()
       : "";
-    const res = await fetch(`${API_BASE}/api/${path}${qs}`, { method: "GET" });
+    const res = await fetch(`${API_BASE}/api/${path}${qs}`, { 
+      method: "GET",
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    });
     const data = await res.json();
     return ok(data);
   } catch (e) {
@@ -176,6 +163,15 @@ export const getAccountInfo = (carAgent) =>
 
 export const getAssetList = (payload) => apiPost("getAssetList", payload);
 export const getAssetSum = (payload) => apiPost("getAssetSum", payload);
+
+/* ------------------------------ 계좌 2.0 ------------------------------ */
+// 계좌 목록 조회
+export const getCarAcctList = (payload) => apiPost("getCarAcctList", payload);
+export const getCarAcctSummary = (payload) => apiPost("getCarAcctSummary", payload);
+export const getCarAcctDetail = (acctId) => apiGet("getCarAcctDetail", { acctId });
+export const getAgentAcctList = (carAgent) => apiGet("getAgentAcctList", { carAgent });
+export const insertCarAcctDetail = (payload) => apiPost("insertCarAcctDetail", payload);
+export const updateCarAcctDetail = (payload) => apiPost("updateCarAcctDetail", payload);
 
 /* ----------------------------- 재고금융 ----------------------------- */
 export const getFinanceList = (carAgent) =>
@@ -321,42 +317,33 @@ export const getSettlementStockFinanceName = (carRegid) =>
   apiGet("getSettlementStockFinanceName", { carRegid });
 
 /* ------------------------------ 환경설정 ------------------------------ */
-export const getCompanyInfo = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getCompanyInfo", { carAgent: agentId, ...additionalParams });
+export const getAgentInfo = async (agentId) => {
+  return apiGet("getAgentInfo", { carAgent: agentId });
 };
-export const getCompanySangsaDealer = async (sangsaCode, additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getCompanySangsaDealer", { sangsaCode, carAgent: agentId, ...additionalParams });
+export const getCompanySangsaDealer = async (agentId, sangsaCode, additionalParams = {}) => {
+  return apiPost("getCompanySangsaDealer", { agentId, sangsaCode, ...additionalParams });
 };
-export const getCompanyDealer = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getCompanyDealer", { carAgent: agentId, ...additionalParams });
+export const getCompanyDealer = async (agentId, additionalParams = {}) => {
+  return apiPost("getCompanyDealer", { agentId, ...additionalParams });
 };
-export const getPurchaseCost = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getPurchaseCost", { carAgent: agentId, ...additionalParams });
+export const getPurchaseCost = async (agentId, additionalParams = {}) => {
+  return apiPost("getPurchaseCost", { agentId, ...additionalParams });
 };
-export const getSellCostSummary = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getSellCostSummary", { carAgent: agentId, ...additionalParams });
+export const getSellCostSummary = async (agentId, additionalParams = {}) => {
+  return apiPost("getSellCostSummary", { agentId, ...additionalParams });
 };
-export const getCompanyExpense = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getCompanyExpense", { carAgent: agentId, ...additionalParams });
+export const getCompanyExpense = async (agentId, additionalParams = {}) => {
+  return apiPost("getCompanyExpense", { agentId, ...additionalParams });
 };
-export const getCompanyIncome = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getCompanyIncome", { carAgent: agentId, ...additionalParams });
+export const getCompanyIncome = async (agentId, additionalParams = {}) => {
+  return apiPost("getCompanyIncome", { agentId, ...additionalParams });
 };
 
 /* -------------------------------- 공통 -------------------------------- */
 export const getMgtKey = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
   return apiGet("getMgtKey", { carAgent: agentId, ...additionalParams });
 };
-export const getDealerList = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
+export const getDealerList = async (agentId, additionalParams = {}) => {
   return apiGet("getDealerList", { carAgent: agentId, ...additionalParams });
 };
 export const getCDList = (grpCD) => apiGet("getCDList", { grpCD });

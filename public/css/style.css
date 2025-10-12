@@ -1212,12 +1212,13 @@ html, body {
   }
   .address-input-group .input-with-search .input {
     flex: 1;
+    width: auto;
   }
   .address-input-group .input-with-search .btn {
     flex-shrink: 0;
   }
   .address-input-group .zip-input {
-    width: 50px;
+    width: 80px;
     flex-shrink: 0;
   }
   

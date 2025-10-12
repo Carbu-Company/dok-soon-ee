@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from 'next/navigation';
 import CarSearchModal from "@/components/modal/CarSearchModal";
+import CustSearchModal from "@/components/modal/CustSearchModal";
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 import { getAcqTax } from '@/app/(main)/common/script.js'
@@ -43,6 +44,8 @@ export default function SalesRegisterPage({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
+  const [isCustModalOpen, setIsCustModalOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   console.log(sellTpList);
 
@@ -89,6 +92,34 @@ export default function SalesRegisterPage({
 
   const handleCarSearchClick = () => {
     setIsModalOpen(true);
+  };
+
+  // 고객 선택 핸들러
+  const handleCustomerSelect = (customer) => {
+    console.log('선택된 고객:', customer);
+    setSelectedCustomer(customer);
+    setIsCustModalOpen(false);
+    
+    // 선택된 고객 정보를 현재 매수고객에 적용
+    if (buyerCustomers.length > 0) {
+      const updatedCustomers = buyerCustomers.map(cust => ({
+        ...cust,
+        customerName: customer.CUST_NM || '',
+        residentNumber: customer.CUST_NO || '',
+        phone: customer.CUST_PHON || '',
+        address: customer.CUST_ADDR || '',
+        zipCode: customer.CUST_ZIP || ''
+      }));
+      setBuyerCustomers(updatedCustomers);
+    }
+  };
+
+  const handleCustModalClose = () => {
+    setIsCustModalOpen(false);
+  };
+
+  const handleCustSearchClick = () => {
+    setIsCustModalOpen(true);
   };
 
   // 매수고객 추가 핸들러
@@ -1235,7 +1266,7 @@ export default function SalesRegisterPage({
             <col style={{ width: "220px" }} />
             <col style={{ width: "200px" }} />
             <col style={{ width: "200px" }} />
-            <col style={{ width: "auto" }} />
+            <col style={{ width: "300px" }} />
             <col style={{ width: "200px" }} />
             <col style={{ width: "200px" }} />
             <col style={{ width: "64px" }} />
@@ -1275,7 +1306,7 @@ export default function SalesRegisterPage({
                         </button>
                       </div>
                     </div>
-                    <button className="btn btn--dark" type="button">검색</button>
+                    <button className="btn btn--dark" type="button" onClick={handleCustSearchClick}>검색</button>
                   </div>
                 </td>
                 <td>
@@ -1368,7 +1399,7 @@ export default function SalesRegisterPage({
                           </button>
                         </div>
                       </div>
-                      <button className="btn btn--dark" type="button" onClick={handleBuyerAddressSearch}>검색</button>
+                      <button className="btn btn--dark" type="button" onClick={handleBuyerAddressSearch} style={{ width: "50px" }}>검색</button>
                     </div>
                   </div>
                 </td>
@@ -2489,6 +2520,13 @@ export default function SalesRegisterPage({
         open={isModalOpen} 
         onClose={handleModalClose} 
         onCarSelect={handleCarSelect}
+        agentId={session}
+      />
+      
+      <CustSearchModal 
+        open={isCustModalOpen} 
+        onClose={handleCustModalClose} 
+        onCarSelect={handleCustomerSelect}
         agentId={session}
       />
     </main>
