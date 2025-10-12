@@ -7,7 +7,6 @@ import { getDealerList, getCDList } from "@/app/(main)/common/api";
 // Server Action 정의
 async function searchCarConcilList(searchParamsWithPage) {
   "use server";
-
   try {
     const result = await getCarConcilList(searchParamsWithPage);
 
