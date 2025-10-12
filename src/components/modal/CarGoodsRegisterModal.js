@@ -29,7 +29,7 @@ export default function CarGoodsRegisterModal({ open, onClose, onCarSelect, agen
   const handleCancel = () => {
     const confirmMessage = "차량을 선택하지 않으면 상품화비용을 등록할 수 없습니다. 정말 닫으시겠습니까?";
     if (window.confirm(confirmMessage)) {
-      handleClose();
+      if (onClose) onClose();
     }
   };
 

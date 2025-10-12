@@ -67,13 +67,6 @@ export default function ProductCostRegisterPage({
   };
 
   const handleModalClose = () => {
-    // 차량이 선택되지 않았고 기존 차량 정보도 없으면 경고
-    if (!selectedCar && (!carPurDetail || !carPurDetail.CAR_REG_ID)) {
-      const confirmClose = window.confirm("차량을 선택하지 않으면 상품화비용을 등록할 수 없습니다. 정말 닫으시겠습니까?");
-      if (!confirmClose) {
-        return; // 사용자가 취소하면 모달을 닫지 않음
-      }
-    }
     setIsModalOpen(false);
   };
 
