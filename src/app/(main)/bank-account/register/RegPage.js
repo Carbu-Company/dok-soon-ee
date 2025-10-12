@@ -1,6 +1,39 @@
 'use client';
 
+import { useState } from 'react';
+import CarSearchModal from '@/components/modal/CarSearchModal';
+
 export default function Page({ session = null }) {
+  // 차량 검색 모달 상태
+  const [isCarSearchModalOpen, setIsCarSearchModalOpen] = useState(false);  
+  // 선택된 차량 정보 상태
+  const [selectedCar, setSelectedCar] = useState({
+    carRegId: '',
+    carNo: '',
+    carName: '',
+    dealerName: ''
+  });
+
+  // 차량 검색 모달 열기
+  const handleOpenCarSearchModal = () => {
+    setIsCarSearchModalOpen(true);
+  };
+
+  // 차량 검색 모달 닫기
+  const handleCloseCarSearchModal = () => {
+    setIsCarSearchModalOpen(false);
+  };
+
+  // 차량 선택 핸들러
+  const handleCarSelect = (car) => {
+    setSelectedCar({
+      carRegId: car.CAR_REG_ID || '',
+      carNo: car.CAR_NO || '',
+      carName: car.CAR_NM || '',
+      dealerName: car.DLR_NM || ''
+    });
+    setIsCarSearchModalOpen(false);
+  };
   return (
     <main className="container container--page">
       <div className="container__head">
@@ -81,38 +114,72 @@ export default function Page({ session = null }) {
               <td>
                 <div className="input-group">
                   <div className="input w400">
-                    <input type="text" className="input__field" placeholder="" />
+                    <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="" 
+                      value={selectedCar.carNo}
+                      readOnly
+                    />
                     <div className="input__utils">
-                      <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                      <button 
+                        type="button" 
+                        className="jsInputClear input__clear ico ico--input-delete"
+                        onClick={() => setSelectedCar(prev => ({ ...prev, carNo: '' }))}
+                      >
+                        삭제
+                      </button>
                     </div>
                   </div>
-                  {/* <button className="btn btn--dark" type="button" disabled>검색</button> */}
-                  <button className="btn btn--dark" type="button">검색</button>
+                  <button 
+                    className="btn btn--dark" 
+                    type="button"
+                    onClick={handleOpenCarSearchModal}
+                  >
+                    검색
+                  </button>
                 </div>
               </td>
               <th>차량명</th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
+                  <input 
+                    type="text" 
+                    className="input__field" 
+                    placeholder="" 
+                    value={selectedCar.carName}
+                    readOnly
+                  />
                   <div className="input__utils">
-                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                    <button 
+                      type="button" 
+                      className="jsInputClear input__clear ico ico--input-delete"
+                      onClick={() => setSelectedCar(prev => ({ ...prev, carName: '' }))}
+                    >
+                      삭제
+                    </button>
                   </div>
                 </div>
               </td>
               <th>관계딜러</th>
               <td>
-                <div className="select">
-                  <input className="select__input" type="hidden" name="dealer" defaultValue="" />
-                  <button className="select__toggle" type="button">
-                    <span className="select__text">선택</span>
-                    <img className="select__arrow" src="../assets/images/ico-dropdown.svg" alt="" />
-                  </button>
-
-                  <ul className="select__menu">
-                    <li className="select__option select__option--selected" data-value="value1">선택</li>
-                    <li className="select__option" data-value="">선택1</li>
-                    <li className="select__option" data-value="">선택2</li>
-                  </ul>
+                <div className="input">
+                  <input 
+                    type="text" 
+                    className="input__field" 
+                    placeholder="" 
+                    value={selectedCar.dealerName}
+                    readOnly
+                  />
+                  <div className="input__utils">
+                    <button 
+                      type="button" 
+                      className="jsInputClear input__clear ico ico--input-delete"
+                      onClick={() => setSelectedCar(prev => ({ ...prev, dealerName: '' }))}
+                    >
+                      삭제
+                    </button>
+                  </div>
                 </div>
               </td>
             </tr>
@@ -139,6 +206,14 @@ export default function Page({ session = null }) {
         <button className="btn btn--primary" type="button">확인</button>
       </div>
       */}
+
+      {/* 차량 검색 모달 */}
+      <CarSearchModal
+        open={isCarSearchModalOpen}
+        onClose={handleCloseCarSearchModal}
+        onCarSelect={handleCarSelect}
+        agentId={session}
+      />
     </main>
   );
 }
