@@ -10,6 +10,9 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
   const [loading, setLoading] = useState(false);
   const [searchParams, setSearchParams] = useState({
     custNm: "",  // 고객명
+    custPhon: "", // 고객전화번호
+    custAddr: "", // 고객주소
+    custZip: "", // 고객우편번호
     page: 1,
     pageSize: 5,
     orderItem: "등록일",
@@ -19,7 +22,7 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
   const [totalCount, setTotalCount] = useState(0);
 
   // 입력 필드 ref 추가
-  const carNoInputRef = useRef(null);
+  const custNmInputRef = useRef(null);
 
   const handleClose = () => {
     if (onClose) onClose();
@@ -94,11 +97,11 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
         // 딜러 필터링 (클라이언트 사이드)
         const dealerFilter = params.dealer !== undefined ? params.dealer : searchParams.dealer;
         if (dealerFilter && dealerFilter !== "") {
-          filteredList = filteredList.filter(car => car.DLR_NM === dealerFilter);
+          filteredList = filteredList.filter(customer => customer.DLR_NM === dealerFilter);
           console.log("딜러 필터링 적용:", dealerFilter, "결과:", filteredList.length, "건");
         }
         
-        setCarList(filteredList);
+        setCustomerList(filteredList);
         setTotalCount(filteredList.length);
       }
     } catch (error) {
@@ -274,16 +277,16 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
               <div className="input-group">
                 {/* 정렬 항목 */}
                 <div className="select select--dark w160">
-                  <input
-                    className="select__input"
-                    type="hidden"
-                    name="orderItem"
-                    value={searchParams.orderItem}
-                  />
-                  <button className="select__toggle" type="button">
-                    <span className="select__text">
-                      {searchParams.orderItem || "전체"}
-                    </span>
+                  <input className="select__input" type="hidden" name="dealer" defaultValue="매도(판매)일" />
+                  <button
+                    className="select__toggle"
+                    type="button"
+                    onClick={() => {
+                      closeAllToggles();
+                      setIsOrdItemSelectOpenDtl(!isOrdItemSelectOpenDtl);
+                    }}
+                  >
+                    <span className="select__text">{ordItemDtl || "제시일"}</span>
                     <Image
                       className="select__arrow"
                       src="/images/ico-dropdown.svg"
@@ -293,24 +296,30 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
                     />
                   </button>
 
-                  <ul className="select__menu">
-                    <li 
-                      className={`select__option ${!searchParams.dealer ? "select__option--selected" : ""}`}
-                      data-value=""
-                      onClick={() => handleDealerChange("")}
+                  <ul
+                    className="select__menu"
+                    style={{ display: isOrdItemSelectOpenDtl ? "block" : "none" }}
                     >
-                      전체
+                    <li
+                      className={`select__option ${ordItemDtl === "제시일" ? "select__option--selected" : ""}`}
+                      onClick={() => {
+                        setOrdItemDtl("매도(판매)일");
+                        setIsOrdItemSelectOpenDtl(false);
+                        handleSearch(1);
+                      }}
+                    >
+                      매도(판매)일
                     </li>
-                    {dealerList.map((dealer, index) => (
-                      <li
-                        key={dealer.USR_ID || index}
-                        className={`select__option ${searchParams.dealer === dealer.USR_NM ? "select__option--selected" : ""}`}
-                        data-value={dealer.USR_NM}
-                        onClick={() => handleDealerChange(dealer.USR_NM)}
-                      >
-                        {dealer.USR_NM}
-                      </li>
-                    ))}
+                    <li
+                      className={`select__option ${ordItemDtl === "제시(매입)일" ? "select__option--selected" : ""}`}
+                      onClick={() => {
+                        setOrdItemDtl("제시(매입)일");
+                        setIsOrdItemSelectOpenDtl(false);
+                        handleSearch(1);
+                      }}
+                    >
+                      제시(매입)일
+                    </li>
                   </ul>
                 </div>
 
@@ -398,12 +407,11 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
               <thead>
                 <tr>
                   <th>선택</th>
-                  <th>차량번호</th>
-                  <th>차량명</th>
-                  <th>담당 딜러</th>
-                  <th>매입 금액</th>
-                  <th>매입일</th>
-                  <th>차주명</th>
+                  <th>고객번호</th>
+                  <th>고객명</th>
+                  <th>고객 연락처</th>
+                  <th>우편번호</th>
+                  <th>주소</th>
                   <th>등록일</th>
                 </tr>
               </thead>
@@ -421,28 +429,27 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
                     </td>
                   </tr>
                 ) : (
-                  carList.map((car, index) => (
-                    <tr key={car.CAR_REG_ID || index}>
+                  customerList.map((customer, index) => (
+                    <tr key={customer.CUST_NO || index}>
                       <td>
                         <div className="form-option form-option--icon">
                           <label className="form-option__label">
                             <input 
                               type="radio" 
                               name="radiogroup" 
-                              checked={selectedCar?.CAR_REG_ID === car.CAR_REG_ID}
-                              onChange={() => handleCarSelect(car)}
+                              checked={selectedCustomer?.CUST_NO === customer.CUST_NO}
+                              onChange={() => handleCustSelect(customer)}
                             />
                             <span className="form-option__title">선택</span>
                           </label>
                         </div>
                       </td>
-                      <td>{car.CAR_NO || "-"}</td>
-                      <td>{car.CAR_NM || "-"}</td>
-                      <td>{car.DLR_NM || "-"}</td>
-                      <td>{car.PUR_AMT ? `${car.PUR_AMT.toLocaleString()}원` : "-"}</td>
-                      <td>{car.CAR_PUR_DT || "-"}</td>
-                      <td>{car.OWNR_NM || "-"}</td>
-                      <td>{car.CAR_REG_DT || "-"}</td>
+                      <td>{customer.CUST_NO || "-"}</td>
+                      <td>{customer.CUST_NM || "-"}</td>
+                      <td>{customer.CUST_PHON || "-"}</td>
+                      <td>{customer.CUST_ZIP || "-"}</td>
+                      <td>{customer.CUST_ADDR || "-"}</td>
+                      <td>{customer.REGDATE || "-"}</td>
                     </tr>
                   ))
                 )}
