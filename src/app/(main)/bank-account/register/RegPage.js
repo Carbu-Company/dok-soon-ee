@@ -5,10 +5,10 @@ import CarSearchModal from '@/components/modal/CarSearchModal';
 
 export default function Page({ session = null }) {
   // 차량 검색 모달 상태
-  const [isCarSearchModalOpen, setIsCarSearchModalOpen] = useState(false);
-  
+  const [isCarSearchModalOpen, setIsCarSearchModalOpen] = useState(false);  
   // 선택된 차량 정보 상태
   const [selectedCar, setSelectedCar] = useState({
+    carRegId: '',
     carNo: '',
     carName: '',
     dealerName: ''
@@ -27,6 +27,7 @@ export default function Page({ session = null }) {
   // 차량 선택 핸들러
   const handleCarSelect = (car) => {
     setSelectedCar({
+      carRegId: car.CAR_REG_ID || '',
       carNo: car.CAR_NO || '',
       carName: car.CAR_NM || '',
       dealerName: car.DLR_NM || ''
