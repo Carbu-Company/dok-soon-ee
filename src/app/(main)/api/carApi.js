@@ -315,3 +315,83 @@ export const getMgtKey = (carAgent) => apiGet("getMgtKey", { carAgent });
 export const getDealerList = (carAgent) => apiGet("getDealerList", { carAgent });
 export const getCDList = (grpCD) => apiGet("getCDList", { grpCD });
 export const getCustomerList = (params) => apiGet("getCustomerList", params);
+
+/* -------------------------------- 팝빌 API -------------------------------- */
+
+/* 현금영수증 */
+export const popbillCashbillRegistIssue = (payload) =>
+  apiPost("popbill/v1/cashbill/registIssue", payload);
+export const popbillCashbillRevokeRegistIssue = (payload) =>
+  apiPost("popbill/v1/cashbill/revokeRegistIssue", payload);
+export const popbillCashbillGetInfo = (payload) =>
+  apiPost("popbill/v1/cashbill/getInfo", payload);
+export const popbillCashbillGetPrintURL = (payload) =>
+  apiPost("popbill/v1/cashbill/getPrintURL", payload);
+
+/* 전자세금계산서 */
+export const popbillTaxinvoiceRegistIssue = (payload) =>
+  apiPost("popbill/v1/taxinvoice/registIssue", payload);
+export const popbillTaxinvoiceCancelIssue = (payload) =>
+  apiPost("popbill/v1/taxinvoice/cancelIssue", payload);
+export const popbillTaxinvoiceGetTaxCertURL = (payload) =>
+  apiPost("popbill/v1/taxinvoice/getTaxCertURL", payload);
+export const popbillTaxinvoiceGetPrintURL = (payload) =>
+  apiPost("popbill/v1/taxinvoice/getPrintURL", payload);
+
+/* 계좌 조회 */
+export const popbillEasyfinbankRegistBankAccount = (payload) =>
+  apiPost("popbill/v1/easyfinbank/registBankAccount", payload);
+export const popbillEasyfinbankUpdateBankAccount = (payload) =>
+  apiPost("popbill/v1/easyfinbank/updateBankAccount", payload);
+export const popbillEasyfinbankSearch = (payload) =>
+  apiPost("popbill/v1/easyfinbank/search", payload);
+export const popbillEasyfinbankRequestJob = (payload) =>
+  apiPost("popbill/v1/easyfinbank/requestJob", payload);
+export const popbillEasyfinbankListBankAccount = (payload) =>
+  apiPost("popbill/v1/easyfinbank/listBankAccount", payload);
+
+/* 카톡 */
+export const popbillKakaoListPlusFriendID = (payload) =>
+  apiPost("popbill/v1/kakao/listPlusFriendID", payload);
+export const popbillKakaoGetPlusFriendMgtURL = (payload) =>
+  apiPost("popbill/v1/kakao/getPlusFriendMgtURL", payload);
+export const popbillKakaoGetATSTemplateMgtURL = (payload) =>
+  apiPost("popbill/v1/kakao/getATSTemplateMgtURL", payload);
+export const popbillKakaoSendATS_one = (payload) =>
+  apiPost("popbill/v1/kakao/sendATS_one", payload);
+export const popbillKakaoSendATS_multi = (payload) =>
+  apiPost("popbill/v1/kakao/sendATS_multi", payload);
+
+/* 문자 */
+export const popbillSmsSendSMS = (payload) =>
+  apiPost("popbill/v1/sms/sendSMS", payload);
+
+/* 연동회원 */
+export const popbillBizinfoJoinMember = (payload) =>
+  apiPost("popbill/v1/bizinfo/joinMember", payload);
+export const popbillBizinfoQuitMember = (payload) =>
+  apiPost("popbill/v1/bizinfo/quitMember", payload);
+export const popbillBizinfoGetCorpInfo = (payload) =>
+  apiPost("popbill/v1/bizinfo/getCorpInfo", payload);
+
+/* FAX */
+export const popbillFaxServiceCheckSenderNumber = (payload) =>
+  apiPost("popbill/v1/faxService/checkSenderNumber", payload);
+export const popbillFaxServiceGetSenderNumberMgtURL = (payload) =>
+  apiPost("popbill/v1/faxService/getSenderNumberMgtURL", payload);
+export const popbillFaxServiceGetSenderNumberList = (payload) =>
+  apiPost("popbill/v1/faxService/getSenderNumberList", payload);
+export const popbillFaxServiceSendOneFAX = (payload) =>
+  apiPost("popbill/v1/faxService/sendOneFAX", payload);
+
+/* 홈텍스 수집 */
+export const popbillHtTaxinvoiceRequestJob = (payload) =>
+  apiPost("popbill/v1/htTaxinvoice/requestJob", payload);
+export const popbillHtTaxinvoiceGetJobState = (payload) =>
+  apiPost("popbill/v1/htTaxinvoice/GetJobState", payload);
+export const popbillHtTaxinvoiceSearch = (payload) =>
+  apiPost("popbill/v1/htTaxinvoice/Search", payload);
+export const popbillHtTaxinvoiceGetPopUpURL = (payload) =>
+  apiPost("popbill/v1/htTaxinvoice/GetPopUpURL", payload);
+export const popbillHtTaxinvoiceGetTaxinvoice = (payload) =>
+  apiPost("popbill/v1/htTaxinvoice/GetTaxinvoice", payload);
