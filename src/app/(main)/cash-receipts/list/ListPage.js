@@ -6,6 +6,12 @@ import Pagination from "@/components/ui/pagination";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import CarSearchModal from "@/components/modal/CarSearchModal";
 import Image from "next/image";
+import { 
+  getCashBillList, 
+  getCashBillAmount, 
+  getReceiptIssueList, 
+  getReceiptIssueSummary 
+} from "@/app/(main)/api/carApi";
 
 export default function CashReceiptList(
 props
@@ -280,8 +286,37 @@ props
           alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
         }
       } else {
-        // 오류 발생
-        alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
+        // searchAction이 없을 때 carApi 사용
+        const searchParamsWithPage = {
+          ...getDefaultParams(pageNum),
+          ...searchParams,
+        };
+
+        // 현금영수증 발행 리스트 조회
+        const listResult = await getReceiptIssueList(searchParamsWithPage);
+        const summaryResult = await getReceiptIssueSummary(searchParamsWithPage);
+
+        if (listResult.success && summaryResult.success) {
+          const responseData = listResult.data?.list || [];
+          const paginationInfo = listResult.data?.pagination || {};
+          const summaryData = summaryResult.data || [];
+
+          console.log('응답 데이터:', {
+            responseDataLength: responseData.length,
+            paginationInfo,
+            summaryData
+          });
+
+          setCarList(responseData);
+          setPagination(paginationInfo);
+          setCarCashSummary(summaryData);
+
+          // 서버에서 제공하는 페이지네이션 정보 사용
+          setTotalPages(paginationInfo.totalPages || 1);
+          setCurrentPage(paginationInfo.currentPage || pageNum);
+        } else {
+          alert("검색 중 오류가 발생했습니다: " + (listResult?.error || summaryResult?.error || "unknown"));
+        }
       }
     } catch (error) {
       console.error("검색 에러:", error);
@@ -321,6 +356,139 @@ props
       window.openModal(id);
     } else {
       console.log("openModal stub:", id);
+    }
+  };
+
+  // 현금영수증 인쇄 기능
+  const handlePrintReceipt = async (item) => {
+    try {
+      const printData = {
+        carAgent: props.session?.agentId,
+        costSeq: item.COST_SEQ || item.CAR_REG_ID,
+        ntsConfNo: item.NTS_CONF_NO,
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/printCashReceipt`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(printData)
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // 인쇄 팝업 열기
+        window.open(result.data.printUrl, '_blank', 'width=800,height=600');
+      } else {
+        alert('인쇄 중 오류가 발생했습니다: ' + result.error);
+      }
+    } catch (error) {
+      console.error('인쇄 오류:', error);
+      alert('인쇄 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 알림톡 전송 기능
+  const handleSendAlimtalk = async (item) => {
+    try {
+      const alimtalkData = {
+        carAgent: props.session?.agentId,
+        costSeq: item.COST_SEQ || item.CAR_REG_ID,
+        custNm: item.CUST_NM,
+        custPhone: item.CUST_PHONE,
+        tradeAmt: item.TRADE_AMT,
+        ntsConfNo: item.NTS_CONF_NO,
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sendCashReceiptAlimtalk`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(alimtalkData)
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('알림톡이 성공적으로 전송되었습니다.');
+      } else {
+        alert('알림톡 전송 중 오류가 발생했습니다: ' + result.error);
+      }
+    } catch (error) {
+      console.error('알림톡 전송 오류:', error);
+      alert('알림톡 전송 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 메일 전송 기능
+  const handleSendEmail = async (item) => {
+    try {
+      const emailData = {
+        carAgent: props.session?.agentId,
+        costSeq: item.COST_SEQ || item.CAR_REG_ID,
+        custNm: item.CUST_NM,
+        custEmail: item.CUST_EMAIL,
+        tradeAmt: item.TRADE_AMT,
+        ntsConfNo: item.NTS_CONF_NO,
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sendCashReceiptEmail`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailData)
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('메일이 성공적으로 전송되었습니다.');
+      } else {
+        alert('메일 전송 중 오류가 발생했습니다: ' + result.error);
+      }
+    } catch (error) {
+      console.error('메일 전송 오류:', error);
+      alert('메일 전송 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 취소발행 기능
+  const handleCancelIssuance = async (item) => {
+    if (!confirm('정말로 취소발행하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      const cancelData = {
+        carAgent: props.session?.agentId,
+        costSeq: item.COST_SEQ || item.CAR_REG_ID,
+        ntsConfNo: item.NTS_CONF_NO,
+        usrId: props.session?.usrId,
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cancelCashReceipt`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(cancelData)
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('현금영수증이 성공적으로 취소되었습니다.');
+        handleSearch(currentPage); // 목록 새로고침
+      } else {
+        alert('취소발행 중 오류가 발생했습니다: ' + result.error);
+      }
+    } catch (error) {
+      console.error('취소발행 오류:', error);
+      alert('취소발행 중 오류가 발생했습니다.');
     }
   };
 
@@ -1525,13 +1693,37 @@ props
 
                       <ul className="select__menu">
                         <li className="select__option">
-                          <a href="#">영수증인쇄</a>
+                          <a 
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handlePrintReceipt(car);
+                            }}
+                          >
+                            영수증인쇄
+                          </a>
                         </li>
                         <li className="select__option">
-                          <a href="#">알림톡전송</a>
+                          <a 
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleSendAlimtalk(car);
+                            }}
+                          >
+                            알림톡전송
+                          </a>
                         </li>
                         <li className="select__option">
-                          <a href="#">메일전송</a>
+                          <a 
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleSendEmail(car);
+                            }}
+                          >
+                            메일전송
+                          </a>
                         </li>
                         <li className="select__option">
                           <a href="#">Fax전송</a>
@@ -1541,7 +1733,7 @@ props
                             href="#"
                             onClick={(e) => {
                               e.preventDefault();
-                              openModal(car.CAR_REG_ID);
+                              handleCancelIssuance(car);
                             }}
                           >
                             취소발행

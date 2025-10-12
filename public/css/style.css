@@ -1185,6 +1185,41 @@ html, body {
     font-size: 14px;
     color: #C4C4CA;
   }
+
+  /* 고객명 입력 필드와 검색 버튼 레이아웃 */
+  .input-with-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .input-with-search .input {
+    flex: 1;
+  }
+  .input-with-search .btn {
+    flex-shrink: 0;
+  }
+
+  /* 주소 입력 필드들 레이아웃 */
+  .address-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .address-input-group .input-with-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .address-input-group .input-with-search .input {
+    flex: 1;
+  }
+  .address-input-group .input-with-search .btn {
+    flex-shrink: 0;
+  }
+  .address-input-group .zip-input {
+    width: 50px;
+    flex-shrink: 0;
+  }
   
   .input-notice {
     font-size: 14px;

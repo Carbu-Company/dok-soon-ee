@@ -183,6 +183,13 @@ export default function SalesRegisterPage({
   // 차량번호(출고) 선택 상태 관리
   const [outCarNo, setOutCarNo] = useState('');
 
+  // selectedCar가 변경될 때 차량번호(출고) 초기값 설정
+  useEffect(() => {
+    if (selectedCar?.CAR_NO) {
+      setOutCarNo(selectedCar.CAR_NO);
+    }
+  }, [selectedCar]);
+
   // 특이사항 선택 상태 관리
   const [sellMemo, setSellMemo] = useState('');
 
@@ -1216,7 +1223,7 @@ export default function SalesRegisterPage({
         </div>
         <table className="table table--xl" id="myTable">
           <colgroup>
-            <col style={{ width: "300px" }} />
+            <col style={{ width: "280px" }} />
             <col style={{ width: "220px" }} />
             <col style={{ width: "200px" }} />
             <col style={{ width: "200px" }} />
@@ -1241,25 +1248,26 @@ export default function SalesRegisterPage({
             {buyerCustomers.map((customer, index) => (
               <tr key={customer.id}>
                 <td>
-                  <div className="input">
-                    <input 
-                      type="text" 
-                      className="input__field" 
-                      placeholder="고객명"
-                      value={customer.customerName}
-                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'customerName', e.target.value)}
-                    />
-                    <button className="btn btn--dark" type="button">검색</button>
-                    <div className="input__utils">
-                      <button
-                        type="button"
-                        className="jsInputClear input__clear ico ico--input-delete"
-                        onClick={() => handleUpdateBuyerCustomer(customer.id, 'customerName', '')}
-                      >
-                        고객명
-                      </button>
+                  <div className="input-with-search">
+                    <div className="input">
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="고객명"
+                        value={customer.customerName}
+                        onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'customerName', e.target.value)}
+                      />
+                      <div className="input__utils">
+                        <button
+                          type="button"
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => handleUpdateBuyerCustomer(customer.id, 'customerName', '')}
+                        >
+                          고객명
+                        </button>
+                      </div>
                     </div>
-                    
+                    <button className="btn btn--dark" type="button">검색</button>
                   </div>
                 </td>
                 <td>
@@ -1323,31 +1331,37 @@ export default function SalesRegisterPage({
                   </div>
                 </td>
                 <td>
-                  <div className="input">
-                  <input 
-                      type="text" 
-                      className="input__field" 
-                      placeholder="우편번호"
-                      value={customer.zip}
-                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'zip', e.target.value)}
-                    />
-                    <input 
-                      type="text" 
-                      className="input__field" 
-                      placeholder="주소"
-                      value={customer.address}
-                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'address', e.target.value)}
-                    />
-                    <div className="input__utils">
-                      <button
-                        type="button"
-                        className="jsInputClear input__clear ico ico--input-delete"
-                        onClick={() => handleUpdateBuyerCustomer(customer.id, 'address', '')}
-                      >
-                        주소
-                      </button>
+                  <div className="address-input-group">
+                    <div className="input zip-input">
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="우편번호"
+                        value={customer.zip}
+                        onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'zip', e.target.value)}
+                      />
                     </div>
-                    <button className="btn btn--dark" type="button">검색</button>
+                    <div className="input-with-search">
+                      <div className="input">
+                        <input 
+                          type="text" 
+                          className="input__field" 
+                          placeholder="주소"
+                          value={customer.address}
+                          onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'address', e.target.value)}
+                        />
+                        <div className="input__utils">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                            onClick={() => handleUpdateBuyerCustomer(customer.id, 'address', '')}
+                          >
+                            주소
+                          </button>
+                        </div>
+                      </div>
+                      <button className="btn btn--dark" type="button">검색</button>
+                    </div>
                   </div>
                 </td>
                 <td>

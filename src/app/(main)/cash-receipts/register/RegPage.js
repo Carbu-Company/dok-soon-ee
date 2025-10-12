@@ -4,6 +4,12 @@ import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 import Pagination from "@/components/ui/pagination";
+import { 
+  getCashBillList, 
+  getCashBillAmount, 
+  getReceiptIssueList, 
+  getReceiptIssueSummary 
+} from "@/app/(main)/api/carApi";
 
 // ===== 상수 정의 =====
 const TRANSACTION_TYPE = {
@@ -129,6 +135,25 @@ export default function CashReceiptRegisterPage({
         } else {
           alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
         }
+      } else {
+        // searchAction이 없을 때 carApi 사용
+        const searchParamsWithPage = {
+          ...getDefaultParams(pageNum),
+          ...searchParams,
+        };
+
+        const result = await getCashBillList(searchParamsWithPage);
+        
+        if (result.success) {
+          const responseData = result.data?.list || [];
+          const paginationInfo = result.data?.pagination || {};
+
+          setPendingList(responseData);
+          setTotalPages(paginationInfo.totalPages || 1);
+          setCurrentPage(paginationInfo.currentPage || pageNum);
+        } else {
+          alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
+        }
       }
     } catch (error) {
       console.error("검색 에러:", error);
@@ -220,24 +245,48 @@ export default function CashReceiptRegisterPage({
         issuanceType: issuanceType,
         selectedItems: selectedItems,
         usrId: session?.usrId,
+        carAgent: session?.agentId,
       };
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/bulkCashReceiptIssuance`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(issuanceData)
+      // 개별 현금영수증 발행 처리
+      const issuancePromises = selectedItems.map(async (item) => {
+        try {
+          const itemData = {
+            ...issuanceData,
+            costSeq: item.COST_SEQ || item.CAR_REG_ID,
+            tradeAmt: item.TRADE_AMT,
+            custNm: item.CUST_NM,
+            rcgnNo: item.RCGN_NO,
+            carNo: item.CAR_NO,
+            dlrNm: item.DLR_NM,
+          };
+
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/cashReceiptIssuance`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(itemData)
+          });
+          
+          const res = await response.json();
+          return res;
+        } catch (error) {
+          console.error(`현금영수증 발행 오류 (${item.CAR_NO}):`, error);
+          return { success: false, error: error.message };
+        }
       });
-      
-      const res = await response.json();
-      
-      if (res.success) {
-        alert(`${selectedItems.length}건의 현금영수증이 성공적으로 발행되었습니다.`);
+
+      const results = await Promise.all(issuancePromises);
+      const successCount = results.filter(result => result.success).length;
+      const failCount = results.length - successCount;
+
+      if (successCount > 0) {
+        alert(`${successCount}건의 현금영수증이 성공적으로 발행되었습니다.${failCount > 0 ? ` (실패: ${failCount}건)` : ''}`);
         setSelectedItems([]);
         handleSearch(currentPage); // 목록 새로고침
       } else {
-        throw new Error(res.message || '현금영수증 발행에 실패했습니다');
+        throw new Error('모든 현금영수증 발행에 실패했습니다');
       }
     } catch (error) {
       setError(error.message);
