@@ -640,6 +640,8 @@ html, body {
     background-repeat: no-repeat;
     font-size: 14px;
     line-height: 20px;
+    min-width: 20px;
+    min-height: 20px;
   }
   
   .form-option--icon  .form-option__title {
@@ -663,6 +665,14 @@ html, body {
   }
   .form-option input[type="radio"]:checked ~ .form-option__title {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9.5' fill='white' stroke='%232979FF'/%3E%3Ccircle cx='10' cy='10' r='6' fill='%232979FF'/%3E%3C/svg%3E");
+  }
+
+  /* 선택된 테이블 행 스타일 */
+  .table__row--selected {
+    background-color: #E3F2FD !important;
+  }
+  .table__row--selected td {
+    background-color: #E3F2FD !important;
   }
   
   /* �곸꽭 寃��� */

@@ -1295,7 +1295,7 @@ props
             type="button"
             className="btn btn--red btn--padding--r30"
             onClick={() => {
-              window.location.href = "#";
+              router.push('/cash-receipts/register');
             }}
           >
             <span className="ico ico--add"></span>건별 발행 등록
