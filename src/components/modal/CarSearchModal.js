@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { getCarPurList, getDealerList } from "../../app/(main)/api/carApi";
+import Pagination from "@/components/ui/pagination";
 
 export default function CarSearchModal({ open, onClose, onCarSelect, agentId }) {
   const [carList, setCarList] = useState([]);
@@ -502,155 +503,16 @@ export default function CarSearchModal({ open, onClose, onCarSelect, agentId }) 
               </tbody>
             </table>
 
-            <div className="pagination">
-              <button 
-                type="button" 
-                className="pagination__btn pagination__btn--prev"
-                disabled={searchParams.page <= 1}
-                onClick={() => handlePageChange(searchParams.page - 1)}
-              >
-                이전
-              </button>
-              
-              {(() => {
-                const totalPages = Math.ceil(totalCount / searchParams.pageSize);
-                const currentPage = searchParams.page;
-                const pages = [];
-                
-                // 페이지 번호 생성 로직
-                if (totalPages <= 10) {
-                  // 총 페이지가 10개 이하인 경우 모든 페이지 표시
-                  for (let i = 1; i <= totalPages; i++) {
-                    pages.push(
-                      <button
-                        key={i}
-                        type="button"
-                        className={`pagination__btn ${currentPage === i ? "on" : ""}`}
-                        onClick={() => handlePageChange(i)}
-                      >
-                        {i}
-                      </button>
-                    );
-                  }
-                } else {
-                  // 총 페이지가 10개 초과인 경우
-                  if (currentPage <= 5) {
-                    // 현재 페이지가 5 이하인 경우
-                    for (let i = 1; i <= 7; i++) {
-                      pages.push(
-                        <button
-                          key={i}
-                          type="button"
-                          className={`pagination__btn ${currentPage === i ? "on" : ""}`}
-                          onClick={() => handlePageChange(i)}
-                        >
-                          {i}
-                        </button>
-                      );
-                    }
-                    pages.push(
-                      <button key="..." type="button" className="pagination__btn" disabled>
-                        ...
-                      </button>
-                    );
-                    pages.push(
-                      <button
-                        key={totalPages}
-                        type="button"
-                        className={`pagination__btn ${currentPage === totalPages ? "on" : ""}`}
-                        onClick={() => handlePageChange(totalPages)}
-                      >
-                        {totalPages}
-                      </button>
-                    );
-                  } else if (currentPage >= totalPages - 4) {
-                    // 현재 페이지가 마지막 5개 안에 있는 경우
-                    pages.push(
-                      <button
-                        key={1}
-                        type="button"
-                        className={`pagination__btn ${currentPage === 1 ? "on" : ""}`}
-                        onClick={() => handlePageChange(1)}
-                      >
-                        1
-                      </button>
-                    );
-                    pages.push(
-                      <button key="..." type="button" className="pagination__btn" disabled>
-                        ...
-                      </button>
-                    );
-                    for (let i = totalPages - 6; i <= totalPages; i++) {
-                      pages.push(
-                        <button
-                          key={i}
-                          type="button"
-                          className={`pagination__btn ${currentPage === i ? "on" : ""}`}
-                          onClick={() => handlePageChange(i)}
-                        >
-                          {i}
-                        </button>
-                      );
-                    }
-                  } else {
-                    // 중간에 있는 경우
-                    pages.push(
-                      <button
-                        key={1}
-                        type="button"
-                        className={`pagination__btn ${currentPage === 1 ? "on" : ""}`}
-                        onClick={() => handlePageChange(1)}
-                      >
-                        1
-                      </button>
-                    );
-                    pages.push(
-                      <button key="..." type="button" className="pagination__btn" disabled>
-                        ...
-                      </button>
-                    );
-                    for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-                      pages.push(
-                        <button
-                          key={i}
-                          type="button"
-                          className={`pagination__btn ${currentPage === i ? "on" : ""}`}
-                          onClick={() => handlePageChange(i)}
-                        >
-                          {i}
-                        </button>
-                      );
-                    }
-                    pages.push(
-                      <button key="..." type="button" className="pagination__btn" disabled>
-                        ...
-                      </button>
-                    );
-                    pages.push(
-                      <button
-                        key={totalPages}
-                        type="button"
-                        className={`pagination__btn ${currentPage === totalPages ? "on" : ""}`}
-                        onClick={() => handlePageChange(totalPages)}
-                      >
-                        {totalPages}
-                      </button>
-                    );
-                  }
-                }
-                
-                return pages;
-              })()}
-              
-              <button 
-                type="button" 
-                className="pagination__btn pagination__btn--next"
-                disabled={searchParams.page >= Math.ceil(totalCount / searchParams.pageSize)}
-                onClick={() => handlePageChange(searchParams.page + 1)}
-              >
-                다음
-              </button>
-            </div>
+            {totalCount > 0 && (
+              <Pagination
+                currentPage={searchParams.page}
+                totalPages={Math.ceil(totalCount / searchParams.pageSize)}
+                onPageChange={handlePageChange}
+                showPrevNext={true}
+                showEllipsis={true}
+                maxVisiblePages={10}
+              />
+            )}
           </div>
 
           <div className="modal__btns">
