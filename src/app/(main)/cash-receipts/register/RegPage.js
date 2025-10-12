@@ -171,22 +171,16 @@ export default function CashReceiptRegisterPage({
   // 아이템 선택/해제 핸들러
   const handleItemSelect = (item, index) => {
     setSelectedItems(prev => {
-      // 고유 식별자로 비교 (인덱스와 아이템 ID 조합)
-      const itemId = `${index}_${item.CAR_REG_ID || item.NTS_CONF_NO || index}`;
-      const isSelected = prev.some(selected => 
-        selected.index === index || 
-        (selected.CAR_REG_ID && selected.CAR_REG_ID === item.CAR_REG_ID)
-      );
+      // 인덱스로만 비교하여 다중 선택 가능하도록 수정
+      const isSelected = prev.some(selected => selected.index === index);
       
       if (isSelected) {
-        const newItems = prev.filter(selected => 
-          selected.index !== index && 
-          (!selected.CAR_REG_ID || selected.CAR_REG_ID !== item.CAR_REG_ID)
-        );
-        return newItems;
+        // 선택 해제
+        return prev.filter(selected => selected.index !== index);
       } else {
-        const newItems = [...prev, { ...item, index, itemId }];
-        return newItems;
+        // 선택 추가
+        const itemId = `${index}_${item.CAR_REG_ID || item.NTS_CONF_NO || index}`;
+        return [...prev, { ...item, index, itemId }];
       }
     });
   };
@@ -542,17 +536,17 @@ export default function CashReceiptRegisterPage({
 
         <table className="table">
           <colgroup>
-            <col style={{ width: "50px" }} />
             <col style={{ width: "80px" }} />
-            <col style={{ width: "200px" }} />
-            <col style={{ width: "150px" }} />
-            <col style={{ width: "120px" }} />
-            <col style={{ width: "150px" }} />
-            <col style={{ width: "auto" }} />
-            <col style={{ width: "130px" }} />
-            <col style={{ width: "auto" }} />
-            <col style={{ width: "125px" }} />
             <col style={{ width: "100px" }} />
+            <col style={{ width: "200px" }} />
+            <col style={{ width: "300px" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "320px" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "120px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "120px" }} />
+            <col style={{ width: "80px" }} />
           </colgroup>
           <thead>
             <tr>
@@ -575,14 +569,15 @@ export default function CashReceiptRegisterPage({
               return (
                 <tr key={index} className={isSelected ? 'table__row--selected' : ''}>
                   <td>
-                    <div className="form-option">
+                    <div className="form-option form-option--icon">
                       <label className="form-option__label">
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => handleItemSelect(item, index)}
+                          className="form-option__checkbox--round"
                         />
-                        <span className="form-option__title"></span>
+                        <span className="form-option__title">선택</span>
                       </label>
                     </div>
                   </td>

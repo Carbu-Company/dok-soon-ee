@@ -667,6 +667,14 @@ html, body {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9.5' fill='white' stroke='%232979FF'/%3E%3Ccircle cx='10' cy='10' r='6' fill='%232979FF'/%3E%3C/svg%3E");
   }
 
+  /* 원형 체크박스 스타일 - 더 구체적인 선택자로 우선순위 높임 */
+  .form-option .form-option__checkbox--round ~ .form-option__title {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9.5' fill='white' stroke='%23E1E1E5'/%3E%3C/svg%3E") !important;
+  }
+  .form-option .form-option__checkbox--round:checked ~ .form-option__title {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Ccircle cx='10' cy='10' r='9.5' fill='white' stroke='%232979FF'/%3E%3Ccircle cx='10' cy='10' r='6' fill='%232979FF'/%3E%3C/svg%3E") !important;
+  }
+
   /* 선택된 테이블 행 스타일 */
   .table__row--selected {
     background-color: #E3F2FD !important;
