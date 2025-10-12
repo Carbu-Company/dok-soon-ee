@@ -76,16 +76,16 @@ export default function SettingsPage(props) {
       if (result.success && result.data) {
         console.log('상사 정보 데이터:', result.data)
         setCompanyInfo({
-          companyName: result.data.companyName || '',
-          businessNumber: result.data.businessNumber || '',
+          companyName: result.data.COMNAME || '',
+          businessNumber: result.data.BRNO || '',
           loginId: result.data.loginId || '',
           password: result.data.password || '',
-          phone: result.data.phone || '',
-          email: result.data.email || '',
-          emailDomain: result.data.emailDomain || 'gmail.com',
+          phone: result.data.PHON || '',
+          email: result.data.EMAIL_ID || '',
+          emailDomain: result.data.EMAIL_DOMAIN || 'gmail.com',
           mobile: result.data.mobile || '',
-          address: result.data.address || '',
-          detailAddress: result.data.detailAddress || ''
+          address: result.data.ADDR1 || '',
+          detailAddress: result.data.ADDR2 || ''
         })
       } else {
         console.log('상사 정보 로드 실패:', result.error)

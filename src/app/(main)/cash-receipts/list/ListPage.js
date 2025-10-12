@@ -1665,6 +1665,7 @@ props
               {/*소득공제/지출증빙*/}
               <th>식별번호</th>
               <th>고객명</th>
+              <th>고객전화번호</th>
               <th>담당딜러</th>
               <th>품명</th>
               <th>거래금액</th>
@@ -1682,6 +1683,7 @@ props
                 <td>{car.TRADE_TP_NM}</td>
                 <td>{car.RCGN_NO}</td>
                 <td>{car.CUST_NM}</td>
+                <td>{car.CUST_HP}</td>
                 <td>{car.DLR_NM}</td>
                 <td>{car.CAR_NM} {car.CAR_NO}<br/>{car.CR_TRNS_STAT_NM}</td>
                 <td>{car.TRADE_AMT}</td>
