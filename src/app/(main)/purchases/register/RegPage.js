@@ -55,8 +55,8 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
     const amount = Number(purAmt.replace(/[^0-9]/g, ''));
     
     if (!isNaN(amount)) {
-      // 공급가액 = 매입금액 / 1.1 (소수점 버림)
-      const supplyPrice = Math.floor(amount / 1.1);
+      // 공급가액 = 매입금액 / 1.1 (소수점 올림)
+      const supplyPrice = Math.ceil(amount / 1.1);
       // 부가세 = 매입금액 - 공급가액
       const vat = amount - supplyPrice;
       

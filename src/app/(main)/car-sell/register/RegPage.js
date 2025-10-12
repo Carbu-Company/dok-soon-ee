@@ -130,11 +130,43 @@ export default function SalesRegisterPage({
   const [selectedSellDealer, setSelectedSellDealer] = useState("");
   const [isSellDealerSelectOpen, setIsSellDealerSelectOpen] = useState(false);
 
-  // 매입금액 선택 상태 관리
+  // 판매금액 선택 상태 관리
   const [sellAmt, setSellAmt] = useState('0');
   const [sellSupPrc, setSellSupPrc] = useState('0');
   const [sellVat, setSellVat] = useState('0');
 
+  // 매입금액이 변경될 때 공급가액과 부가세 계산
+  useEffect(() => {
+    // sellAmt undefined이거나 null인 경우 빈 문자열로 처리
+    const amountStr = sellAmt || '';
+    // 문자열에서 숫자로 변환
+    const amount = Number(amountStr.toString().replace(/[^0-9]/g, ''));
+    
+    if (!isNaN(amount)) {
+      // 공급가액 = 판매금액 / 1.1 (소수점 올림)
+      const supplyPrice = Math.ceil(amount / 1.1);
+      // 부가세 = 판매금액 - 공급가액
+      const vat = amount - supplyPrice;
+      
+      // 값이 실제로 변경된 경우에만 state 업데이트
+      if (sellSupPrc !== supplyPrice) {
+        setSellSupPrc(supplyPrice);
+      }
+      if (sellVat !== vat) {
+        setSellVat(vat);
+      }
+    } else {
+      // 값이 실제로 변경된 경우에만 state 업데이트
+      if (sellSupPrc !== 0) {
+        setSellSupPrc(0);
+      }
+      if (sellVat !== 0) {
+        setSellVat(0);
+      }
+    }
+  }, [sellAmt]); // sellSupPrc, sellVat 제거하여 무한 루프 방지
+
+  
   // 판매유형 선택 상태 관리
   const [selectedSellType, setSelectedSellType] = useState("");
   const [isSellTypeSelectOpen, setIsSellTypeSelectOpen] = useState(false);
@@ -165,21 +197,84 @@ export default function SalesRegisterPage({
       residentNumber: '',
       businessNumber: '',
       phone: '',
+      zip: '',
       address: '',
       memo: '',
       shareRate: ''
     }
   ]);
 
-  /////////////////////////////////////////////////////////////////////////////
+  const handleSellSubmit = async () => {
+    console.log('handleSellSubmit');
+
+    setLoading(true);
+    setError(null);
+
+
+    const formValues = {    
+      carRegId: carPurDetail.CAR_REG_ID,                        // 매입차량 ID
+      carSaleDt,                                                // 판매일
+      saleRegDt: new Date().toISOString().split('T')[0],       // 등록일
+      agentId: session?.agentId,                               // 상사사 ID
+      dlrId: selectedSellDealer,                               // 딜러 ID
+      saleTpCd: selectedSellType,                              // 판매유형
+      buyerNm: buyerCustomers[0].customerName,                 // 매수자명
+      buyerTpCd: buyerCustomers[0].customerType,               // 매수자구분
+      buyerSsn: buyerCustomers[0].residentNumber,              // 매수자 주민번호
+      buyerBrno: buyerCustomers[0].businessNumber,             // 매수자 사업자번호
+      buyerPhon: buyerCustomers[0].phone,                      // 매수자 연락처
+      buyerZip: buyerCustomers[0].zipCode,                     // 매수자 우편번호
+      buyerAddr1: buyerCustomers[0].address,                   // 매수자 주소
+      buyerAddr2: buyerCustomers[0].addressDetail,             // 매수자 상세주소
+      saleAmt: sellAmt,                                        // 판매금액
+      saleSupPrc: sellSupPrc,                                  // 판매 공급가액
+      saleVat: sellVat,                                        // 판매 부가세
+      saleCarNo: outCarNo,                                     // 판매차량번호
+      agentSelCost,                                            // 상사매도비
+      perfInfeAmt,                                             // 성능보험료
+      txblIssuYn: 'N',                                         // 세금계산서발행여부
+      selcstInclusYn: 'N',                                     // 매도비포함여부
+      selEvdcCd: '',                                           // 매도증빙코드
+      selEvdcCont: '',                                         // 매도증빙내용
+      selEvdcDt: '',                                           // 매도증빙일자
+      adjFinYn: 'N',                                           // 정산완료여부
+      attachedFiles: attachedSellFiles,                        // 첨부파일
+      saleDesc: sellMemo,                                      // 판매설명
+      totFeeAmt: '0',                                          // 총수수료
+      realFeeAmt: '0',                                         // 실수수료
+      saleCrIssuYn: 'N',                                       // 매도확인서발행여부
+      modrId: session?.usrId,                                   // 수정자ID
+      buyerCustomers
+    };
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarSel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formValues)
+      });
+      const res = await response.json();
+      
+      alert('매도차량 등록 되었습니다.'); // 테스트용 알림
+      setLoading(false);
+      if (res.success) {
+        router.push('/car-sell/list');
+        return { success: true, res, error: null };
+      } else {
+        throw new Error(res.message || '매도차량 등록에 실패했습니다');
+      }
+    } catch (error) {
+      setError(error.message);
+      alert('매도차량 등록 중 오류가 발생했습니다.'); // 테스트용 알림
+      setLoading(false);
+      return { success: false, res: [], error: error.message };
+    }
+
+  };
 
   /////////////////////////////////////////////////////////////////////////////
-  // 고객 정보 등록 항목 
-  /////////////////////////////////////////////////////////////////////////////
-
-
-  /////////////////////////////////////////////////////////////////////////////
-
 
 
   /////////////////////////////////////////////////////////////////////////////
@@ -219,8 +314,8 @@ export default function SalesRegisterPage({
     const amount = Number(amountStr.toString().replace(/[^0-9]/g, ''));
     
     if (!isNaN(amount)) {
-      // 공급가액 = 매입금액 / 1.1 (소수점 버림)
-      const supplyPrice = Math.floor(amount / 1.1);
+      // 공급가액 = 매입금액 / 1.1 (소수점 올림)
+      const supplyPrice = Math.ceil(amount / 1.1);
       // 부가세 = 매입금액 - 공급가액
       const vat = amount - supplyPrice;
       
@@ -363,136 +458,136 @@ export default function SalesRegisterPage({
     setIsParkingCdSelectOpen(false);
   }, []);
 
-  const handleSubmit = async () => {
+  const handlePurSubmit = async () => {
 
     setLoading(true);
     setError(null);
-    //console.log('buyerCustomers', buyerCustomers);    // 매수고객 정보
-    // console.log('dealerId', dealerId);    // 매입딜러 ID
-    // console.log('carKndCd', carKndCd);    // 차량 종류 코드
-    // console.log('evdcCd', evdcCd);    // 증빙종류 코드
-    // console.log('carNm', carNm);    // 차량명
 
-    // console.log('prsnSctCd', prsnSctCd);    // 제시구분 코드
-    // console.log('purAmt', purAmt);    // 매입금액
-    // console.log('purSupPrc', purSupPrc);    // 공급가액
-    // console.log('purVat', purVat);    // 부가세    
-    // console.log('carPurDt', carPurDt);    // 매입일
-    // console.log('agentPurCst', agentPurCst);    // 상사매입비
-    // console.log('brokerageDate', brokerageDate);    // 상사매입비 입금일
-    // console.log('carRegDt', carRegDt);    // 이전일
-    // console.log('txblIssuDt', txblIssuDt);    // 발행일
-    // console.log('carNo', carNo);    // 차량번호(매입후)
-    // console.log('purBefCarNo', purBefCarNo);    // 차량번호(매입전)
-    // console.log('ownrNm', ownrNm);    // 고객명
-    // console.log('ownrTpCd', ownrTpCd);    // 고객구분
-    // console.log('ctshNo', ctshNo);    // 계약서번호
-    // console.log('ownrSsn', ownrSsn);    // 주민(법인)등록번호
-    // console.log('ownrPhon', ownrPhon);    // 연락처
-    // console.log('ownrEmail', ownrEmail);    // e메일 주소
-    // console.log('emailDomain', emailDomain);    // e메일 도메인
-    // console.log('ownrZip', ownrZip);    // 우편번호
-    // console.log('ownrAddr1', ownrAddr1);    // 주소1
-    // console.log('ownrAddr2', ownrAddr2);    // 주소2
-    // console.log('ownrBrno', ownrBrno);    // 사업자등록번호
-    // console.log('txblRcvYn', txblRcvYn);    // 세금 납부일
-    // console.log('purDesc', purDesc);    // 특이사항
-    // console.log('parkingCd', parkingCd);    // 주차위치 코드
-    // console.log('parkingLocationDesc', parkingLocationDesc);    // 주차위치 설명
-    // console.log('fctCndcYn', fctCndcYn);    // 사실확인서
-    // console.log('attachedFiles', attachedFiles);    // 관련 서류 첨부
-    // console.log('parkKeyNo', parkKeyNo);    // Key번호
+    console.log('dealerId', dealerId);    // 매입딜러 ID
+    console.log('carKndCd', carKndCd);    // 차량 종류 코드
+    console.log('evdcCd', evdcCd);    // 증빙종류 코드
+    console.log('carNm', carNm);    // 차량명
+
+    console.log('prsnSctCd', prsnSctCd);    // 제시구분 코드
+    console.log('purAmt', purAmt);    // 매입금액
+    console.log('purSupPrc', purSupPrc);    // 공급가액
+    console.log('purVat', purVat);    // 부가세    
+    console.log('carPurDt', carPurDt);    // 매입일
+    console.log('agentPurCst', agentPurCst);    // 상사매입비
+    console.log('brokerageDate', brokerageDate);    // 상사매입비 입금일
+    console.log('carRegDt', carRegDt);    // 이전일
+    console.log('txblIssuDt', txblIssuDt);    // 발행일
+    console.log('carNo', carNo);    // 차량번호(매입후)
+    console.log('purBefCarNo', purBefCarNo);    // 차량번호(매입전)
+    console.log('ownrNm', ownrNm);    // 고객명
+    console.log('ownrTpCd', ownrTpCd);    // 고객구분
+    console.log('ctshNo', ctshNo);    // 계약서번호
+    console.log('ownrSsn', ownrSsn);    // 주민(법인)등록번호
+    console.log('ownrPhon', ownrPhon);    // 연락처
+    console.log('ownrEmail', ownrEmail);    // e메일 주소
+    console.log('emailDomain', emailDomain);    // e메일 도메인
+    console.log('ownrZip', ownrZip);    // 우편번호
+    console.log('ownrAddr1', ownrAddr1);    // 주소1
+    console.log('ownrAddr2', ownrAddr2);    // 주소2
+    console.log('ownrBrno', ownrBrno);    // 사업자등록번호
+    console.log('txblRcvYn', txblRcvYn);    // 세금 납부일
+    console.log('purDesc', purDesc);    // 특이사항
+    console.log('parkingCd', parkingCd);    // 주차위치 코드
+    console.log('parkingLocationDesc', parkingLocationDesc);    // 주차위치 설명
+    console.log('fctCndcYn', fctCndcYn);    // 사실확인서
+    console.log('attachedFiles', attachedFiles);    // 관련 서류 첨부
+    console.log('parkKeyNo', parkKeyNo);    // Key번호
 
     // 매입딜러
-    // if(!dealerId) {
-    //   alert('매입딜러를 선택해주세요.');
-    //   return;
-    // }
+    if(!dealerId) {
+      alert('매입딜러를 선택해주세요.');
+      return;
+    }
 
-    // // 매입금액
-    // if(!purAmt || purAmt === '0') {
-    //   alert('매입금액을 입력해주세요.');
-    //   return;
-    // }
+    // 매입금액
+    if(!purAmt || purAmt === '0') {
+      alert('매입금액을 입력해주세요.');
+      return;
+    }
 
-    // // 매입일
-    // if(!carPurDt) {
-    //   alert('매입일을 선택해주세요.');
-    //   return;
-    // }
+    // 매입일
+    if(!carPurDt) {
+      alert('매입일을 선택해주세요.');
+      return;
+    }
 
-    // // 상사매입비
-    // if(!agentPurCst) {
-    //   alert('상사매입비를 입력해주세요.');
-    //   return;
-    // }
+    // 상사매입비
+    if(!agentPurCst) {
+      alert('상사매입비를 입력해주세요.');
+      return;
+    }
 
-    // // 취득세
-    // if(!gainTax) {
-    //   alert('취득세를 선택해주세요.');
-    //   return;
-    // }
+    // 취득세
+    if(!gainTax) {
+      alert('취득세를 선택해주세요.');
+      return;
+    }
 
-    // // 차량 유형
-    // if(!carKndCd) {
-    //   alert('차량 유형을 선택해주세요.');
-    //   return;
-    // }
+    // 차량 유형
+    if(!carKndCd) {
+      alert('차량 유형을 선택해주세요.');
+      return;
+    }
     
-    // // 차량명
-    // if(!carNm) {
-    //   alert('차량명을 입력해주세요.');
-    //   return;
-    // }
+    // 차량명
+    if(!carNm) {
+      alert('차량명을 입력해주세요.');
+      return;
+    }
 
-    // // 차량번호(매입후)
-    // if(!carNo) {
-    //   alert('차량번호(매입후)를 입력해주세요.');
-    //   return;
-    // }
+    // 차량번호(매입후)
+    if(!carNo) {
+      alert('차량번호(매입후)를 입력해주세요.');
+      return;
+    }
 
-    // // 고객명
-    // if(!ownrNm) {
-    //   alert('매도자/전소유자명을 입력해주세요.');
-    //   return;
-    // }
+    // 고객명
+    if(!ownrNm) {
+      alert('매도자/전소유자명을 입력해주세요.');
+      return;
+    }
 
-    // // 고객구분
-    // if(!ownrTpCd) {
-    //   alert('고객구분을 선택해주세요.');
-    //   return;
-    // }
+    // 고객구분
+    if(!ownrTpCd) {
+      alert('고객구분을 선택해주세요.');
+      return;
+    }
 
-    // // 증빙종류
-    // if(!evdcCd) {
-    //   alert('증빙종류를 선택해주세요.');
-    //   return;
-    // }
+    // 증빙종류
+    if(!evdcCd) {
+      alert('증빙종류를 선택해주세요.');
+      return;
+    }
 
-    // // 주민(법인)등록번호
-    // if(ownrSsn) {
+    // 주민(법인)등록번호
+    if(ownrSsn) {
 
-    //   // 주민번호 체크 
-    //   if(!isValidResidentNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.INDIVIDUAL) {
-    //     alert('주민등록번호를 확인해주세요.');
-    //     return;
-    //   } else if(!isValidCorporateNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.CORPORATION) {
-    //     alert('법인등록번호를 확인해주세요.');
-    //     return;
-    //   }
+      // 주민번호 체크 
+      if(!isValidResidentNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.INDIVIDUAL) {
+        alert('주민등록번호를 확인해주세요.');
+        return;
+      } else if(!isValidCorporateNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.CORPORATION) {
+        alert('법인등록번호를 확인해주세요.');
+        return;
+      }
 
-    // }
+    }
 
-    // // 사업자번호
-    // if(ownrBrno) {
-    //   if(!checkBizID(ownrBrno)) {
-    //     alert('사업자등록번호를 확인해주세요.');
-    //     return;
-    //   }
-    // }
+    // 사업자번호
+    if(ownrBrno) {
+      if(!checkBizID(ownrBrno)) {
+        alert('사업자등록번호를 확인해주세요.');
+        return;
+      }
+    }
 
     const formValues = {
-      carRegId : selectedCar?.CAR_REG_ID,                        // 매입차량 ID
+      carRegId : carPurDetail.CAR_REG_ID,                        // 매입차량 ID
       carAgent: session?.agentId,                                // 상사사 ID
       purAmt,                                                    // 매입금액
       purSupPrc,                                                 // 공급가액
@@ -529,14 +624,13 @@ export default function SalesRegisterPage({
       txblRcvYn,                                                 // 매입수취여부
       ctshNo,                                                     // 계약서번호
       carRegDt,                                                  // 이전일
-      buyerCustomers,                                            // 매수고객 정보
     };
 
 
-    console.log('formValues', formValues);
+    //console.log('formValues', formValues);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarSel`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarPur`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -714,7 +808,7 @@ export default function SalesRegisterPage({
                       </button>
                     </div>
                   </div>
-                  <span className="input-help">1,000,000 / 100,000</span>
+                  <span className="input-help">{sellSupPrc?.toLocaleString() || '0'} / {sellVat?.toLocaleString() || '0'}</span>
                 </div>
               </td>
               <th>
@@ -836,7 +930,7 @@ export default function SalesRegisterPage({
                     className="select__input"
                     type="hidden"
                     name="sellTpCd"
-                    value={selectedSellType}
+                    value={selectedSellType || (sellTpList[0]?.CD || '')}
                   />
                   <button 
                     className="select__toggle" 
@@ -844,7 +938,7 @@ export default function SalesRegisterPage({
                     onClick={() => setIsSellTypeSelectOpen(!isSellTypeSelectOpen)}
                   >
                     <span className="select__text">
-                      {sellTpList.find(type => type.CD === selectedSellType)?.CD_NM || '선택'}
+                      {sellTpList.find(type => type.CD === selectedSellType)?.CD_NM || sellTpList[0]?.CD_NM || ''}
                     </span>
                     <Image
                       className="select__arrow"
@@ -859,7 +953,7 @@ export default function SalesRegisterPage({
                     {sellTpList.map((type, index) => (
                       <li 
                         key={index}
-                        className={`select__option ${selectedSellType === type.CD ? 'select__option--selected' : ''}`}
+                        className={`select__option ${(selectedSellType || sellTpList[0]?.CD) === type.CD ? 'select__option--selected' : ''}`}
                         data-value={type.CD}
                         onClick={() => {
                           setSelectedSellType(type.CD);
@@ -1155,6 +1249,7 @@ export default function SalesRegisterPage({
                       value={customer.customerName}
                       onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'customerName', e.target.value)}
                     />
+                    <button className="btn btn--dark" type="button">검색</button>
                     <div className="input__utils">
                       <button
                         type="button"
@@ -1164,6 +1259,7 @@ export default function SalesRegisterPage({
                         고객명
                       </button>
                     </div>
+                    
                   </div>
                 </td>
                 <td>
@@ -1351,7 +1447,7 @@ export default function SalesRegisterPage({
         <button className="btn btn--primary" type="button" disabled>
           확인
         </button>
-        <button className="btn btn--primary" type="button" onClick={handleSubmit}>
+        <button className="btn btn--primary" type="button" onClick={handleSellSubmit}>
           확인
         </button>
       </div>
@@ -2353,7 +2449,7 @@ export default function SalesRegisterPage({
       {/* 매입정보 e */}
 
       <div className="container__btns">
-        <button className="btn btn--primary" type="button"  onClick={handleSubmit}>
+        <button className="btn btn--primary" type="button"  onClick={handlePurSubmit}>
           매입정보 수정
         </button>
       </div>
