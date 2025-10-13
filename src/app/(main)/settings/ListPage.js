@@ -554,17 +554,13 @@ export default function SettingsPage(props) {
                   {dealerList.length > 0 ? (
                     dealerList.map((dealer, index) => (
                       <tr key={index}>
-                        <td>{dealer.dealerName || '-'}</td>
-                        <td>{dealer.phone || '-'}</td>
-                        <td>{dealer.email || '-'}</td>
+                        <td>{dealer.USR_NM || '-'}</td>
+                        <td>{dealer.USR_PHON || '-'}</td>
+                        <td>{dealer.USR_EMAIL || '-'}</td>
+                        <td>{dealer.USR_STAT_NM || '-'}</td>
                         <td>
-                          <span className={`status ${dealer.status === 'active' ? 'status--active' : 'status--inactive'}`}>
-                            {dealer.status === 'active' ? '활성' : '비활성'}
-                          </span>
-                        </td>
-                        <td>
-                          <button className="btn btn--light btn--sm" type="button">수정</button>
-                          <button className="btn btn--red btn--sm" type="button">삭제</button>
+                          <button className="btn btn--light btn--sm" type="button" onClick={usrUpdate(dealer.USR_ID)}>수정</button>
+                          <button className="btn btn--red btn--sm" type="button" onClick={usrDelete(dealer.USR_ID)}>삭제</button>
                         </td>
                       </tr>
                     ))
@@ -661,9 +657,9 @@ export default function SettingsPage(props) {
                   {accountList.length > 0 ? (
                     accountList.map((account, index) => (
                       <tr key={index}>
-                        <td>{account.bankName || '-'}</td>
+                        <td>{account.BNK_NM || '-'}</td>
                         <td>{account.ACCT_NO || '-'}</td>
-                        <td>{account.accountHolder || '-'}</td>
+                        <td>{account.ACCT_HLDR || '-'}</td>
                         <td>{account.ACCT_NM || '-'}</td>
                         <td>
                           <button className="btn btn--light btn--sm" type="button">수정</button>
