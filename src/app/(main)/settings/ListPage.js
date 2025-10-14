@@ -219,7 +219,42 @@ export default function SettingsPage(props) {
   const handleTabChange = (tab) => {
     setActiveTab(tab)
   }
-    return (
+
+  // 딜러 수정
+  const usrUpdate = (usrId) => {
+    if (confirm('수정하시겠습니까?')) {
+      // 수정페이지로 이동
+      window.location.href = `/settings/edit/${usrId}`;
+    }
+  }
+
+  // 딜러 삭제
+  const usrDelete = async (usrId) => {
+      if (confirm('삭제하시겠습니까?')) {
+        try {
+          // API 호출 로직
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/deleteDealer?usrId=${usrId}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            alert('삭제되었습니다.');
+            // 딜러 목록 새로고침
+            loadDealerList();
+          } else {
+            alert('삭제에 실패했습니다.');
+          }
+        } catch (error) {
+          console.error('딜러 삭제 오류:', error);
+          alert('삭제 중 오류가 발생했습니다.');
+        }
+      }
+  }
+
+  return (
         <main className="container container--page">
           <div className="container__head">
             <h2 className="container__title">환경 설정</h2>
@@ -559,8 +594,8 @@ export default function SettingsPage(props) {
                         <td>{dealer.USR_EMAIL || '-'}</td>
                         <td>{dealer.USR_STAT_NM || '-'}</td>
                         <td>
-                          <button className="btn btn--light btn--sm" type="button" onClick={usrUpdate(dealer.USR_ID)}>수정</button>
-                          <button className="btn btn--red btn--sm" type="button" onClick={usrDelete(dealer.USR_ID)}>삭제</button>
+                          <button className="btn btn--light btn--sm" type="button" onClick={() => usrUpdate(dealer.USR_ID)}>수정</button>
+                          <button className="btn btn--red btn--sm" type="button" onClick={() => usrDelete(dealer.USR_ID)}>삭제</button>
                         </td>
                       </tr>
                     ))
@@ -699,6 +734,5 @@ export default function SettingsPage(props) {
             </button>
           </div>
         </main>
-    );
-  }
-  
+  );
+}
