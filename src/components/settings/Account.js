@@ -5,24 +5,48 @@ export default function Account({ accountList, loading, onAccountListChange }) {
   // 행별 수정 모드 상태 관리
   const [editingRows, setEditingRows] = useState(new Set())
   const [originalData, setOriginalData] = useState({})
+  // 새로 추가된 항목들의 인덱스를 추적
+  const [newlyAddedItems, setNewlyAddedItems] = useState(new Set())
 
   // 특정 행 수정 모드 시작
   const handleRowEditStart = (index) => {
-    setOriginalData(prev => ({
-      ...prev,
-      [index]: { ...accountList[index] }
-    }))
+    // 새로 추가된 항목이 아닌 경우에만 originalData에 저장
+    if (!newlyAddedItems.has(index)) {
+      setOriginalData(prev => ({
+        ...prev,
+        [index]: { ...accountList[index] }
+      }))
+    }
     setEditingRows(prev => new Set([...prev, index]))
   }
 
   // 특정 행 수정 모드 취소
   const handleRowEditCancel = (index) => {
-    // 원본 데이터로 복원
-    if (originalData[index]) {
+    if (newlyAddedItems.has(index)) {
+      // 새로 추가된 행인 경우 - 해당 행을 삭제
+      const updatedList = accountList.filter((_, i) => i !== index)
+      onAccountListChange(updatedList)
+      
+      // newlyAddedItems에서 제거하고 인덱스 조정
+      setNewlyAddedItems(prev => {
+        const newSet = new Set()
+        prev.forEach(itemIndex => {
+          if (itemIndex < index) {
+            newSet.add(itemIndex)
+          } else if (itemIndex > index) {
+            newSet.add(itemIndex - 1)
+          }
+          // itemIndex === index인 경우는 제거됨
+        })
+        return newSet
+      })
+    } else {
+      // 기존 데이터 수정인 경우 - 원본 데이터로 복원
       const updatedList = [...accountList]
       updatedList[index] = { ...originalData[index] }
       onAccountListChange(updatedList)
     }
+    
     setEditingRows(prev => {
       const newSet = new Set(prev)
       newSet.delete(index)
@@ -39,6 +63,16 @@ export default function Account({ accountList, loading, onAccountListChange }) {
   const handleRowEditSave = (index) => {
     // 여기에 저장 API 호출 로직 추가 예정
     alert('저장되었습니다.')
+    
+    // 새로 추가된 항목이었다면 추적에서 제거 (이제 기존 데이터가 됨)
+    if (newlyAddedItems.has(index)) {
+      setNewlyAddedItems(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(index)
+        return newSet
+      })
+    }
+    
     setEditingRows(prev => {
       const newSet = new Set(prev)
       newSet.delete(index)
@@ -66,6 +100,15 @@ export default function Account({ accountList, loading, onAccountListChange }) {
       ACCT_NM: '',
       MAST_YN: 'N'
     }
+    
+    // 기존 newlyAddedItems의 인덱스를 모두 1씩 증가 (새 항목이 맨 앞에 추가되므로)
+    setNewlyAddedItems(prev => {
+      const newSet = new Set()
+      prev.forEach(index => newSet.add(index + 1))
+      newSet.add(0) // 새로 추가된 항목은 인덱스 0
+      return newSet
+    })
+    
     // 상단에 추가 (배열의 맨 앞에 추가)
     const updatedList = [newAccount, ...accountList]
     onAccountListChange(updatedList)

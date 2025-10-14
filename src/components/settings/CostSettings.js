@@ -20,16 +20,26 @@ export default function CostSettings({
     income: new Set()
   })
   const [originalData, setOriginalData] = useState({})
+  // 새로 추가된 항목들의 인덱스를 추적
+  const [newlyAddedItems, setNewlyAddedItems] = useState({
+    purchase: new Set(),
+    sell: new Set(),
+    expense: new Set(),
+    income: new Set()
+  })
 
   // 특정 행 수정 모드 시작
   const handleRowEditStart = (section, index) => {
     const dataKey = `${section}-${index}`
     const currentData = getCurrentData(section)
     
-    setOriginalData(prev => ({
-      ...prev,
-      [dataKey]: { ...currentData[index] }
-    }))
+    // 새로 추가된 항목이 아닌 경우에만 originalData에 저장
+    if (!newlyAddedItems[section].has(index)) {
+      setOriginalData(prev => ({
+        ...prev,
+        [dataKey]: { ...currentData[index] }
+      }))
+    }
     
     setEditingRows(prev => ({
       ...prev,
@@ -37,11 +47,50 @@ export default function CostSettings({
     }))
   }
 
+  // 새로 추가된 항목인지 확인
+  const isNewlyAddedItem = (section, index) => {
+    const currentData = getCurrentData(section)
+    const item = currentData[index]
+    
+    // 새로 추가된 항목의 특징: 모든 필드가 기본값이거나 빈 값
+    if (section === 'purchase' || section === 'sell') {
+      return item.CNFG_FEE_TITLE === '' && 
+             item.CNFG_FEE_RATE === 0 && 
+             item.CNFG_FEE_AMT === 0
+    } else if (section === 'expense' || section === 'income') {
+      return item.CODE1 === '' && 
+             item.NAME === '' && 
+             item.NAME2 === '0'
+    }
+    return false
+  }
+
   // 특정 행 수정 모드 취소
   const handleRowEditCancel = (section, index) => {
     const dataKey = `${section}-${index}`
     
-    if (originalData[dataKey]) {
+    if (newlyAddedItems[section].has(index)) {
+      // 새로 추가된 행인 경우 - 해당 행을 삭제
+      const currentData = getCurrentData(section)
+      const updatedData = currentData.filter((_, i) => i !== index)
+      
+      updateData(section, updatedData)
+      
+      // newlyAddedItems에서 제거하고 인덱스 조정
+      setNewlyAddedItems(prev => ({
+        ...prev,
+        [section]: new Set([...prev[section]].filter(itemIndex => {
+          if (itemIndex < index) return true
+          if (itemIndex > index) {
+            // 인덱스를 1 감소시켜야 하지만 Set에서는 직접 수정 불가
+            // 새로운 Set을 만들어야 함
+            return false
+          }
+          return false // itemIndex === index인 경우 제거
+        }).map(itemIndex => itemIndex > index ? itemIndex - 1 : itemIndex))
+      }))
+    } else {
+      // 기존 데이터 수정인 경우 - 원본 데이터로 복원
       const currentData = getCurrentData(section)
       const updatedData = [...currentData]
       updatedData[index] = { ...originalData[dataKey] }
@@ -65,6 +114,14 @@ export default function CostSettings({
   const handleRowEditSave = (section, index) => {
     // 여기에 저장 API 호출 로직 추가 예정
     alert('저장되었습니다.')
+    
+    // 새로 추가된 항목이었다면 추적에서 제거 (이제 기존 데이터가 됨)
+    if (newlyAddedItems[section].has(index)) {
+      setNewlyAddedItems(prev => ({
+        ...prev,
+        [section]: new Set([...prev[section]].filter(i => i !== index))
+      }))
+    }
     
     setEditingRows(prev => ({
       ...prev,
@@ -91,6 +148,12 @@ export default function CostSettings({
     const newItem = getNewItemTemplate(section)
     const currentData = getCurrentData(section)
     const updatedData = [newItem, ...currentData]
+    
+    // 기존 newlyAddedItems의 인덱스를 모두 1씩 증가 (새 항목이 맨 앞에 추가되므로)
+    setNewlyAddedItems(prev => ({
+      ...prev,
+      [section]: new Set([...prev[section]].map(index => index + 1).concat([0]))
+    }))
     
     updateData(section, updatedData)
     
