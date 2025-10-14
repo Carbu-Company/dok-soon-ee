@@ -11,6 +11,11 @@ import {
   getCompanyIncome,
   getAgentAcctList
 } from '@/app/(main)/api/carApi'
+import CompanyInfo from '@/components/settings/CompanyInfo'
+import DealerManagement from '@/components/settings/DealerManagement'
+import CostSettings from '@/components/settings/CostSettings'
+import Certificate from '@/components/settings/Certificate'
+import Account from '@/components/settings/Account'
 
 export default function SettingsPage(props) {
     const carAgent = props.session.agentId;
@@ -72,9 +77,7 @@ export default function SettingsPage(props) {
     try {
       setLoading(true)
       const result = await getAgentInfo(carAgent)
-      console.log('상사 정보 API 응답:', result)
       if (result.success && result.data) {
-        console.log('상사 정보 데이터:', result.data)
         setCompanyInfo({
           companyName: result.data.COMNAME || '',
           businessNumber: result.data.BRNO || '',
@@ -87,11 +90,8 @@ export default function SettingsPage(props) {
           address: result.data.ADDR1 || '',
           detailAddress: result.data.ADDR2 || ''
         })
-      } else {
-        console.log('상사 정보 로드 실패:', result.error)
       }
     } catch (error) {
-      console.error('상사 정보 로드 오류:', error)
     } finally {
       setLoading(false)
     }
@@ -101,15 +101,10 @@ export default function SettingsPage(props) {
   const loadDealerList = async () => {
     try {
       const result = await getCompanyDealer(carAgent) // carAgent는 자동으로 세션에서 가져옴
-      console.log('딜러 목록 API 응답:', result)
       if (result.success && result.data) {
-        console.log('딜러 목록 데이터:', result.data)
         setDealerList(result.data)
-      } else {
-        console.log('딜러 목록 로드 실패:', result.error)
       }
     } catch (error) {
-      console.error('딜러 목록 로드 오류:', error)
     }
   }
   
@@ -117,15 +112,10 @@ export default function SettingsPage(props) {
   const loadPurchaseCost = async () => {
     try {
       const result = await getPurchaseCost(carAgent) // carAgent는 자동으로 세션에서 가져옴
-      console.log('매입비 설정 API 응답:', result)
       if (result.success && result.data) {
-        console.log('매입비 설정 데이터:', result.data)
         setPurchaseCost(result.data)
-      } else {
-        console.log('매입비 설정 로드 실패:', result.error)
       }
     } catch (error) {
-      console.error('매입비 설정 로드 오류:', error)
     }
   }
   
@@ -133,15 +123,10 @@ export default function SettingsPage(props) {
   const loadSellCostSummary = async () => {
     try {
       const result = await getSellCostSummary(carAgent) // carAgent는 자동으로 세션에서 가져옴
-      console.log('매도비 설정 API 응답:', result)
       if (result.success && result.data) {
-        console.log('매도비 설정 데이터:', result.data)
         setSellCostSummary(result.data)
-      } else {
-        console.log('매도비 설정 로드 실패:', result.error)
       }
     } catch (error) {
-      console.error('매도비 설정 로드 오류:', error)
     }
   }
   
@@ -149,15 +134,10 @@ export default function SettingsPage(props) {
   const loadExpenseList = async () => {
     try {
       const result = await getCompanyExpense(carAgent) // carAgent는 자동으로 세션에서 가져옴
-      console.log('지출 항목 API 응답:', result)
       if (result.success && result.data) {
-        console.log('지출 항목 데이터:', result.data)
         setExpenseList(result.data)
-      } else {
-        console.log('지출 항목 로드 실패:', result.error)
       }
     } catch (error) {
-      console.error('지출 항목 로드 오류:', error)
     }
   }
   
@@ -165,15 +145,10 @@ export default function SettingsPage(props) {
   const loadIncomeList = async () => {
     try {
       const result = await getCompanyIncome(carAgent) // carAgent는 자동으로 세션에서 가져옴
-      console.log('수입 항목 API 응답:', result)
       if (result.success && result.data) {
-        console.log('수입 항목 데이터:', result.data)
         setIncomeList(result.data)
-      } else {
-        console.log('수입 항목 로드 실패:', result.error)
       }
     } catch (error) {
-      console.error('수입 항목 로드 오류:', error)
     }
   }
   
@@ -181,15 +156,10 @@ export default function SettingsPage(props) {
   const loadAccountList = async () => {
     try {
       const result = await getAgentAcctList(carAgent)
-      console.log('계좌 목록 API 응답:', result)
       if (result.success && result.data) {
-        console.log('계좌 목록 데이터:', result.data)
         setAccountList(result.data)
-      } else {
-        console.log('계좌 목록 로드 실패:', result.error)
       }
     } catch (error) {
-      console.error('계좌 목록 로드 오류:', error)
     }
   }
   
@@ -208,7 +178,6 @@ export default function SettingsPage(props) {
       // 여기에 저장 API 호출 로직 추가
       alert('저장되었습니다.')
     } catch (error) {
-      console.error('저장 오류:', error)
       alert('저장 중 오류가 발생했습니다.')
     } finally {
       setLoading(false)
@@ -297,388 +266,46 @@ export default function SettingsPage(props) {
   
           {/* 상사 정보 관리 탭 */}
           {activeTab === 'company-info' && (
-            <div className="table-wrap">
-              <h2 className="table-wrap__title">상사 정보 관리</h2>
-              <table className="table table--lg">
-                <colgroup>
-                  <col style={{ width: "140px" }} />
-                  <col style={{ width: "auto" }} />
-                  <col style={{ width: "140px" }} />
-                  <col style={{ width: "auto" }} />
-                </colgroup>
-                <tbody>
-                  <tr>
-                    <th>상사명</th>
-                    <td>
-                      <div className="input w240">
-                        <input 
-                          type="text" 
-                          className="input__field" 
-                          placeholder="상사명" 
-                          value={companyInfo.companyName}
-                          onChange={(e) => handleCompanyInfoChange('companyName', e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button 
-                            type="button" 
-                            className="jsInputClear input__clear ico ico--input-delete"
-                            onClick={() => handleCompanyInfoChange('companyName', '')}
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <th>사업자 등록번호</th>
-                    <td className="text-left">
-                      <div className="input w240">
-                        <input 
-                          type="text" 
-                          className="input__field" 
-                          placeholder="123-45-67890" 
-                          value={companyInfo.businessNumber}
-                          onChange={(e) => handleCompanyInfoChange('businessNumber', e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button 
-                            type="button" 
-                            className="jsInputClear input__clear ico ico--input-delete"
-                            onClick={() => handleCompanyInfoChange('businessNumber', '')}
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>로그인 ID</th>
-                    <td>
-                      <div className="input w240">
-                        <input 
-                          type="text" 
-                          className="input__field" 
-                          placeholder="아이디" 
-                          value={companyInfo.loginId}
-                          onChange={(e) => handleCompanyInfoChange('loginId', e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button 
-                            type="button" 
-                            className="jsInputClear input__clear ico ico--input-delete"
-                            onClick={() => handleCompanyInfoChange('loginId', '')}
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <th>비밀번호</th>
-                    <td>
-                      <div className="input w240">
-                        <input 
-                          type="password" 
-                          className="input__field" 
-                          placeholder="비밀번호" 
-                          value={companyInfo.password}
-                          onChange={(e) => handleCompanyInfoChange('password', e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button 
-                            type="button" 
-                            className="jsInputClear input__clear ico ico--input-delete"
-                            onClick={() => handleCompanyInfoChange('password', '')}
-                          >
-                            삭제
-                          </button>
-                          <button type="button" className="jsInputTypeToggle input__toggle ico ico--view">비밀번호 보기</button>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>전화</th>
-                    <td>
-                      <div className="input w240">
-                        <input 
-                          type="text" 
-                          className="input__field" 
-                          placeholder="- 없이 입력" 
-                          value={companyInfo.phone}
-                          onChange={(e) => handleCompanyInfoChange('phone', e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button 
-                            type="button" 
-                            className="jsInputClear input__clear ico ico--input-delete"
-                            onClick={() => handleCompanyInfoChange('phone', '')}
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                    <th>이메일 주소</th>
-                    <td>
-                      <div className="input-group input-group--sm">
-                        <div className="input w240">
-                          <input 
-                            type="text" 
-                            className="input__field" 
-                            placeholder="이메일 주소" 
-                            value={companyInfo.email}
-                            onChange={(e) => handleCompanyInfoChange('email', e.target.value)}
-                          />
-                          <div className="input__utils">
-                            <button 
-                              type="button" 
-                              className="jsInputClear input__clear ico ico--input-delete"
-                              onClick={() => handleCompanyInfoChange('email', '')}
-                            >
-                              삭제
-                            </button>
-                          </div>
-                        </div>
-                        <span className="input-group__dash">@</span>
-                        <div className="select w120">
-                          <input className="select__input" type="hidden" name="emailDomain" value={companyInfo.emailDomain} />
-                          <button className="select__toggle" type="button">
-                            <span className="select__text">{companyInfo.emailDomain}</span>
-                            <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
-                          </button>
-                          <ul className="select__menu">
-                            {emailDomains.map((domain) => (
-                              <li 
-                                key={domain.value}
-                                className={`select__option ${companyInfo.emailDomain === domain.value ? 'select__option--selected' : ''}`}
-                                onClick={() => handleCompanyInfoChange('emailDomain', domain.value)}
-                              >
-                                {domain.label}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>휴대폰 번호</th>
-                    <td colSpan={3}>
-                      <div className="input w240">
-                        <input 
-                          type="text" 
-                          className="input__field" 
-                          placeholder="- 없이 입력" 
-                          value={companyInfo.mobile}
-                          onChange={(e) => handleCompanyInfoChange('mobile', e.target.value)}
-                        />
-                        <div className="input__utils">
-                          <button 
-                            type="button" 
-                            className="jsInputClear input__clear ico ico--input-delete"
-                            onClick={() => handleCompanyInfoChange('mobile', '')}
-                          >
-                            삭제
-                          </button>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>주소</th>
-                    <td colSpan={3}>
-                      <div className="input-group">
-                        <button className="btn btn--dark" type="button">주소 검색</button>
-                        <div className="input w400">
-                          <input 
-                            type="text" 
-                            className="input__field" 
-                            placeholder="검색 버튼을 눌러주세요" 
-                            value={companyInfo.address}
-                            onChange={(e) => handleCompanyInfoChange('address', e.target.value)}
-                          />
-                          <div className="input__utils">
-                            <button 
-                              type="button" 
-                              className="jsInputClear input__clear ico ico--input-delete"
-                              onClick={() => handleCompanyInfoChange('address', '')}
-                            >
-                              삭제
-                            </button>
-                          </div>
-                        </div>
-                        <div className="input w400">
-                          <input 
-                            type="text" 
-                            className="input__field" 
-                            placeholder="상세 주소" 
-                            value={companyInfo.detailAddress}
-                            onChange={(e) => handleCompanyInfoChange('detailAddress', e.target.value)}
-                          />
-                          <div className="input__utils">
-                            <button 
-                              type="button" 
-                              className="jsInputClear input__clear ico ico--input-delete"
-                              onClick={() => handleCompanyInfoChange('detailAddress', '')}
-                            >
-                              삭제
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <CompanyInfo 
+              companyInfo={companyInfo}
+              emailDomains={emailDomains}
+              onCompanyInfoChange={handleCompanyInfoChange}
+              loading={loading}
+            />
           )}
 
           {/* 상사 딜러 관리 탭 */}
           {activeTab === 'dealer-management' && (
-            <div className="table-wrap">
-              <h2 className="table-wrap__title">상사 딜러 관리</h2>
-              <div className="table-wrap__head">
-                <button className="btn btn--primary" type="button">딜러 추가</button>
-              </div>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>딜러명</th>
-                    <th>연락처</th>
-                    <th>이메일</th>
-                    <th>상태</th>
-                    <th>관리</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dealerList.length > 0 ? (
-                    dealerList.map((dealer, index) => (
-                      <tr key={index}>
-                        <td>{dealer.dealerName || '-'}</td>
-                        <td>{dealer.phone || '-'}</td>
-                        <td>{dealer.email || '-'}</td>
-                        <td>
-                          <span className={`status ${dealer.status === 'active' ? 'status--active' : 'status--inactive'}`}>
-                            {dealer.status === 'active' ? '활성' : '비활성'}
-                          </span>
-                        </td>
-                        <td>
-                          <button className="btn btn--light btn--sm" type="button">수정</button>
-                          <button className="btn btn--red btn--sm" type="button">삭제</button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="text-center">등록된 딜러가 없습니다.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <DealerManagement 
+              dealerList={dealerList}
+              loading={loading}
+            />
           )}
 
           {/* 매입/매도비 설정 탭 */}
           {activeTab === 'cost-settings' && (
-            <div className="table-wrap">
-              <h2 className="table-wrap__title">매입/매도비 설정</h2>
-              <div className="table-wrap__head">
-                <button className="btn btn--primary" type="button">비용 항목 추가</button>
-              </div>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>항목명</th>
-                    <th>유형</th>
-                    <th>금액</th>
-                    <th>설명</th>
-                    <th>관리</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {purchaseCost.length > 0 ? (
-                    purchaseCost.map((cost, index) => (
-                      <tr key={index}>
-                        <td>{cost.itemName || '-'}</td>
-                        <td>{cost.type || '-'}</td>
-                        <td>{cost.amount ? cost.amount.toLocaleString() + '원' : '-'}</td>
-                        <td>{cost.description || '-'}</td>
-                        <td>
-                          <button className="btn btn--light btn--sm" type="button">수정</button>
-                          <button className="btn btn--red btn--sm" type="button">삭제</button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="text-center">등록된 비용 항목이 없습니다.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <CostSettings 
+              purchaseCost={purchaseCost}
+              sellCostSummary={sellCostSummary}
+              expenseList={expenseList}
+              incomeList={incomeList}
+              loading={loading}
+            />
           )}
 
           {/* 공인인증서 등록 탭 */}
           {activeTab === 'certificate' && (
-            <div className="table-wrap">
-              <h2 className="table-wrap__title">공인인증서 등록</h2>
-              <div className="guidebox">
-                <p className="guidebox__title">공인인증서 등록 안내</p>
-                <p className="guidebox__desc">
-                  전자세금계산서 발행을 위해 공인인증서를 등록해주세요.<br/>
-                  등록된 공인인증서는 팝빌 시스템에서 자동으로 관리됩니다.
-                </p>
-              </div>
-              <div className="upload-area">
-                <div className="upload-area__content">
-                  <div className="upload-area__icon">📄</div>
-                  <p className="upload-area__text">공인인증서 파일을 선택하거나 드래그하여 업로드하세요</p>
-                  <button className="btn btn--primary" type="button">파일 선택</button>
-                </div>
-              </div>
-            </div>
+            <Certificate 
+              loading={loading}
+            />
           )}
 
           {/* 계좌 등록 탭 */}
           {activeTab === 'account' && (
-            <div className="table-wrap">
-              <h2 className="table-wrap__title">계좌 등록</h2>
-              <div className="table-wrap__head">
-                <button className="btn btn--primary" type="button">계좌 추가</button>
-              </div>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>은행명</th>
-                    <th>계좌번호</th>
-                    <th>예금주</th>
-                    <th>계좌유형</th>
-                    <th>관리</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {accountList.length > 0 ? (
-                    accountList.map((account, index) => (
-                      <tr key={index}>
-                        <td>{account.bankName || '-'}</td>
-                        <td>{account.ACCT_NO || '-'}</td>
-                        <td>{account.accountHolder || '-'}</td>
-                        <td>{account.ACCT_NM || '-'}</td>
-                        <td>
-                          <button className="btn btn--light btn--sm" type="button">수정</button>
-                          <button className="btn btn--red btn--sm" type="button">삭제</button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="text-center">등록된 계좌가 없습니다.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <Account 
+              accountList={accountList}
+              loading={loading}
+            />
           )}
   
           <div className="container__btns">
