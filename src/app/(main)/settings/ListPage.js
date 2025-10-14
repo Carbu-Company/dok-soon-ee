@@ -203,6 +203,12 @@ export default function SettingsPage(props) {
     setAccountList(newAccountList)
   }
   
+  // 공인인증서 정보 업데이트
+  const handleCertificateChange = (newCertificateData) => {
+    // 공인인증서 데이터 업데이트 로직
+    console.log('공인인증서 데이터 변경:', newCertificateData)
+  }
+  
   
   // 탭 변경 처리
   const handleTabChange = (tab) => {
@@ -357,6 +363,7 @@ export default function SettingsPage(props) {
           {activeTab === 'certificate' && (
             <Certificate 
               loading={loading}
+              onCertificateChange={handleCertificateChange}
             />
           )}
 
