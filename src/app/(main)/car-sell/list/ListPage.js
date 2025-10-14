@@ -27,13 +27,13 @@ export default function SalesVehicleList(props) {
   const initialPagination = props.carList?.data?.pagination || {};
 
   // Summary 데이터
-  const initialPurchasesSummary = props.purchasesSummary?.data || [];
+  const initialCarSellSummary = props.carSellSummary?.data || [];
 
   const [carList, setCarList] = useState(initialCarListData);
   const [pagination, setPagination] = useState(initialPagination);
   const [totalPages, setTotalPages] = useState(initialPagination.totalPages || 1);
 
-  const [purchasesSummary, setPurchasesSummary] = useState(initialPurchasesSummary);
+  const [carSellSummary, setCarSellSummary] = useState(initialCarSellSummary);
 
   const [dealerList, setDealerList] = useState(props.dealerList || []);
   const [evdcCdList, setEvdcCdList] = useState(props.evdcCdList || []);
@@ -296,7 +296,7 @@ export default function SalesVehicleList(props) {
 
           setCarList(responseData);
           setPagination(paginationInfo);
-          setPurchasesSummary(summaryData);
+          setCarSellSummary(summaryData);
 
           // 서버에서 제공하는 페이지네이션 정보 사용
           setTotalPages(paginationInfo.totalPages || 1);
@@ -1625,7 +1625,7 @@ export default function SalesVehicleList(props) {
 
                     <ul className="select__menu">
                       <li className="select__option">
-                      <Link href={`/car-sell/edit/${item.CAR_REG_ID}`}>매입 수정</Link>
+                      <Link href={`/purchases/edit/${item.CAR_REG_ID}`}>매입 수정</Link>
                       </li>
                       <li className="select__option">
                         <a
@@ -1701,35 +1701,34 @@ export default function SalesVehicleList(props) {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>상사매입</td>
-              <td>100</td>
-              <td>1,000,000</td>
-              <td>100,000</td>
-              <td>1,100,000</td>
-              <td></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>고객위탁</td>
-              <td>10</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td></td>
-              <td></td>
-            </tr>
+          {carSellSummary?.map((item, index) => (
+                index < 2 && (
+                  <tr key={index}>
+                    <td>{item.PRSN_SCT_NM}</td>
+                    <td>{item.CNT.toLocaleString()}</td>
+                    <td>{item.PUR_AMT.toLocaleString()}</td>
+                    <td>{item.CAR_LOAN_AMT.toLocaleString()}</td>
+                    <td>{item.SALE_AMT.toLocaleString()}</td>
+                    <td>{item.AGENT_SEL_COST.toLocaleString()}</td>
+                    <td>{item.PERF_INFE_AMT.toLocaleString()}</td>
+                  </tr>
+                )
+              ))}
           </tbody>
           <tfoot>
-            <tr>
-              <th>합계</th>
-              <th>110</th>
-              <th>1,000,000</th>
-              <th>100,000</th>
-              <th>1,100,000</th>
-              <th></th>
-              <th></th>
-            </tr>
+            {carSellSummary?.map((item, index) => (
+              index === 2 && (
+                <tr key={index}>
+                  <th>{item.PRSN_SCT_NM}</th>
+                  <th>{item.CNT.toLocaleString()}</th>
+                  <th>{item.PUR_AMT.toLocaleString()}</th>
+                  <th>{item.CAR_LOAN_AMT.toLocaleString()}</th>
+                  <th>{item.SALE_AMT.toLocaleString()}</th>
+                  <th>{item.AGENT_SEL_COST.toLocaleString()}</th>
+                  <th>{item.PERF_INFE_AMT.toLocaleString()}</th>
+                </tr>
+              )
+            ))}
           </tfoot>
         </table>
       </div>

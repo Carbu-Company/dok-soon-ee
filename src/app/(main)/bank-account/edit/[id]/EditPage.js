@@ -3,7 +3,26 @@
 import { useState } from 'react';
 import CarSearchModal from '@/components/modal/CarSearchModal';
 
-export default function Page({ session = null }) {
+export default function Page({   
+    session = null, 
+    tradeInItemCDList = [], 
+    tradeOutItemCDList = [], 
+    carAcctDetail = []
+  }) {
+
+  // ===== 거래항목 코드 목록 상태 =====    
+  const [isTradeItemOpen, setIsTradeItemOpen] = useState(false);
+  const [tradeItemCd, setTradeItemCd] = useState(carAcctDetail.TRADE_ITEM_CD || '');
+  const [tradeItemNm, setTradeItemNm] = useState(carAcctDetail.TRADE_ITEM_NM || '');
+
+  // ===== 거래항목 메모 상태 =====    
+  const [tradeMemo, setTradeMemo] = useState(carAcctDetail.TRADE_RMRK_NM || '');
+
+  // 거래항목 코드 목록 상태
+  const [tradeItemCDList, setTradeItemCDList] = useState(
+    carAcctDetail.TRADE_SCT_NM === "입금" ? tradeInItemCDList : 
+    carAcctDetail.TRADE_SCT_NM === "출금" ? tradeOutItemCDList : []
+  );
   // 차량 검색 모달 상태
   const [isCarSearchModalOpen, setIsCarSearchModalOpen] = useState(false);  
   // 선택된 차량 정보 상태
@@ -34,6 +53,54 @@ export default function Page({ session = null }) {
     });
     setIsCarSearchModalOpen(false);
   };
+
+  const handleSubmit = async () => {
+
+    setLoading(true);
+    setError(null);
+
+    console.log('tradeItemCd', tradeItemCd);    // 거래항목 코드
+    console.log('tradeMemo', tradeMemo);    // 특이사항
+    console.log('selectedCar', selectedCar);    // 관계딜러
+
+    // 증빙종류
+    if(!tradeItemCd) {
+      alert('거래항목명을 선택해주세요.');
+      return;
+    }
+
+    const formValues = {
+      acctDtlSeq : carAcctDetail.ACCT_DTL_SEQ,                   // 계좌 내역 순번
+      tradeItemCd : tradeItemCd,                                 // 거래항목 코드
+      tradeItemNm : tradeItemNm,                                 // 거래항목 명
+      tradeMemo : tradeMemo,                                     // 거래항목 메모
+      carRegId : selectedCar.carRegId,                           // 차량 ID
+      usrId: session?.usrId,                                     // 사용자 ID
+    };
+
+    console.log('formValues', formValues);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarAcctDetail`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formValues)
+      });
+      const res = await response.json();
+      
+      alert('계좌 내역 수정 완료되었습니다.'); // 테스트용 알림
+      setLoading(false);
+      return { success: true, res, error: null };
+    } catch (error) {
+      setError(error.message);
+      alert('계좌 내역 수정 중 오류가 발생했습니다.'); // 테스트용 알림
+      setLoading(false);
+      return { success: false, res: [], error: error.message };
+    }
+  };
+
   return (
     <main className="container container--page">
       <div className="container__head">
@@ -58,19 +125,19 @@ export default function Page({ session = null }) {
           <tbody>
             <tr>
               <th>거래일시</th>
-              <td>2025-09-11 20:45:45</td>
+              <td>{carAcctDetail.TRADE_DTIME}</td>
               <th>계좌번호</th>
-              <td>110-11-123545</td>
+              <td>{carAcctDetail.ACCT_NO}</td>
               <th>통장적요</th>
-              <td></td>
+              <td>{carAcctDetail.TRADE_RMRK_NM}</td>
             </tr>
             <tr>
               <th>입금액</th>
-              <td className="text-red">5,000,000원</td>
+              <td className="text-red">{carAcctDetail.IAMT?.toLocaleString()}</td>
               <th>출금액</th>
-              <td className="text-point"></td>
+              <td className="text-point">{carAcctDetail.OAMT?.toLocaleString()}</td>
               <th>잔액</th>
-              <td>12,550,000</td>
+              <td>{carAcctDetail.BLNC?.toLocaleString()}</td>
             </tr>
             <tr>
               <th>
@@ -86,25 +153,53 @@ export default function Page({ session = null }) {
               </th>
               <td>
                 <div className="select">
-                  <input className="select__input" type="hidden" name="dealer" defaultValue="value1" />
-                  <button className="select__toggle" type="button">
-                    <span className="select__text">선택</span>
+                  <input className="select__input" type="hidden" name="tradeItem" defaultValue="" />
+                  <button 
+                    className="select__toggle" 
+                    type="button"
+                    onClick={() => setIsTradeItemOpen(!isTradeItemOpen)}
+                  >
+                    <span className="select__text">{tradeItemNm || '선택'}</span>
                     <img className="select__arrow" src="/images/ico-dropdown.svg" alt="" />
                   </button>
 
-                  <ul className="select__menu">
-                    <li className="select__option select__option--selected" data-value="value1">선택</li>
-                    <li className="select__option" data-value="value2">차량대금</li>
-                    <li className="select__option" data-value="value3">상사매도비</li>
+                  <ul className="select__menu" style={{display: isTradeItemOpen ? 'block' : 'none'}}>
+                    <li className="select__option select__option--selected" data-value="">선택</li>
+                    {tradeItemCDList.map((item) => (
+                      <li 
+                        key={item.CD} 
+                        className="select__option" 
+                        data-value={item.CD}
+                        onClick={() => {
+                          setTradeItemCd(item.CD);
+                          setTradeItemNm(item.CD_NM);
+                          setIsTradeItemOpen(false);
+                        }}
+                      >
+                        {item.CD_NM}
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </td>
               <th>추가메모</th>
               <td colSpan={3}>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
+                  <input 
+                    type="text" 
+                    className="input__field" 
+                    placeholder="" 
+                    value={tradeMemo}
+                    onChange={(e) => setTradeMemo(e.target.value)}
+                  />
                   <div className="input__utils">
-                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                    <button 
+                      type="button" 
+                      className="jsInputClear input__clear ico ico--input-delete"
+                      onClick={() => setTradeMemo('')}
+                    >
+                      삭제
+                    </button>
                   </div>
                 </div>
               </td>
@@ -191,12 +286,11 @@ export default function Page({ session = null }) {
         <button
           className="btn btn--light"
           type="button"
-          onClick={() => { window.location.href = 'm1.jsp'; }}
+          onClick={() => { window.location.href = '/bank-account/list'; }}
         >
           취소
         </button>
-        <button className="btn btn--primary" type="button" disabled>확인</button>
-        <button className="btn btn--primary" type="button">확인</button>
+        <button className="btn btn--primary" type="button" onClick={handleSubmit}>확인</button>
       </div>
 
       {/* 
