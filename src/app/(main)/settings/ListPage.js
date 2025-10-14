@@ -77,18 +77,19 @@ export default function SettingsPage(props) {
     try {
       setLoading(true)
       const result = await getAgentInfo(carAgent)
-      if (result.success && result.data) {
+      if (result.success && result.data && result.data.length > 0) {
+        const companyData = result.data[0]
         setCompanyInfo({
-          companyName: result.data.COMNAME || '',
-          businessNumber: result.data.BRNO || '',
-          loginId: result.data.loginId || '',
-          password: result.data.password || '',
-          phone: result.data.PHON || '',
-          email: result.data.EMAIL_ID || '',
-          emailDomain: result.data.EMAIL_DOMAIN || 'gmail.com',
-          mobile: result.data.mobile || '',
-          address: result.data.ADDR1 || '',
-          detailAddress: result.data.ADDR2 || ''
+          companyName: companyData.COMNAME || '',
+          businessNumber: companyData.BRNO || '',
+          loginId: companyData.loginId || '',
+          password: companyData.password || '',
+          phone: companyData.PHON || '',
+          email: companyData.EMAIL_ID || '',
+          emailDomain: companyData.EMAIL_DOMAIN || 'gmail.com',
+          mobile: companyData.mobile || '',
+          address: companyData.ADDR1 || '',
+          detailAddress: companyData.ADDR2 || ''
         })
       }
     } catch (error) {
@@ -156,6 +157,7 @@ export default function SettingsPage(props) {
   const loadAccountList = async () => {
     try {
       const result = await getAgentAcctList(carAgent)
+      console.log('계좌 목록 로드:', result)
       if (result.success && result.data) {
         setAccountList(result.data)
       }
@@ -171,18 +173,36 @@ export default function SettingsPage(props) {
     }))
   }
   
-  // 저장 처리
-  const handleSave = async () => {
-    try {
-      setLoading(true)
-      // 여기에 저장 API 호출 로직 추가
-      alert('저장되었습니다.')
-    } catch (error) {
-      alert('저장 중 오류가 발생했습니다.')
-    } finally {
-      setLoading(false)
-    }
+  // 딜러 목록 업데이트
+  const handleDealerListChange = (newDealerList) => {
+    setDealerList(newDealerList)
   }
+  
+  // 매입비 설정 업데이트
+  const handlePurchaseCostChange = (newPurchaseCost) => {
+    setPurchaseCost(newPurchaseCost)
+  }
+  
+  // 매도비 설정 업데이트
+  const handleSellCostSummaryChange = (newSellCostSummary) => {
+    setSellCostSummary(newSellCostSummary)
+  }
+  
+  // 지출 항목 업데이트
+  const handleExpenseListChange = (newExpenseList) => {
+    setExpenseList(newExpenseList)
+  }
+  
+  // 수입 항목 업데이트
+  const handleIncomeListChange = (newIncomeList) => {
+    setIncomeList(newIncomeList)
+  }
+  
+  // 계좌 목록 업데이트
+  const handleAccountListChange = (newAccountList) => {
+    setAccountList(newAccountList)
+  }
+  
   
   // 탭 변경 처리
   const handleTabChange = (tab) => {
@@ -314,6 +334,7 @@ export default function SettingsPage(props) {
             <DealerManagement 
               dealerList={dealerList}
               loading={loading}
+              onDealerListChange={handleDealerListChange}
             />
           )}
 
@@ -325,6 +346,10 @@ export default function SettingsPage(props) {
               expenseList={expenseList}
               incomeList={incomeList}
               loading={loading}
+              onPurchaseCostChange={handlePurchaseCostChange}
+              onSellCostSummaryChange={handleSellCostSummaryChange}
+              onExpenseListChange={handleExpenseListChange}
+              onIncomeListChange={handleIncomeListChange}
             />
           )}
 
@@ -340,30 +365,9 @@ export default function SettingsPage(props) {
             <Account 
               accountList={accountList}
               loading={loading}
+              onAccountListChange={handleAccountListChange}
             />
           )}
-  
-          <div className="container__btns">
-            <button 
-              className="btn btn--primary" 
-              type="button" 
-              disabled={loading}
-              onClick={handleSave}
-            >
-              {loading ? '저장 중...' : '저장'}
-            </button>
-            <button 
-              className="btn btn--light" 
-              type="button"
-              onClick={() => {
-                if (confirm('변경사항을 취소하시겠습니까?')) {
-                  loadCompanyInfo()
-                }
-              }}
-            >
-              취소
-            </button>
-          </div>
         </main>
   );
 }

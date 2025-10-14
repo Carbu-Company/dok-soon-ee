@@ -4,6 +4,7 @@ import { useState } from 'react'
 export default function Certificate({ loading }) {
   const [selectedFile, setSelectedFile] = useState(null)
   const [uploadStatus, setUploadStatus] = useState('')
+  const [isEditMode, setIsEditMode] = useState(false)
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0]
@@ -63,6 +64,22 @@ export default function Certificate({ loading }) {
     }
   }
 
+  const handleEditStart = () => {
+    setIsEditMode(true)
+  }
+
+  const handleEditCancel = () => {
+    setIsEditMode(false)
+    setSelectedFile(null)
+    setUploadStatus('')
+  }
+
+  const handleEditSave = () => {
+    // 저장 로직
+    alert('저장되었습니다.')
+    setIsEditMode(false)
+  }
+
   return (
     <div className="table-wrap">
       <h2 className="table-wrap__title">공인인증서 등록</h2>
@@ -72,6 +89,38 @@ export default function Certificate({ loading }) {
           전자세금계산서 발행을 위해 공인인증서를 등록해주세요.<br/>
           등록된 공인인증서는 팝빌 시스템에서 자동으로 관리됩니다.
         </p>
+      </div>
+      
+      <div className="table-wrap__actions">
+        {!isEditMode ? (
+          <button 
+            className="btn btn--secondary" 
+            type="button"
+            onClick={handleEditStart}
+            disabled={loading}
+          >
+            수정
+          </button>
+        ) : (
+          <>
+            <button 
+              className="btn btn--primary" 
+              type="button"
+              onClick={handleEditSave}
+              disabled={loading}
+            >
+              저장
+            </button>
+            <button 
+              className="btn btn--light" 
+              type="button"
+              onClick={handleEditCancel}
+              disabled={loading}
+            >
+              취소
+            </button>
+          </>
+        )}
       </div>
       
       <div 
@@ -97,10 +146,13 @@ export default function Certificate({ loading }) {
               onChange={handleFileSelect}
               style={{ display: 'none' }}
             />
-            <label htmlFor="certificate-file" className="btn btn--primary">
+            <label 
+              htmlFor="certificate-file" 
+              className={`btn btn--primary ${!isEditMode ? 'settings-readonly' : ''}`}
+            >
               파일 선택
             </label>
-            {selectedFile && (
+            {selectedFile && isEditMode && (
               <button 
                 className="btn btn--secondary" 
                 type="button"

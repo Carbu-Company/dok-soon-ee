@@ -2,6 +2,124 @@
 html, body {
     height: 100%;
   }
+
+/* 딜러 관리 스타일 */
+.dealer-table .input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dealer-table .input-group .btn--sm {
+  padding: 4px 8px;
+  font-size: 12px;
+  min-width: auto;
+}
+
+.dealer-table .input-group .input {
+  flex: 1;
+  min-width: 150px;
+}
+
+.dealer-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.dealer-actions .btn--sm {
+  padding: 4px 8px;
+  font-size: 12px;
+  min-width: 50px;
+}
+
+/* 비용 설정 스타일 */
+.cost-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.cost-settings .table-wrap__subtitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.cost-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.cost-table td .input {
+  margin: 0 auto;
+}
+
+.cost-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.cost-actions .btn--sm {
+  padding: 4px 8px;
+  font-size: 12px;
+  min-width: 50px;
+}
+
+/* 계좌 등록 스타일 */
+.account-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.account-table td .input {
+  margin: 0 auto;
+}
+
+.account-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-actions .btn--sm {
+  padding: 4px 8px;
+  font-size: 12px;
+  min-width: 50px;
+}
+
+/* 딜러 테이블 셀 가운데 정렬 */
+.dealer-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.dealer-table td .input {
+  margin: 0 auto;
+}
+
+.settings-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.settings-readonly {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed;
+}
+
+.settings-modified {
+  background-color: #fff3cd !important;
+  border-color: #ffeaa7 !important;
+}
   .wrap {
     height: 100%;
     min-width: 1440px;
@@ -1742,4 +1860,101 @@ html, body {
     width: 1px;
     height: 16px;
     background-color: #19191D;
+  }
+
+  /* Settings Edit Mode Styles */
+  .settings-readonly {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef !important;
+    color: #495057 !important;
+    cursor: default !important;
+  }
+
+  .settings-readonly:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .settings-edit-mode {
+    background-color: #ffffff !important;
+    border: 2px solid #007bff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+  }
+
+  .settings-modified {
+    background-color: #fff3cd !important;
+    border: 2px solid #ffc107 !important;
+  }
+
+  .settings-modified:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25) !important;
+  }
+
+  .settings-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+    justify-content: flex-end;
+  }
+
+  .settings-buttons .btn {
+    min-width: 80px;
+  }
+
+  .table-wrap__actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .table-wrap__actions .btn {
+    min-width: 100px;
+  }
+
+  /* Dealer Management Styles */
+  .dealer-actions {
+    display: flex;
+    gap: 4px;
+    white-space: nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dealer-actions .btn {
+    min-width: 50px;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .address-text {
+    max-width: 200px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .table td {
+    vertical-align: middle;
+    padding: 8px 12px;
+  }
+
+  .table th {
+    padding: 12px;
+    font-weight: 600;
+    background-color: #f8f9fa;
+  }
+
+  .table .input {
+    margin: 0;
+  }
+
+  .table .input .input__field {
+    padding: 4px 8px;
+    font-size: 14px;
+  }
+
+  /* 관리 컬럼 가운데 정렬 */
+  .table tbody tr td:last-child {
+    text-align: center;
   }
