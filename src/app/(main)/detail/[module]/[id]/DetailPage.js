@@ -2,8 +2,30 @@
 import { useState } from "react";
 import DetailModal from "../../../../../components/modal/DetailModal";
 
-export default function DetailPage({ title, data, moduleType, onEdit, onDelete, onBack }) {
+export default function DetailPage({ title, data, dataSets, moduleType, onEdit, onDelete, onBack }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const v = (...keys) => {
+    if (!data) return "";
+    for (const k of keys) {
+      const val = data?.[k];
+      if (val !== undefined && val !== null && val !== "") return val;
+    }
+    return "";
+  };
+
+  const prsnGubunLabel = () => {
+    const code = v("PRSN_SCT_CD", "제시구분코드");
+    if (code === "0") return "상사매입";
+    if (code === "1") return "직거래";
+    return v("제시구분", "PRSN_SCT_NM") || "";
+  };
+
+  const fmtNumber = (num) => {
+    if (num === undefined || num === null || num === "") return "";
+    const n = Number(num);
+    return Number.isFinite(n) ? n.toLocaleString() : String(num);
+  };
 
   const openModal = (id) => {
     console.log("openModal", id);
@@ -116,15 +138,15 @@ export default function DetailPage({ title, data, moduleType, onEdit, onDelete, 
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>상사매입</td>
+              <td>{prsnGubunLabel()}</td>
               <th>차량번호</th>
-              <td>123가1234 (123허1234)</td>
+              <td>{`${v("CAR_NO", "차량번호")}${v("PUR_BEF_CAR_NO") ? ` (${v("PUR_BEF_CAR_NO")})` : ""}`}</td>
               <th>매입딜러</th>
-              <td>홍길동</td>
+              <td>{v("DLR_NM", "담당딜러")}</td>
               <th>차량명</th>
-              <td>그랜저(승용)</td>
+              <td>{v("CAR_NM", "차량명")}</td>
               <th>매입일</th>
-              <td>2025-08-01</td>
+              <td>{v("CAR_PUR_DT", "매입일")}</td>
             </tr>
           </tbody>
         </table>
@@ -149,59 +171,59 @@ export default function DetailPage({ title, data, moduleType, onEdit, onDelete, 
           <tbody>
             <tr>
               <th>매입금액</th>
-              <td>100,000,000원</td>
+              <td>{v("PUR_AMT", "매입금액")}</td>
               <th>상사매입비</th>
-              <td>165,000원 (입금일 : 2025-08-01)</td>
+              <td>{`${v("AGENT_PUR_CST") || ""}${v("AGENT_PUR_CST_PAY_DT") ? ` (입금일 : ${v("AGENT_PUR_CST_PAY_DT")})` : ""}`}</td>
               <th>취득세</th>
-              <td>300,000원</td>
+              <td>{v("GAIN_TAX")}</td>
               <th>계약서번호</th>
-              <td>343543543543</td>
+              <td>{v("CTSH_NO")}</td>
             </tr>
             <tr>
               <th>이전일</th>
-              <td>2025-07-25</td>
+              <td>{v("CAR_REG_DT")}</td>
               <th>매도자(전소유자)</th>
-              <td>개인-홍길순</td>
+              <td>{`${v("OWNR_TP_CD") === "0" ? "개인" : v("OWNR_TP_CD") === "1" ? "법인" : ""}${v("OWNR_NM") ? `-${v("OWNR_NM")}` : ""}`}</td>
               <th>주민(법인)등록번호</th>
-              <td></td>
+              <td>{v("OWNR_SSN")}</td>
               <th>사업자등록번호</th>
-              <td></td>
+              <td>{v("OWNR_BRNO")}</td>
             </tr>
             <tr>
               <th>연락처</th>
-              <td></td>
+              <td>{v("OWNR_PHON", "연락처")}</td>
               <th>e메일주소</th>
-              <td></td>
+              <td>{v("OWNR_EMAIL", "이메일")}</td>
               <th>주소</th>
-              <td colSpan={3}>경기 수원시</td>
+              <td colSpan={3}>{`${v("OWNR_ADDR1")}${v("OWNR_ADDR2") ? ` ${v("OWNR_ADDR2")}` : ""}`}</td>
             </tr>
             <tr>
               <th>매입(세금)계산서</th>
-              <td></td>
+              <td>{v("TXBL_RCV_YN")}</td>
               <th>매입계산서발행일</th>
-              <td></td>
+              <td>{v("TXBL_ISSU_DT")}</td>
               <th>사실확인서</th>
-              <td></td>
+              <td>{v("FCT_CNDC_YN")}</td>
               <th></th>
               <td></td>
             </tr>
             <tr>
               <th>관련첨부서류</th>
-              <td colSpan={7}></td>
+              <td colSpan={7}>{v("ATTACH_DESC")}</td>
             </tr>
             <tr>
               <th>조합제시메모</th>
-              <td colSpan={7}></td>
+              <td colSpan={7}>{v("COMB_PRSN_MEMO")}</td>
             </tr>
             <tr>
               <th>특이사항</th>
-              <td colSpan={7}></td>
+              <td colSpan={7}>{v("PUR_DESC", "특이사항")}</td>
             </tr>
             <tr>
               <th>주차위치</th>
-              <td>위치코드-위치내용</td>
+              <td>{`${v("PARK_ZON_NM")}${v("PARK_ZON_DESC") ? `-${v("PARK_ZON_DESC")}` : ""}`}</td>
               <th>Key번호</th>
-              <td>1256</td>
+              <td>{v("PARK_KEY_NO")}</td>
               <th></th>
               <td></td>
               <th></th>
@@ -237,14 +259,21 @@ export default function DetailPage({ title, data, moduleType, onEdit, onDelete, 
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>2025-07-01</td>
-              <td>홍길동광택</td>
-              <td>1,000,000</td>
-              <td>과세</td>
-              <td>2025-07-10</td>
-              <td>비고내용입니다.</td>
-            </tr>
+            {(() => {
+              const g = dataSets?.goods || null;
+              const row = g || {};
+              const empty = !g;
+              return (
+                <tr>
+                  <td>{empty ? "" : (row.PAY_DT || row.PAY_DATE || row.REG_DT || "")}</td>
+                  <td>{empty ? "" : (row.EXPENSE_NM || row.DEAL_CORP_NM || row.SUPPLY_TO || "")}</td>
+                  <td>{empty ? "" : fmtNumber(row.AMT || row.TRADE_AMT || row.TOTAL_AMT)}</td>
+                  <td>{empty ? "" : (row.TAX_YN || row.VAT_YN || row.TAXABLE_NM || "")}</td>
+                  <td>{empty ? "" : (row.REG_DT || row.INS_DT || "")}</td>
+                  <td>{empty ? "" : (row.REMARK || row.MEMO || "")}</td>
+                </tr>
+              );
+            })()}
           </tbody>
         </table>
         <div className="table-wrap__utils">
@@ -271,14 +300,21 @@ export default function DetailPage({ title, data, moduleType, onEdit, onDelete, 
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>2025-07-01</td>
-              <td>홍길동광택</td>
-              <td>1,000,000</td>
-              <td>과세</td>
-              <td>2025-07-10</td>
-              <td>비고내용입니다.</td>
-            </tr>
+            {(() => {
+              const l = dataSets?.loan || null;
+              const row = l || {};
+              const empty = !l;
+              return (
+                <tr>
+                  <td>{empty ? "" : (row.PAY_DT || row.LOAN_DT || row.REG_DT || "")}</td>
+                  <td>{empty ? "" : (row.CAPITAL_NM || row.FIN_CO_NM || "")}</td>
+                  <td>{empty ? "" : fmtNumber(row.LOAN_AMT || row.AMT || row.TRADE_AMT)}</td>
+                  <td>{empty ? "" : (row.TAX_YN || row.VAT_YN || row.TAXABLE_NM || "")}</td>
+                  <td>{empty ? "" : (row.REG_DT || row.INS_DT || "")}</td>
+                  <td>{empty ? "" : (row.MEMO || row.REMARK || "")}</td>
+                </tr>
+              );
+            })()}
           </tbody>
         </table>
         <div className="table-wrap__utils">
@@ -305,66 +341,31 @@ export default function DetailPage({ title, data, moduleType, onEdit, onDelete, 
             <col style={{ width: "auto" }} />
           </colgroup>
           <tbody>
-            <tr>
-              <th>매입금액</th>
-              <td>100,000,000원</td>
-              <th>상사매입비</th>
-              <td>165,000원 (입금일 : 2025-08-01)</td>
-              <th>취득세</th>
-              <td>300,000원</td>
-              <th>계약서번호</th>
-              <td>343543543543</td>
-            </tr>
-            <tr>
-              <th>이전일</th>
-              <td>2025-07-25</td>
-              <th>매도자(전소유자)</th>
-              <td>개인-홍길순</td>
-              <th>주민(법인)등록번호</th>
-              <td></td>
-              <th>사업자등록번호</th>
-              <td></td>
-            </tr>
-            <tr>
-              <th>연락처</th>
-              <td></td>
-              <th>e메일주소</th>
-              <td></td>
-              <th>주소</th>
-              <td colSpan={3}>경기 수원시</td>
-            </tr>
-            <tr>
-              <th>매입(세금)계산서</th>
-              <td></td>
-              <th>매입계산서발행일</th>
-              <td></td>
-              <th>사실확인서</th>
-              <td></td>
-              <th></th>
-              <td></td>
-            </tr>
-            <tr>
-              <th>관련첨부서류</th>
-              <td colSpan={7}></td>
-            </tr>
-            <tr>
-              <th>조합제시메모</th>
-              <td colSpan={7}></td>
-            </tr>
-            <tr>
-              <th>특이사항</th>
-              <td colSpan={7}></td>
-            </tr>
-            <tr>
-              <th>주차위치</th>
-              <td>위치코드-위치내용</td>
-              <th>Key번호</th>
-              <td>1256</td>
-              <th></th>
-              <td></td>
-              <th></th>
-              <td></td>
-            </tr>
+            {(() => {
+              const s = dataSets?.sell || {};
+              return (
+                <>
+                  <tr>
+                    <th>매도금액</th>
+                    <td>{fmtNumber(s.SELL_AMT || s.TRADE_AMT)}</td>
+                    <th>매도일</th>
+                    <td>{s.SELL_DT || s.TRADE_DT || ""}</td>
+                    <th>구매자</th>
+                    <td>{s.CUST_NM || s.BUYER_NM || ""}</td>
+                    <th>계약서번호</th>
+                    <td>{s.CTSH_NO || ""}</td>
+                  </tr>
+                  <tr>
+                    <th>담당딜러</th>
+                    <td>{s.DLR_NM || ""}</td>
+                    <th>연락처</th>
+                    <td>{s.CUST_PHON || s.PHON || ""}</td>
+                    <th>비고</th>
+                    <td colSpan={3}>{s.MEMO || s.REMARK || ""}</td>
+                  </tr>
+                </>
+              );
+            })()}
           </tbody>
         </table>
         <div className="table-wrap__utils">
@@ -391,14 +392,20 @@ export default function DetailPage({ title, data, moduleType, onEdit, onDelete, 
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>2025-07-01</td>
-              <td>홍길동광택</td>
-              <td>1,000,000</td>
-              <td>과세</td>
-              <td>2025-07-10</td>
-              <td>비고내용입니다.</td>
-            </tr>
+            {(() => {
+              const c = dataSets?.concil || {};
+              const amt = c.ADJ_AMT || c.TOTAL_AMT || c.TRADE_AMT;
+              return (
+                <tr>
+                  <td>{c.ADJ_DT || c.PAY_DT || ""}</td>
+                  <td>{c.PAY_TO || c.CUST_NM || c.DLR_NM || ""}</td>
+                  <td>{fmtNumber(amt)}</td>
+                  <td>{c.TAX_YN || c.VAT_YN || ""}</td>
+                  <td>{c.REG_DT || c.INS_DT || ""}</td>
+                  <td>{c.MEMO || c.REMARK || ""}</td>
+                </tr>
+              );
+            })()}
           </tbody>
         </table>
 

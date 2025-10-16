@@ -56,9 +56,8 @@ export const insertUserRequest = (payload) =>
 
 export const registerUser = (payload) => apiPost("registerUser", payload);
 
-export const getSystemUseRequest = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getSystemUseRequest", { carAgent: agentId, ...additionalParams });
+export const getSystemUseRequest = async (params = {}) => {
+  return apiPost("getSystemUseRequest", { ...params });
 };
 
 export const checkSangsaCode = (SangsaCode) =>
@@ -69,6 +68,11 @@ export const getPhoneAuthNumber = (representativePhone) =>
 
 export const checkPhoneAuthNumber = (representativePhone, authNumber) =>
   apiPost("checkPhoneAuthNumber", { representativePhone, authNumber });
+
+/* ------------------------------ 공통/인증 ------------------------------ */
+export const login = (payload) => apiPost("login", payload);
+export const getCompanyLoanLimit = (carAgent) =>
+  apiGet("getCompanyLoanLimit", { carAgent });
 
 /* ---------------------------- 제시 2.0 ---------------------------- */
 export const getCarPurList = (payload) => apiPost("getCarPurList", payload);
@@ -85,9 +89,11 @@ export const deleteCarPur = (car_regid, flag_type) =>
 export const getCarSelList = (payload) => apiPost("getCarSelList", payload);
 export const getCarSelSummary = (payload) =>
   apiPost("getCarSelSummary", payload);
+export const getCarSelInfo = (params) => apiGet("getCarSelInfo", params);
 export const updateCarSel = (payload) => apiPost("updateCarSel", payload);
 export const deleteCarSel = (car_regid, flag_type) =>
   apiGet("deleteCarSel", { car_regid, flag_type });
+export const insertCarBuyCust = (payload) => apiPost("insertCarBuyCust", payload);
 
 /* -------------------------- 매입 매도비 --------------------------- */
 export const getBuySellFeeList = (payload) =>
@@ -138,6 +144,7 @@ export const updateBuyFeeSum = (payload) => apiPost("updateBuyFeeSum", payload);
 export const getGoodsFeeList = (payload) => apiPost("getGoodsFeeList", payload);
 export const getGoodsFeeCarSumList = (payload) =>
   apiPost("getGoodsFeeCarSumList", payload);
+export const getCarGoodsInfo = (params) => apiGet("getCarGoodsInfo", params);
 export const getGoodsFeeDetail = (goodsFeeSeq) =>
   apiGet("getGoodsFeeDetail", { goodsFeeSeq });
 export const getGoodsFeeDetailList = (carRegId) =>
@@ -152,6 +159,12 @@ export const getCarLoanSumList = (payload) =>
 export const getCarLoanList = (payload) => apiPost("getCarLoanList", payload);
 export const getCarLoanSummary = (carAgent) =>
   apiGet("getCarLoanSummary", { carAgent });
+export const insertCarLoan = (payload) => apiPost("insertCarLoan", payload);
+export const updateCarLoan = (payload) => apiPost("updateCarLoan", payload);
+export const deleteCarLoan = (params) => apiGet("deleteCarLoan", params);
+export const insertAgentLoanCorp = (payload) => apiPost("insertAgentLoanCorp", payload);
+export const updateAgentLoanCorp = (payload) => apiPost("updateAgentLoanCorp", payload);
+export const deleteAgentLoanCorp = (params) => apiGet("deleteAgentLoanCorp", params);
 
 /* ---------------------------- 시제(계좌) ---------------------------- */
 export const insertAccountInfo = (payload) =>
@@ -186,7 +199,11 @@ export const getFinanceDetailList = (carRegid) =>
   apiGet("getFinanceDetailList", { carRegid });
 
 /* ------------------------------- 알선 ------------------------------- */
-export const getAlsonList = (payload) => apiPost("getAlsonList", payload);
+export const getCarConcilList = (payload) => apiPost("getCarConcilList", payload);
+export const getCarConcilSummary = (payload) => apiPost("getCarConcilSummary", payload);
+export const insertCarConcil = (payload) => apiPost("insertCarConcil", payload);
+export const getCarConcilInfo = (params) => apiGet("getCarConcilInfo", params);
+export const updateCarConcil = (payload) => apiPost("updateCarConcil", payload);
 
 /* ----------------------- 운영현황 - 매출관리 ------------------------ */
 export const getSystemSalesList = (payload) =>
@@ -237,22 +254,24 @@ export const getSystemVatPurchaseList = (carAgent) =>
   apiPost("getSystemVatPurchaseList", { carAgent });
 
 /* ------------------------- 현금영수증 발행 ------------------------- */
-export const getCashBillList = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getCashBillList", { carAgent: agentId, ...additionalParams });
+export const getCashBillList = async (params = {}) => {
+  return apiPost("getCashBillList", { ...params });
 };
 export const getCashBillAmount = (costSeq) =>
   apiGet("getCashBillAmount", { costSeq });
 
 /* --------------------- 현금영수증 발행 리스트 ---------------------- */
-export const getReceiptIssueList = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getReceiptIssueList", { carAgent: agentId, ...additionalParams });
+export const getReceiptIssueList = async (params = {}) => {
+  return apiPost("getReceiptIssueList", { ...params });
 };
-export const getReceiptIssueSummary = async (additionalParams = {}) => {
-  const agentId = await getAgentId();
-  return apiPost("getReceiptIssueSummary", { carAgent: agentId, ...additionalParams });
+export const getReceiptIssueSummary = async (params = {}) => {
+  return apiPost("getReceiptIssueSummary", { ...params });
 };
+
+/* -------------------------- 현금영수증 2.0 -------------------------- */
+export const getCarCashList = (payload) => apiPost("getCarCashList", payload);
+export const getCarCashSummary = (payload) => apiPost("getCarCashSummary", payload);
+export const getCarCashInfo = (params) => apiGet("getCarCashInfo", params);
 
 /* ---------------------- 전자세금계산서 발행 ----------------------- */
 export const getTaxInvoiceList = (carAgent) =>
@@ -261,6 +280,11 @@ export const getTaxInvoiceAmount = (eInvoiceSeq) =>
   apiGet("getTaxInvoiceAmount", { eInvoiceSeq });
 
 /* ------------------- 전자세금계산서 발행 리스트 ------------------- */
+/* ---------------------- 전자세금계산서 2.0 ----------------------- */
+export const getCarTaxList = (payload) => apiPost("getCarTaxList", payload);
+export const getCarTaxSummary = (payload) => apiPost("getCarTaxSummary", payload);
+export const getCarTaxInfo = (params) => apiGet("getCarTaxInfo", params);
+export const getCarTaxItemInfo = (params) => apiGet("getCarTaxItemInfo", params);
 export const getTaxIssueList = (carAgent) =>
   apiPost("getTaxIssueList", { carAgent });
 export const getTaxIssueSummary = (carAgent) =>
@@ -283,6 +307,15 @@ export const updateSellCancel = (sell_car_regid) =>
   apiPost("updateSellCancel", { sell_car_regid });
 
 /* -------------------------------- 정산 -------------------------------- */
+/* ------------------------------ 정산 2.0 ------------------------------ */
+export const getCarAdjList = (payload) => apiPost("getCarAdjList", payload);
+export const getCarAdjSummary = (payload) => apiPost("getCarAdjSummary", payload);
+export const getCarAdjInfo = (params) => apiGet("getCarAdjInfo", params);
+export const getCarAdjDtlList = (params) => apiGet("getCarAdjDtlList", params);
+export const insertCarAdj = (payload) => apiPost("insertCarAdj", payload);
+export const updateCarAdj = (payload) => apiPost("updateCarAdj", payload);
+export const deleteCarAdj = (params) => apiGet("deleteCarAdj", params);
+export const deleteCarAdjDtl = (params) => apiGet("deleteCarAdjDtl", params);
 export const getBuyDetail = (sell_car_regid) =>
   apiGet("getBuyDetail", { sell_car_regid });
 export const getSettlementPurchaseInfo = (carRegid) =>
@@ -317,6 +350,7 @@ export const getSettlementStockFinanceName = (carRegid) =>
   apiGet("getSettlementStockFinanceName", { carRegid });
 
 /* ------------------------------ 환경설정 ------------------------------ */
+export const getCompanyInfo = (payload) => apiPost("getCompanyInfo", payload);
 export const getAgentInfo = async (agentId) => {
   return apiGet("getAgentInfo", { carAgent: agentId });
 };
@@ -340,8 +374,8 @@ export const getCompanyIncome = async (agentId, additionalParams = {}) => {
 };
 
 /* -------------------------------- 공통 -------------------------------- */
-export const getMgtKey = async (additionalParams = {}) => {
-  return apiGet("getMgtKey", { carAgent: agentId, ...additionalParams });
+export const getMgtKey = async (params = {}) => {
+  return apiGet("getMgtKey", { ...params });
 };
 export const getDealerList = async (agentId, additionalParams = {}) => {
   return apiGet("getDealerList", { carAgent: agentId, ...additionalParams });

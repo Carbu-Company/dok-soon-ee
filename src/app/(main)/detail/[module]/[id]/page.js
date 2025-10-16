@@ -2,6 +2,22 @@
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import DetailPage from "./DetailPage";
+import {
+  // 제시(매입)
+  getCarPurInfo,
+  // 재고금융
+  getCarLoanInfo,
+  // 상품화비
+  getCarGoodsInfo,
+  // 매도
+  getCarSelInfo,
+  // 현금영수증
+  getCarCashInfo,
+  // 전자세금계산서
+  getCarTaxInfo,
+  // 알선/정산
+  getCarConcilInfo,
+} from "@/app/(main)/api/carApi";
 
 export default function UnifiedDetailPage() {
   const router = useRouter();
@@ -11,14 +27,16 @@ export default function UnifiedDetailPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [extraData, setExtraData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // API 호출 또는 mock 데이터 설정
-        const mockData = getMockData(module, id);
-        setData(mockData);
+        const all = await fetchAllData(id);
+        const primary = all?.purchase || getMockData(module, id);
+        setData(primary);
+        setExtraData(all);
       } catch (err) {
         setError("데이터를 불러오는데 실패했습니다.");
         console.error("Error fetching data:", err);
@@ -31,6 +49,42 @@ export default function UnifiedDetailPage() {
       fetchData();
     }
   }, [module, id]);
+
+  const fetchAllData = async (itemId) => {
+    try {
+      const [
+        purRes,
+        loanRes,
+        goodsRes,
+        sellRes,
+        cashRes,
+        taxRes,
+        concilRes,
+      ] = await Promise.all([
+        getCarPurInfo(itemId).catch(() => null),
+        getCarLoanInfo(itemId).catch(() => null),
+        getCarGoodsInfo({ carRegId: itemId, car_regid: itemId }).catch(() => null),
+        getCarSelInfo({ car_regid: itemId, sell_car_regid: itemId }).catch(() => null),
+        getCarCashInfo({ costSeq: itemId, carRegId: itemId }).catch(() => null),
+        getCarTaxInfo({ eInvoiceSeq: itemId, carRegId: itemId }).catch(() => null),
+        getCarConcilInfo({ brkSeq: itemId, carRegId: itemId }).catch(() => null),
+      ]);
+
+      return {
+        purchase: purRes?.success ? purRes.data : null,
+        loan: loanRes?.success ? loanRes.data : null,
+        goods: goodsRes?.success ? goodsRes.data : null,
+        sell: sellRes?.success ? sellRes.data : null,
+        cash: cashRes?.success ? cashRes.data : null,
+        tax: taxRes?.success ? taxRes.data : null,
+        concil: concilRes?.success ? concilRes.data : null,
+      };
+    } catch (e) {
+      console.error("fetchAllData error:", e);
+      return null;
+    }
+  };
+
 
 
   // API 호출 함수 :   getCarPurInfo
@@ -193,6 +247,7 @@ export default function UnifiedDetailPage() {
     <DetailPage
       title={getTitle(module)}
       data={data}
+      dataSets={extraData}
       moduleType={module}
       onEdit={handleEdit}
       onDelete={handleDelete}
