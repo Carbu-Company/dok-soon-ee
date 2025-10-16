@@ -74,8 +74,8 @@ export const checkPhoneAuthNumber = (representativePhone, authNumber) =>
 export const getCarPurList = (payload) => apiPost("getCarPurList", payload);
 export const getCarPurSummary = (payload) =>
   apiPost("getCarPurSummary", payload);
-export const getCarPurDetail = (car_regid) =>
-  apiGet("getCarPurDetail", { car_regid });
+export const getCarPurInfo = (carRegId) =>
+  apiGet("getCarPurInfo", { carRegId });
 export const insertCarPur = (payload) => apiPost("insertCarPur", payload);
 export const updateCarPur = (payload) => apiPost("updateCarPur", payload);
 export const deleteCarPur = (car_regid, flag_type) =>

@@ -323,11 +323,11 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
       return;
     }
 
-    // 취득세
-    if(!gainTax) {
-      alert('취득세를 선택해주세요.');
-      return;
-    }
+    // (예상) 취득세   --- 나중에 고민 해야함
+    // if(!gainTax) {
+    //   alert('(예상)취득세를 입력해주세요.');
+    //   return;
+    // }
 
     // 차량 유형
     if(!carKndCd) {

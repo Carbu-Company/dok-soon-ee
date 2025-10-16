@@ -32,6 +32,9 @@ export default function UnifiedDetailPage() {
     }
   }, [module, id]);
 
+
+  // API 호출 함수 :   getCarPurInfo
+
   const getMockData = (moduleType, itemId) => {
     const baseData = {
       id: itemId,
@@ -50,6 +53,7 @@ export default function UnifiedDetailPage() {
           특이사항: "특이사항 없음"
         };
       
+        // API 호출 함수 :  getCarLoanInfo
       case "inventory-finance":
         return {
           ...baseData,
@@ -59,6 +63,8 @@ export default function UnifiedDetailPage() {
           딜러이율: "15%",
           월이자: "312,500원"
         };
+
+      //  API 호출 함수 :  getCarGoodsInfo
       
       case "car-goods":
         return {
@@ -68,6 +74,7 @@ export default function UnifiedDetailPage() {
           완료일: "2025-08-15"
         };
       
+        // API 호출 함수 :  getCarSelInfo
       case "car-sell":
         return {
           ...baseData,
@@ -76,6 +83,7 @@ export default function UnifiedDetailPage() {
           구매자: "김구매"
         };
       
+        // API 호출 함수 :  getCarCashInfo
       case "cash-receipts":
         return {
           발행일: "2025-08-01",
@@ -84,6 +92,7 @@ export default function UnifiedDetailPage() {
           승인번호: "20250801001"
         };
       
+        // API 호출 함수 :  getCarTaxInfo
       case "electronic-tax-invoice":
         return {
           발행일: "2025-08-01",
@@ -93,6 +102,8 @@ export default function UnifiedDetailPage() {
           공급자: "독순이상사",
           공급받는자: "구매업체"
         };
+
+        // API 호출 함수 :  getCarConcilInfo
       
       case "car-concil":
         return {

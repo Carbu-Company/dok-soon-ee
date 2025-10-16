@@ -1,6 +1,6 @@
-export const getSuggestOne = async (mgtKey) => {
+export const getSuggestOne = async (carRegId) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarPurDetail?car_regid=${mgtKey}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarPurInfo?carRegId=${carRegId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
