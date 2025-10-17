@@ -472,24 +472,24 @@ export default function CashReceiptRegisterPage({
                   </div>
 
                   <div className="input w140">
-                    <input
-                      type="text"
-                      className="jsStartDate input__field input__field--date"
-                      placeholder="시작일"
+                    <input 
+                      type="date" 
+                      className="input__field" 
+                      placeholder="시작일" 
                       autoComplete="off"
-                      value={startDt}
-                      onChange={e => setStartDt(e.target.value)}
+                      onChange={(e) => setStartDt(e.target.value)}
+                      value={startDt || ''} 
                     />
                   </div>
                   <span className="input-group__dash">-</span>
                   <div className="input w140">
                     <input
-                      type="text"
-                      className="jsEndDate input__field input__field--date"
+                      type="date"
+                      className="input__field"
                       placeholder="종료일"
                       autoComplete="off"
-                      value={endDt}
                       onChange={e => setEndDt(e.target.value)}
+                      value={endDt || ''} 
                     />
                   </div>
 
