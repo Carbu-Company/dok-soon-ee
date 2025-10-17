@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 
 export default function ListPage(props) {
   const router = useRouter();
+  // setSearchBtn
+  const [searchBtn, setSearchBtn] = useState(0);
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 기본 검색 영역
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,8 +172,7 @@ export default function ListPage(props) {
   // 상세 검색 차량번호(매입전)
   const [dtlCarNoBefore, setDtlCarNoBefore] = useState("");
 
-  // setSearchBtn
-  const [searchBtn, setSearchBtn] = useState(1);
+
 
   // 상세검색 영역 표시/숨김 상태
   const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
@@ -683,7 +684,8 @@ export default function ListPage(props) {
                   <button
                     type="button"
                     className="btn btn--type03"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault(); // 기본 동작 방지
                       setSearchBtn(1);
                       handleSearch();
                     }}

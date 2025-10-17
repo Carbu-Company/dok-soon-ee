@@ -188,8 +188,8 @@ export default function ProductCostRegisterPage({
       const promises = validRows.map(async (row) => {
         const formValues = {
           carRegId: carRegId,           // 차량 등록 ID
-          expdItemCd: row.productItem || '',           // 지출 항목 코드
-          expdItemNm: row.productItem || '',            // 지출 항목 명
+          expdItemCd: row.productItem || '',           // 비용 항목 코드
+          expdItemNm: expdCdList.find(item => item.CD === row.productItem)?.CD_NM || '',  // 비용 항목명
           expdSctCd: row.expenseType === 'dealer' ? '01' : '02', // 지출 구분 코드 (딜러: 01, 상사: 02)
           expdAmt: parseFloat(row.amount) || 0,        // 지출 금액
           expdSupPrc: parseFloat(row.supplyPrice) || 0, // 지출 공급가
@@ -370,10 +370,19 @@ export default function ProductCostRegisterPage({
                       className="select__input"
                       type="hidden"
                       name={`productItem_${row.id}`}
-                      defaultValue="value1"
+                      value={row.productItem}
+                      onChange={(e) => updateProductCostRow(row.id, 'productItem', e.target.value)}
                     />
-                    <button className="select__toggle" type="button">
-                      <span className="select__text">선택</span>
+                    <button 
+                      className="select__toggle" 
+                      type="button"
+                      onClick={() => {
+                        // Toggle dropdown logic here
+                      }}
+                    >
+                      <span className="select__text">
+                        {expdCdList.find(item => item.CD === row.productItem)?.CD_NM || '선택'}
+                      </span>
                       <Image
                         className="select__arrow"
                         src="/images/ico-dropdown.svg"
@@ -384,13 +393,21 @@ export default function ProductCostRegisterPage({
                     </button>
 
                     <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">
+                      <li 
+                        className="select__option select__option--selected"
+                        onClick={() => updateProductCostRow(row.id, 'productItem', '')}
+                      >
                         선택
                       </li>
-                      <li className="select__option" data-value="value2">
-                        선택2
-                      </li>
-                      {/* 필요 시 더 추가 (10개 초과 시 내부 스크롤) */}
+                      {expdCdList.map((item) => (
+                        <li
+                          key={item.CD}
+                          className={`select__option ${row.productItem === item.CD ? 'select__option--selected' : ''}`}
+                          onClick={() => updateProductCostRow(row.id, 'productItem', item.CD)}
+                        >
+                          {item.CD_NM}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </td>
@@ -645,7 +662,7 @@ export default function ProductCostRegisterPage({
           className="btn btn--light"
           type="button"
           onClick={() => {
-            if (typeof window !== "undefined") window.location.href = "m2.jsp";
+            window.history.back();
           }}
         >
           취소

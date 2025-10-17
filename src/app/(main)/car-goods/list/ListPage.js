@@ -1649,7 +1649,7 @@ export default function ProductCostList(props) {
                   <td>{car.EXPD_AMT?.toLocaleString()}</td>
                   <td>{car.EXPD_SUP_PRC?.toLocaleString()}</td>
                   <td>{car.EXPD_VAT?.toLocaleString()}</td>
-                  <td>{car.CAR_STAT_CD}</td>
+                  <td>{car.CAR_STAT_NM}</td>
                   <td>{car.CAR_SEL_DT}</td>
                   <td>
                     <div className="input-group input-group--sm input-group--center">

@@ -15,6 +15,9 @@ export default function InventoryFinanceList(props) {
       console.log("openModal stub:", id);
     }
   };
+  
+  // setSearchBtn
+  const [searchBtn, setSearchBtn] = useState(0);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 기본 검색 영역
@@ -130,7 +133,7 @@ export default function InventoryFinanceList(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCountDtl);
-    // handleSearch(1); // 자동 검색 비활성화
+    if (searchBtn === 1 || searchBtn === 2) handleSearch(1); // 자동 검색 비활성화
     console.log("pageSize", pageSize);
     console.log("listCount", listCountDtl);
   }, [ordItemDtl, ordAscDescDtl, listCountDtl]);
@@ -167,9 +170,6 @@ export default function InventoryFinanceList(props) {
 
   // 상세 검색 대출상태
   const [dtlLoanStatGubun, setDtlLoanStatGubun] = useState("");
-
-  // setSearchBtn
-  const [searchBtn, setSearchBtn] = useState(1);
 
   // 상세검색 영역 표시/숨김 상태
   const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
@@ -570,6 +570,7 @@ export default function InventoryFinanceList(props) {
                     type="button"
                     className="btn btn--type03"
                     onClick={() => {
+                      e.preventDefault(); // 기본 동작 방지
                       setSearchBtn(1);
                       handleSearch();
                     }}

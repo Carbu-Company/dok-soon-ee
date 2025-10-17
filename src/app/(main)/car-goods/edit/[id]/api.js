@@ -20,9 +20,9 @@
     }
 };
 
-export const updatePurchase = async (data) => {
+export const updateGoodsFee = async (data) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarPur`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateGoodsFee`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ export const updatePurchase = async (data) => {
             body: JSON.stringify(data),
         });
     } catch (error) {
-        console.error('매입차량 수정 오류:', error);
+        console.error('상품화비용 수정 오류:', error);
         throw error;
     }
 };

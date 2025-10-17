@@ -34,6 +34,8 @@ async function searchCarPurSummary(searchParamsWithPage) {
   try {
     const result = await getCarPurSummary(searchParamsWithPage);
 
+    console.log('서버 액션 결과*******************:searchCarPurSummary');
+
     return result;
   } catch (error) {
     console.error('검색 중 오류 발생:', error);
@@ -51,6 +53,8 @@ async function searchCarPurListAndSummary(searchParamsWithPage) {
       getCarPurList(searchParamsWithPage),
       getCarPurSummary(searchParamsWithPage)
     ]);
+
+    console.log('서버 액션 결과*******************:searchCarPurListAndSummary');
 
     return {
       success: listResult.success && summaryResult.success,
@@ -133,6 +137,6 @@ export default async function CarPurList() {
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
                    searchAction={searchCarPurListAndSummary}
-                   purchasesSummary={carPurSummary}
+                   carSummary={carPurSummary}
    />;
 }

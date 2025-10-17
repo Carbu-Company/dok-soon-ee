@@ -1539,7 +1539,7 @@ export default function ProductCostList(props) {
               <tr key={index}>
                 <td>{car.CAR_NO} / {car.DLR_NM} / {car.CAR_NM} / {car.CAR_PUR_DT} / {car.PUR_AMT.toLocaleString()}</td>
 
-                <td>{car.TAX_SCT_NM}</td>
+                <td>{car.EXPD_ITEM_NM}</td>
                 <td>{car.EXPD_SCT_NM}</td>
                 <td>{car.TAX_SCT_NM}</td>
 
@@ -1558,7 +1558,7 @@ export default function ProductCostList(props) {
 
                       <ul className="select__menu">
                         <li className="select__option">
-                          <a href="m2.jsp">상품화비용 수정</a>
+                          <Link href={`/car-goods/edit/${car.CAR_REG_ID}`}>상품화비용 수정</Link>
                         </li>
 
                         <li className="select__option">
