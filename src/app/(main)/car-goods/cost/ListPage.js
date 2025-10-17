@@ -1558,7 +1558,7 @@ export default function ProductCostList(props) {
 
                       <ul className="select__menu">
                         <li className="select__option">
-                          <Link href={`/car-goods/edit/${car.CAR_REG_ID}`}>상품화비용 수정</Link>
+                          <Link href={`/car-goods/edit/${car.CAR_REG_ID}/${car.GOODS_FEE_SEQ}`}>상품화비용 수정</Link>
                         </li>
 
                         <li className="select__option">

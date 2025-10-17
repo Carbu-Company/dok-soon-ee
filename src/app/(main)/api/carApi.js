@@ -193,7 +193,7 @@ export const getGoodsFeeDetailList = (carRegId) =>
 export const getGoodsFeeCarSummary = (payload) =>
   apiPost("getGoodsFeeCarSummary", payload);
 export const insertGoodsFee = (payload) => apiPost("insertGoodsFee", payload);
-
+export const updateGoodsFee = (payload) => apiPost("updateGoodsFee", payload);
 /* --------------------------- 재고금융 2.0 --------------------------- */
 export const getCarLoanSumList = (payload) =>
   apiPost("getCarLoanSumList", payload);
