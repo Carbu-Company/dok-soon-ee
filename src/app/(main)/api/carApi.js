@@ -27,7 +27,29 @@ async function apiGet(path, params) {
         'Pragma': 'no-cache'
       }
     });
-    const data = await res.json();
+
+    // 응답 상태 확인
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    // 응답 내용 확인
+    const text = await res.text();
+    if (!text.trim()) {
+      console.warn(`${path} GET: Empty response`);
+      return ok(null);
+    }
+
+    // JSON 파싱
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (parseError) {
+      console.error(`${path} GET JSON parse error:`, parseError);
+      console.error('Response text:', text);
+      throw new Error(`Invalid JSON response: ${parseError.message}`);
+    }
+
     return ok(data);
   } catch (e) {
     console.error(`${path} GET Error:`, e);
@@ -42,7 +64,29 @@ async function apiPost(path, body) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body || {}),
     });
-    const data = await res.json();
+
+    // 응답 상태 확인
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    // 응답 내용 확인
+    const text = await res.text();
+    if (!text.trim()) {
+      console.warn(`${path} POST: Empty response`);
+      return ok(null);
+    }
+
+    // JSON 파싱
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (parseError) {
+      console.error(`${path} POST JSON parse error:`, parseError);
+      console.error('Response text:', text);
+      throw new Error(`Invalid JSON response: ${parseError.message}`);
+    }
+
     return ok(data);
   } catch (e) {
     console.error(`${path} POST Error:`, e);
@@ -51,9 +95,6 @@ async function apiPost(path, body) {
 }
 
 /* ----------------------------- 사용 요청 ----------------------------- */
-export const insertUserRequest = (payload) =>
-  apiPost("insertUserRequest", payload);
-
 export const registerUser = (payload) => apiPost("registerUser", payload);
 
 export const getSystemUseRequest = async (params = {}) => {
