@@ -9,11 +9,6 @@ import Image from "next/image";
 
 export default function BankCashLedgerPage(props) {
 
-
-
-  console.log('tradeInItemCDList', props.tradeInItemCDList);
-  console.log('tradeOutItemCDList', props.tradeOutItemCDList);
-
   const router = useRouter();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +16,7 @@ export default function BankCashLedgerPage(props) {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // props 값 가져오기
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
 
   // 초기 데이터: 서버에서 전달된 데이터 구조 처리
   const initialCarListData = props.carList?.data?.carlist || [];

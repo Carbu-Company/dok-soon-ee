@@ -130,7 +130,7 @@ export default function InventoryFinanceList(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCountDtl);
-    // handleSearch(1); // 자동 검색 비활성화
+    if (searchBtn === 1 || searchBtn === 2) handleSearch(1); // 자동 검색 비활성화
     console.log("pageSize", pageSize);
     console.log("listCount", listCountDtl);
   }, [ordItemDtl, ordAscDescDtl, listCountDtl]);

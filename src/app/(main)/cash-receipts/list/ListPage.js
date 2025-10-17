@@ -492,7 +492,7 @@ props
     }
   };
 
-    // listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
+  // listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
   // // 자동 검색 비활성화
   // useEffect(() => {
   //   setPageSize(listCount);
