@@ -291,13 +291,13 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
               <td>
                 <div className="input-group">
                   <div className="input w200">
-                    <input
-                      type="text"
-                      className="jsStartDate input__field input__field--date"
-                      placeholder="날짜"
+                    <input 
+                      type="date" 
+                      className="input__field" 
+                      placeholder="날짜" 
                       autoComplete="off"
-                      value={loanDt || ''}
                       onChange={(e) => setLoanDt(e.target.value)}
+                      value={loanDt || ''} 
                     />
                   </div>
                   <span className="input-help">대출 실행일</span>

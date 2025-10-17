@@ -9,11 +9,6 @@ import Image from "next/image";
 
 export default function BankCashLedgerPage(props) {
 
-
-
-  console.log('tradeInItemCDList', props.tradeInItemCDList);
-  console.log('tradeOutItemCDList', props.tradeOutItemCDList);
-
   const router = useRouter();
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +16,7 @@ export default function BankCashLedgerPage(props) {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // props 값 가져오기
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
 
   // 초기 데이터: 서버에서 전달된 데이터 구조 처리
   const initialCarListData = props.carList?.data?.carlist || [];
@@ -536,24 +531,24 @@ export default function BankCashLedgerPage(props) {
                   </div>
 
                   <div className="input w140">
-                    <input
-                      type="text"
-                      className="jsStartDate input__field input__field--date"
-                      placeholder="시작일"
+                    <input 
+                      type="date" 
+                      className="input__field" 
+                      placeholder="시작일" 
                       autoComplete="off"
-                      value={startDt}
-                      onChange={e => setStartDt(e.target.value)}
+                      onChange={(e) => setStartDt(e.target.value)}
+                      value={startDt || ''} 
                     />
                   </div>
                   <span className="input-group__dash">-</span>
                   <div className="input w140">
                     <input
-                      type="text"
-                      className="jsEndDate input__field input__field--date"
+                      type="date"
+                      className="input__field"
                       placeholder="종료일"
                       autoComplete="off"
-                      value={endDt}
                       onChange={e => setEndDt(e.target.value)}
+                      value={endDt || ''} 
                     />
                   </div>
 
@@ -734,24 +729,24 @@ export default function BankCashLedgerPage(props) {
                         </div>
 
                         <div className="input w140">
-                          <input
-                            type="text"
-                            className="jsStartDate input__field input__field--date"
-                            placeholder="시작일"
+                          <input 
+                            type="date" 
+                            className="input__field" 
+                            placeholder="시작일" 
                             autoComplete="off"
-                            value={dtlStartDt}
-                            onChange={e => setDtlStartDt(e.target.value)}
+                            onChange={(e) => setDtlStartDt(e.target.value)}
+                            value={dtlStartDt || ''} 
                           />
                         </div>
                         <span className="input-group__dash">-</span>
                         <div className="input w140">
                           <input
-                            type="text"
-                            className="jsEndDate input__field input__field--date"
+                            type="date"
+                            className="input__field"
                             placeholder="종료일"
                             autoComplete="off"
-                            value={dtlEndDt}
                             onChange={e => setDtlEndDt(e.target.value)}
+                            value={dtlEndDt || ''} 
                           />
                         </div>
                       </div>
