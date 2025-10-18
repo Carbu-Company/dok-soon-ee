@@ -110,9 +110,6 @@ export default async function CarSelList() {
   const expdEvdcList = await getCDList('07');   // 지출 증빙 코드목록
   const goodsFeeCarSummary = await searchGoodsFeeCarSummary({ ...defaultParams, ...searchParams });
 
-  console.log(goodsFeeList.data.carlist);
-
-
   return <ListPage session={session}
                    carList={goodsFeeList}
                    dealerList={dealerList.data}
