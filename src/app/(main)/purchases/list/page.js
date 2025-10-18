@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/auth";
 import ListPage from "@/app/(main)/purchases/list/ListPage";
 import { getCarPurList, getCarPurSummary } from "./api";
-import { getDealerList, getCDList } from "@/app/(main)/common/api";
-
+import { getCDList } from "@/app/(main)/common/api";
+import { getDealerList } from "@/app/(main)/api/carApi";
 // Server Action 정의
 async function searchCarPurList(searchParamsWithPage) {
   "use server";
