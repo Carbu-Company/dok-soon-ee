@@ -97,7 +97,7 @@ export default function CashReceiptRegisterPage({
 
   // 검색 파라미터
   const getDefaultParams = (pageNum = currentPage) => ({
-    carAgent: session?.agentId,
+    agentId: session?.agentId,
     page: pageNum,
     pageSize: pageSize,
   });
@@ -239,7 +239,7 @@ export default function CashReceiptRegisterPage({
         issuanceType: issuanceType,
         selectedItems: selectedItems,
         usrId: session?.usrId,
-        carAgent: session?.agentId,
+        agentId: session?.agentId,
       };
 
       // 개별 현금영수증 발행 처리

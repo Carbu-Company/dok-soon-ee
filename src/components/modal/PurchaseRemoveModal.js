@@ -8,7 +8,7 @@ export default function PurchaseRemoveModal(props) {
   const handleConfirm = async () => {
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/deleteSuggest?car_regid=${carData.CAR_REG_ID}&flag_type=${flagType}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/deleteSuggest?carRegId=${carData.CAR_REG_ID}&flag_type=${flagType}`, {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',

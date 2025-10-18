@@ -227,7 +227,7 @@ export default function ProductCostList(props) {
 
   // 기본 파라미터 (동적으로 생성)
   const getDefaultParams = (pageNum = currentPage, pageSize = listCount) => ({
-    carAgent: props.session?.agentId,
+    agentId: props.session?.agentId,
     page: pageNum,
     pageSize: pageSize,
   });

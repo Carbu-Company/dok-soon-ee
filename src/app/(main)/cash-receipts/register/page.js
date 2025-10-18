@@ -41,7 +41,7 @@ export default async function CashReceiptRegister() {
 
   // 기본 파라미터로 발행대기 목록 조회
   const defaultParams = {
-    carAgent: session.agentId,
+    agentId: session.agentId,
     page: 1,
     pageSize: 10
   };

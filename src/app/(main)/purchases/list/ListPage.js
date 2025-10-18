@@ -23,7 +23,7 @@ export default function ListPage(props) {
   const initialPagination = props.carList?.data?.pagination || {};
 
   // Summary 데이터
-  const initialPurchasesSummary = props.purchasesSummary?.data || [];
+  const initialPurchasesSummary = props.carSummary?.data || [];
 
   const [carList, setCarList] = useState(initialCarListData);
   const [pagination, setPagination] = useState(initialPagination);
@@ -230,7 +230,7 @@ export default function ListPage(props) {
 
   // 기본 파라미터 (동적으로 생성)
   const getDefaultParams = (pageNum = currentPage, pageSize = listCount) => ({
-    carAgent: props.session?.agentId,
+    agentId: props.session?.agentId,
     page: pageNum,
     pageSize: pageSize,
   });

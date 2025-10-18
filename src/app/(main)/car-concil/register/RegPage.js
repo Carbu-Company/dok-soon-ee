@@ -192,7 +192,7 @@ export default function BrokerageSalesCreatePage({ session = null, dealerList = 
     
     
     const formValues = {
-      carAgent: session?.agentId,                                // 상사사 ID
+      agentId: session?.agentId,                                // 상사사 ID
       dealerId,                                                  // 판매딜러 ID
       tradeItemCd,                                               // 거래항목 코드
       brkSaleDt,                                                 // 알선판매일  

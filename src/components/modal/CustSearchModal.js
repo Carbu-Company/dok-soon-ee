@@ -82,7 +82,7 @@ export default function CustSearchModal({ open, onClose, onCarSelect, agentId })
       }
       // 딜러 필터링을 위해 서버에서는 딜러 파라미터를 제거하고 모든 데이터를 가져옴
       const payload = {
-        carAgent: agentId.agentId, // 세션에서 carAgent 가져오기
+        agentId: agentId.agentId, // 세션에서 agentId 가져오기
         page: params.page || searchParams.page,
         pageSize: params.pageSize || searchParams.pageSize,
         custNm: params.custNm !== undefined ? params.custNm : searchParams.custNm,

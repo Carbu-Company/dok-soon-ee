@@ -18,7 +18,9 @@ import Certificate from '@/components/settings/Certificate'
 import Account from '@/components/settings/Account'
 
 export default function SettingsPage(props) {
-    const carAgent = props.session.agentId;
+    const agentId = props.session.agentId;
+    console.log('SettingsPage - agentId:', agentId);
+    console.log('SettingsPage - props.session:', props.session);
   // 탭 상태 관리
   const [activeTab, setActiveTab] = useState('company-info')
   
@@ -74,11 +76,16 @@ export default function SettingsPage(props) {
   
   // 상사 정보 로드
   const loadCompanyInfo = async () => {
+    console.log('loadCompanyInfo*******************:', agentId);
     try {
       setLoading(true)
-      const result = await getAgentInfo(carAgent)
+      const result = await getAgentInfo(agentId)
+      console.log('getAgentInfo result*******************:', result);
       if (result.success && result.data && result.data.length > 0) {
-        const companyData = result.data[0]
+        const companyData = result.data[0];
+
+
+        console.log('companyData*******************:', companyData);
         setCompanyInfo({
           companyName: companyData.COMNAME || '',
           businessNumber: companyData.BRNO || '',
@@ -100,30 +107,40 @@ export default function SettingsPage(props) {
   
   // 딜러 목록 로드
   const loadDealerList = async () => {
+    if (!agentId) {
+      console.warn('agentId is not available, skipping dealer list load');
+      return;
+    }
     try {
-      const result = await getCompanyDealer(carAgent) // carAgent는 자동으로 세션에서 가져옴
+      console.log('Loading dealer list for agentId:', agentId);
+      const result = await getCompanyDealer(agentId) // carAgent는 자동으로 세션에서 가져옴
+      console.log('Dealer list result:', result);
       if (result.success && result.data) {
         setDealerList(result.data)
       }
     } catch (error) {
+      console.error('Error loading dealer list:', error);
     }
   }
   
   // 매입비 설정 로드
   const loadPurchaseCost = async () => {
     try {
-      const result = await getPurchaseCost(carAgent) // carAgent는 자동으로 세션에서 가져옴
+      console.log('Loading purchase cost for agentId:', agentId);
+      const result = await getPurchaseCost(agentId) // carAgent는 자동으로 세션에서 가져옴
+      console.log('Purchase cost result:', result);
       if (result.success && result.data) {
         setPurchaseCost(result.data)
       }
     } catch (error) {
+      console.error('Error loading purchase cost:', error);
     }
   }
   
   // 매도비 설정 로드
   const loadSellCostSummary = async () => {
     try {
-      const result = await getSellCostSummary(carAgent) // carAgent는 자동으로 세션에서 가져옴
+      const result = await getSellCostSummary(agentId) // carAgent는 자동으로 세션에서 가져옴
       if (result.success && result.data) {
         setSellCostSummary(result.data)
       }
@@ -134,7 +151,7 @@ export default function SettingsPage(props) {
   // 지출 항목 로드
   const loadExpenseList = async () => {
     try {
-      const result = await getCompanyExpense(carAgent) // carAgent는 자동으로 세션에서 가져옴
+      const result = await getCompanyExpense(agentId) // carAgent는 자동으로 세션에서 가져옴
       if (result.success && result.data) {
         setExpenseList(result.data)
       }
@@ -145,7 +162,7 @@ export default function SettingsPage(props) {
   // 수입 항목 로드
   const loadIncomeList = async () => {
     try {
-      const result = await getCompanyIncome(carAgent) // carAgent는 자동으로 세션에서 가져옴
+      const result = await getCompanyIncome(agentId) // carAgent는 자동으로 세션에서 가져옴
       if (result.success && result.data) {
         setIncomeList(result.data)
       }
@@ -156,7 +173,7 @@ export default function SettingsPage(props) {
   // 계좌 목록 로드
   const loadAccountList = async () => {
     try {
-      const result = await getAgentAcctList(carAgent)
+      const result = await getAgentAcctList(agentId)
       console.log('계좌 목록 로드:', result)
       if (result.success && result.data) {
         setAccountList(result.data)

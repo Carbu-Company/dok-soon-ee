@@ -346,7 +346,7 @@ export default function EditPage({
 
     const formValues = {
       carRegId : carPurDetail.CAR_REG_ID,                        // 매입차량 ID
-      carAgent: session?.agentId,                                // 상사사 ID
+      agentId: session?.agentId,                                // 상사사 ID
       purAmt,                                                    // 매입금액
       purSupPrc,                                                 // 공급가액
       purVat,                                                    // 부가세

@@ -1,6 +1,6 @@
-export const getDealerList = async (carAgent) => {
+export const getDealerList = async (agentId) => {
   try {
-    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getDealerList?carAgent=${carAgent}`, {
+    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getDealerList?agentId=${agentId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

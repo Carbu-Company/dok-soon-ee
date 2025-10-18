@@ -4,9 +4,9 @@ import sql from "mssql";
 import { getPool } from "@/lib/mssql/pool";
 
   /* 딜러 목록 */
-export async function getDealerList(carAgent) {
+export async function getDealerList(agentId) {
   try {
-    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getDealerList?carAgent=${carAgent}`).then(res => res.json());
+    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getDealerList?agentId=${agentId}`).then(res => res.json());
     return { success: true, data, error: null };
   } catch (error) {
     console.error("getDealerList Error:", error);
@@ -26,9 +26,9 @@ export async function getCDList(grpCD) {
 }
 
 /* 상사 대출회사 한도 */
-export async function getCompanyLoanLimit(carAgent) {
+export async function getCompanyLoanLimit(agentId) {
   try {
-    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCompanyLoanLimit?carAgent=${carAgent}`).then(res => res.json());
+    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCompanyLoanLimit?agentId=${agentId}`).then(res => res.json());
     return { success: true, data, error: null };
   } catch (error) {
     console.error("getCompanyLoanLimit Error:", error);

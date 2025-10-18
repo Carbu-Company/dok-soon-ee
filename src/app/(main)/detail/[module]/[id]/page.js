@@ -63,8 +63,8 @@ export default function UnifiedDetailPage() {
       ] = await Promise.all([
         getCarPurInfo(itemId).catch(() => null),
         getCarLoanInfo(itemId).catch(() => null),
-        getCarGoodsInfo({ carRegId: itemId, car_regid: itemId }).catch(() => null),
-        getCarSelInfo({ car_regid: itemId, sell_car_regid: itemId }).catch(() => null),
+        getCarGoodsInfo({ carRegId: itemId, carRegId: itemId }).catch(() => null),
+        getCarSelInfo({ carRegId: itemId, sell_car_regid: itemId }).catch(() => null),
         getCarCashInfo({ costSeq: itemId, carRegId: itemId }).catch(() => null),
         getCarTaxInfo({ eInvoiceSeq: itemId, carRegId: itemId }).catch(() => null),
         getCarConcilInfo({ brkSeq: itemId, carRegId: itemId }).catch(() => null),

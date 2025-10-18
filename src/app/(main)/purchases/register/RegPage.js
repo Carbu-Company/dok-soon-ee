@@ -388,7 +388,7 @@ export default function RegPage({ session = null, dealerList = [], carKndList = 
     }
 
     const formValues = {
-      carAgent: session?.agentId,                                // 상사사 ID
+      agentId: session?.agentId,                                // 상사사 ID
       purAmt,                                                    // 매입금액
       purSupPrc,                                                 // 공급가액
       purVat,                                                    // 부가세

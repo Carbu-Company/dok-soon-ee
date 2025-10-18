@@ -167,7 +167,7 @@ export default function EditPage({
 
     const formValues = {
       brkSeq: carConcilDetail.BRK_SEQ,                            // 알선매출 일련번호
-      carAgent: session?.agentId,                                // 상사사 ID
+      agentId: session?.agentId,                                // 상사사 ID
       dealerId,                                                  // 판매딜러 ID
       tradeItemCd,                                               // 거래항목 코드
       brkSaleDt,                                                 // 알선판매일  

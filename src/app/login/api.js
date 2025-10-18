@@ -40,11 +40,11 @@ export async function checkPhoneAuthNumber({
   }
 }
 
-export async function getSystemUseRequest({ carAgent }) {
+export async function getSystemUseRequest({ agentId }) {
   try {
     const pool = await getPool();
     const request = pool.request();
-    request.input("CAR_AGENT", sql.VarChar, carAgent);
+    request.input("CAR_AGENT", sql.VarChar, agentId);
 
     const query = `SELECT DBO.SMJ_FN_MK_AGENT() as agent,
                             CONVERT(VARCHAR(10), DATEADD(DAY, 3650, GETDATE()), 21) as alive_dt,

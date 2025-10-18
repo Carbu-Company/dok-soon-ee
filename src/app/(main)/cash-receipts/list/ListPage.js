@@ -222,7 +222,7 @@ props
 
   // 기본 파라미터 (동적으로 생성)
   const getDefaultParams = (pageNum = currentPage, pageSize = listCount) => ({
-    carAgent: props.session?.agentId,
+    agentId: props.session?.agentId,
     page: pageNum,
     pageSize: pageSize,
   });
@@ -353,7 +353,7 @@ props
   const handlePrintReceipt = async (item) => {
     try {
       const printData = {
-        carAgent: props.session?.agentId,
+        agentId: props.session?.agentId,
         costSeq: item.COST_SEQ || item.CAR_REG_ID,
         ntsConfNo: item.NTS_CONF_NO,
       };
@@ -384,7 +384,7 @@ props
   const handleSendAlimtalk = async (item) => {
     try {
       const alimtalkData = {
-        carAgent: props.session?.agentId,
+        agentId: props.session?.agentId,
         costSeq: item.COST_SEQ || item.CAR_REG_ID,
         custNm: item.CUST_NM,
         custPhone: item.CUST_PHONE,
@@ -417,7 +417,7 @@ props
   const handleSendEmail = async (item) => {
     try {
       const emailData = {
-        carAgent: props.session?.agentId,
+        agentId: props.session?.agentId,
         costSeq: item.COST_SEQ || item.CAR_REG_ID,
         custNm: item.CUST_NM,
         custEmail: item.CUST_EMAIL,
@@ -454,7 +454,7 @@ props
 
     try {
       const cancelData = {
-        carAgent: props.session?.agentId,
+        agentId: props.session?.agentId,
         costSeq: item.COST_SEQ || item.CAR_REG_ID,
         ntsConfNo: item.NTS_CONF_NO,
         usrId: props.session?.usrId,

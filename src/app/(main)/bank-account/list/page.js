@@ -80,7 +80,7 @@ export default async function CarAcctList() {
 
   // 기본 파라미터
   const defaultParams = {
-    carAgent: session.agentId,
+    agentId: session.agentId,
     page: 1,
     pageSize: 10
   };

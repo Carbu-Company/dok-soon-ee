@@ -39,7 +39,7 @@ export default function CashTaxModal({ open, onClose, data, session }) {
       setError(null);
 
       const issueData = {
-        carAgent: session?.agentId,
+        agentId: session?.agentId,
         costSeq: data?.COST_SEQ || data?.CAR_REG_ID,
         tradeAmt: data?.PUR_AMT || data?.TRADE_AMT,
         custNm: data?.OWNR_NM || data?.CUST_NM,

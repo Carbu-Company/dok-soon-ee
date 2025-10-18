@@ -1,6 +1,6 @@
   export const getCarSellInfo = async (mgtKey) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarSellDetail?car_regid=${mgtKey}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarSellDetail?carRegId=${mgtKey}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

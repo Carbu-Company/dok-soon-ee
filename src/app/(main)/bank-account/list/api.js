@@ -31,9 +31,9 @@ export const getCarAcctList = async (params) => {
   };
   
   /** 계좌 정보 조회 */
-  export const getAgentAcctList = async (carAgent) => {
+  export const getAgentAcctList = async (agentId) => {
     try {
-        const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getAgentAcctList?carAgent=${carAgent}`, {
+        const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getAgentAcctList?agentId=${agentId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

@@ -103,7 +103,7 @@ export default async function CarPurList() {
 
   // 기본 파라미터
   const defaultParams = {
-    carAgent: session.agentId,
+    agentId: session.agentId,
     page: 1,
     pageSize: 10
   };
@@ -131,6 +131,8 @@ export default async function CarPurList() {
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const carPurSummary = await searchCarPurSummary({ ...defaultParams, ...searchParams });
+
+  console.log('carPurSummary*******************:', carPurSummary);
 
   return <ListPage session={session}
                    carList={carPurList}
