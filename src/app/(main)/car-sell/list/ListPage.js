@@ -7,7 +7,12 @@ import Pagination from "@/components/ui/pagination";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 
 export default function SalesVehicleList(props) {
+  
   const router = useRouter();
+
+  // setSearchBtn
+  const [searchBtn, setSearchBtn] = useState(0);
+
   const openModal = (id) => {
     if (typeof window !== "undefined" && window.openModal) {
       window.openModal(id);
@@ -130,7 +135,7 @@ export default function SalesVehicleList(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCountDtl);
-    handleSearch(1);
+    if (searchBtn === 1 || searchBtn === 2) handleSearch(1);
     console.log("pageSize", pageSize);
     console.log("listCount", listCountDtl);
   }, [ordItemDtl, ordAscDescDtl, listCountDtl]);
@@ -181,8 +186,6 @@ export default function SalesVehicleList(props) {
   // 매입 상태 구분
   const [dtlPurStatGubun, setDtlPurStatGubun] = useState("");
 
-  // setSearchBtn
-  const [searchBtn, setSearchBtn] = useState(1);
 
   // 상세검색 영역 표시/숨김 상태
   const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);

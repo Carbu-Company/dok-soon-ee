@@ -10,6 +10,9 @@ import Image from "next/image";
 export default function ProductCostList(props) {
   const router = useRouter();
 
+  // setSearchBtn
+  const [searchBtn, setSearchBtn] = useState(0);
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 기본 검색 영역
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +125,7 @@ export default function ProductCostList(props) {
   // 자동 검색 비활성화
   useEffect(() => {
     setPageSize(listCountDtl);
-    handleSearch(1);
+    if (searchBtn === 1 || searchBtn === 2) handleSearch(1);
     console.log("pageSize", pageSize);
     console.log("listCount", listCountDtl);
   }, [ordItemDtl, ordAscDescDtl, listCountDtl]);
@@ -170,9 +173,7 @@ export default function ProductCostList(props) {
   // 상세 검색 반영/제외 구분
   const [dtlAdjInclusYN, setDtlAdjInclusYN] = useState("");
 
-  // setSearchBtn
-  const [searchBtn, setSearchBtn] = useState(1);
-  
+
   // 모든 토글을 닫는 함수
   const closeAllToggles = () => {
     setIsDealerSelectOpen(false);
@@ -356,18 +357,6 @@ export default function ProductCostList(props) {
       setLoading(false);
     }
   };
-
-  // 컴포넌트 마운트 시: 서버에서 이미 데이터가 전달되었다면 그걸 우선 사용하고,
-  // 데이터가 없을 때만 검색을 수행합니다 (중복 호출 방지).
-  // 초기 자동 검색 비활성화
-  /*
-    useEffect(() => {
-      if (!initialCarListData || initialCarListData.length === 0) {
-        handleSearch(1);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    */
 
   // 상세 검색 버튼 클릭 핸들러
   const handleDtlSearch = async () => {
@@ -662,7 +651,8 @@ export default function ProductCostList(props) {
                   <button
                     type="button"
                     className="btn btn--type03"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault(); // 기본 동작 방지
                       setSearchBtn(1);
                       handleSearch();
                     }}

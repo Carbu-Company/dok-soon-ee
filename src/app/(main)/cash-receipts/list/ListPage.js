@@ -17,6 +17,10 @@ export default function CashReceiptList(
 props
 ) {
   const router = useRouter();
+
+  // setSearchBtn
+  const [searchBtn, setSearchBtn] = useState(0);
+
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 기본 검색 영역
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,9 +167,7 @@ props
 
   // 상세 검색 문서번호
   const [dtlNtsConfNo, setDtlNtsConfNo] = useState("");
-
-  const [searchBtn, setSearchBtn] = useState(0);
-  
+ 
   // 상세검색 영역 표시/숨김 상태
   const [isDetailSearchOpen, setIsDetailSearchOpen] = useState(false);
 
@@ -326,18 +328,6 @@ props
     }
   };
 
-  // 컴포넌트 마운트 시: 서버에서 이미 데이터가 전달되었다면 그걸 우선 사용하고,
-  // 데이터가 없을 때만 검색을 수행합니다 (중복 호출 방지).
-  // 초기 자동 검색 비활성화
-  /*
-    useEffect(() => {
-      if (!initialCarListData || initialCarListData.length === 0) {
-        handleSearch(1);
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-    */
-
   // 상세 검색 버튼 클릭 핸들러
   const handleDtlSearch = () => {
     setSearchBtn(2);
@@ -492,14 +482,14 @@ props
     }
   };
 
-  // listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
-  // // 자동 검색 비활성화
-  // useEffect(() => {
-  //   setPageSize(listCount);
-  //   // handleSearch(1); // 자동 검색 비활성화
-  //   console.log("pageSize", pageSize);
-  //   console.log("listCount", listCount);
-  // }, [ordItem, ordAscDesc, listCount]);
+  //listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
+  // 자동 검색 비활성화
+  useEffect(() => {
+    setPageSize(listCount);
+    if (searchBtn === 1 || searchBtn === 2) handleSearch(1); // 자동 검색 비활성화
+    console.log("pageSize", pageSize);
+    console.log("listCount", listCount);
+  }, [ordItem, ordAscDesc, listCount]);
 
   // listCount가 변경될 때 pageSize 업데이트하고 첫 페이지로 이동
   // 자동 검색 비활성화
