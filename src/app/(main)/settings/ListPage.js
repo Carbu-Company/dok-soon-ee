@@ -3,8 +3,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { 
   getAgentInfo, 
-  getCompanyDealer, 
-  getCompanySangsaDealer,
+  getDealerList,    // getUsrList 
   getPurchaseCost,
   getSellCostSummary,
   getCompanyExpense,
@@ -28,7 +27,7 @@ export default function SettingsPage(props) {
   const [loading, setLoading] = useState(false)
   
   // 상사 정보 상태
-  const [companyInfo, setCompanyInfo] = useState({
+  const [agentInfo, setAgentInfo] = useState({
     companyName: '',
     businessNumber: '',
     loginId: '',
@@ -65,7 +64,7 @@ export default function SettingsPage(props) {
   
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
-    loadCompanyInfo()
+    loadAgentInfo()
     loadDealerList()
     loadPurchaseCost()
     loadSellCostSummary()
@@ -75,28 +74,24 @@ export default function SettingsPage(props) {
   }, [])
   
   // 상사 정보 로드
-  const loadCompanyInfo = async () => {
-    console.log('loadCompanyInfo*******************:', agentId);
+  const loadAgentInfo = async () => {
+    console.log('loadAgentInfo*******************:', agentId);
     try {
       setLoading(true)
       const result = await getAgentInfo(agentId)
       console.log('getAgentInfo result*******************:', result);
       if (result.success && result.data && result.data.length > 0) {
-        const companyData = result.data[0];
+        const agentData = result.data[0];
 
-
-        console.log('companyData*******************:', companyData);
-        setCompanyInfo({
-          companyName: companyData.COMNAME || '',
-          businessNumber: companyData.BRNO || '',
-          loginId: companyData.loginId || '',
-          password: companyData.password || '',
-          phone: companyData.PHON || '',
-          email: companyData.EMAIL_ID || '',
-          emailDomain: companyData.EMAIL_DOMAIN || 'gmail.com',
-          mobile: companyData.mobile || '',
-          address: companyData.ADDR1 || '',
-          detailAddress: companyData.ADDR2 || ''
+        console.log('agentData*******************:', agentData);
+        setAgentInfo({
+          companyName: agentData.AGENT_NM || '',
+          businessNumber: agentData.BRNO || '',
+          loginId: agentData.LOGIN_ID || '',
+          password: agentData.LOGIN_PASSWORD || '',
+          phone: agentData.PHON || '',
+          email: agentData.EMAIL || '',
+          emailDomain: agentData.EMAIL_DOMAIN || ''
         })
       }
     } catch (error) {
@@ -113,7 +108,7 @@ export default function SettingsPage(props) {
     }
     try {
       console.log('Loading dealer list for agentId:', agentId);
-      const result = await getCompanyDealer(agentId) // carAgent는 자동으로 세션에서 가져옴
+      const result = await getDealerList(agentId) // carAgent는 자동으로 세션에서 가져옴
       console.log('Dealer list result:', result);
       if (result.success && result.data) {
         setDealerList(result.data)
@@ -345,7 +340,7 @@ export default function SettingsPage(props) {
           {/* 상사 정보 관리 탭 */}
           {activeTab === 'company-info' && (
             <CompanyInfo 
-              companyInfo={companyInfo}
+              agentInfo={agentInfo}
               emailDomains={emailDomains}
               onCompanyInfoChange={handleCompanyInfoChange}
               loading={loading}

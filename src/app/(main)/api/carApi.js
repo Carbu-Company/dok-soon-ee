@@ -248,9 +248,7 @@ export const getCompanyIncome = async (agentId, additionalParams = {}) => {
 export const getMgtKey = async (params = {}) => {
   return apiGet("getMgtKey", { ...params });
 };
-export const getDealerList = async (agentId, additionalParams = {}) => {
-  return apiGet("getDealerList", { agentId: agentId, ...additionalParams });
-};
+
 export const getCDList = (grpCD) => apiGet("getCDList", { grpCD });
 export const getCustomerList = (params) => apiGet("getCustomerList", params);
 

@@ -6,16 +6,8 @@ import Pagination from "@/components/ui/pagination";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import CarSearchModal from "@/components/modal/CarSearchModal";
 import Image from "next/image";
-import { 
-  getCashBillList, 
-  getCashBillAmount, 
-  getReceiptIssueList, 
-  getReceiptIssueSummary 
-} from "@/app/(main)/api/carApi";
 
-export default function CashReceiptList(
-props
-) {
+export default function CashReceiptList(props) {
   const router = useRouter();
 
   // setSearchBtn
@@ -287,39 +279,7 @@ props
         } else {
           alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
         }
-      } else {
-        // searchAction이 없을 때 carApi 사용
-        const searchParamsWithPage = {
-          ...getDefaultParams(pageNum),
-          ...searchParams,
-        };
-
-        // 현금영수증 발행 리스트 조회
-        const listResult = await getReceiptIssueList(searchParamsWithPage);
-        const summaryResult = await getReceiptIssueSummary(searchParamsWithPage);
-
-        if (listResult.success && summaryResult.success) {
-          const responseData = listResult.data?.list || [];
-          const paginationInfo = listResult.data?.pagination || {};
-          const summaryData = summaryResult.data || [];
-
-          console.log('응답 데이터:', {
-            responseDataLength: responseData.length,
-            paginationInfo,
-            summaryData
-          });
-
-          setCarList(responseData);
-          setPagination(paginationInfo);
-          setCarCashSummary(summaryData);
-
-          // 서버에서 제공하는 페이지네이션 정보 사용
-          setTotalPages(paginationInfo.totalPages || 1);
-          setCurrentPage(paginationInfo.currentPage || pageNum);
-        } else {
-          alert("검색 중 오류가 발생했습니다: " + (listResult?.error || summaryResult?.error || "unknown"));
-        }
-      }
+      } 
     } catch (error) {
       console.error("검색 에러:", error);
       alert("검색 중 오류가 발생했습니다.");
