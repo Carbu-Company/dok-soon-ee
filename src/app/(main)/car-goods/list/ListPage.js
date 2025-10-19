@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
+import CarGoodsRemoveModal from "@/components/modal/CarGoodsRemoveModal";
 import CarSearchModal from "@/components/modal/CarSearchModal";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import Image from "next/image";
@@ -60,8 +61,8 @@ export default function ProductCostList(props) {
 
   // 매입취소/삭제 모달 관련 state
   const [isGoodsFeeCarRemoveModalOpen, setIsGoodsFeeCarRemoveModalOpen] = useState(false);
-  const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
-  const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
+  const [selectedGoodsFeeCarForRemove, setSelectedGoodsFeeCarForRemove] = useState(null);
+  const [selectedGoodsFeeCarTypeForRemove, setSelectedGoodsFeeCarTypeForRemove] = useState(null);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -382,6 +383,27 @@ export default function ProductCostList(props) {
     };
 
     await handleSearchWithParams(1, detailSearchParams);
+  };
+
+  
+  // 매입취소/삭제 모달 관련 핸들러
+  const handleGoodsFeeCarRemoveModalOpen = (car, type) => {
+    setSelectedGoodsFeeCarForRemove(car);
+    setSelectedGoodsFeeCarTypeForRemove(type);
+    setIsGoodsFeeCarRemoveModalOpen(true);
+  };
+
+  const handleGoodsFeeCarRemoveModalClose = () => {
+    setIsGoodsFeeCarRemoveModalOpen(false);
+    setSelectedGoodsFeeCarForRemove(null);
+  };
+
+  const handleGoodsFeeCarRemoveConfirm = async () => {
+    // TODO: 실제 매입취소/삭제 API 호출 구현
+    console.log("비용 전체 삭제 확인:", selectedGoodsFeeCarForRemove);
+    // API 호출 후 성공하면 모달 닫기 및 목록 새로고침
+    handleGoodsFeeCarRemoveModalClose();
+    // handleSearch(currentPage); // 목록 새로고침
   };
 
   /**
@@ -1673,20 +1695,25 @@ export default function ProductCostList(props) {
                             </button>
                           </li>
                           <li className="select__option">
-                            <a
-                              href="#"
+                            <button
+                              type="button"
                               onClick={e => {
                                 e.preventDefault();
-                                if (
-                                  typeof window !== "undefined" &&
-                                  typeof window.openModal === "function"
-                                ) {
-                                  window.openModal("2");
-                                }
+                                e.stopPropagation();
+                                handleGoodsFeeCarRemoveModalOpen(car, "all");
+                              }}
+                              style={{
+                                border: "none",
+                                background: "none",
+                                padding: 0,
+                                color: "inherit",
+                                cursor: "pointer",
+                                width: "100%",
+                                textAlign: "left",
                               }}
                             >
                               비용 전체 삭제
-                            </a>
+                            </button>
                           </li>
                         </ul>
                       </div>
@@ -1768,6 +1795,16 @@ export default function ProductCostList(props) {
           </tfoot>
         </table>
       </div>
+
+
+      <CarGoodsRemoveModal
+        car={selectedGoodsFeeCarForRemove}
+        flagType={selectedGoodsFeeCarTypeForRemove}
+        open={isGoodsFeeCarRemoveModalOpen}
+        onClose={handleGoodsFeeCarRemoveModalClose}
+        onConfirm={handleGoodsFeeCarRemoveConfirm}
+        session={props.session}
+      />
     </main>
   );
 }

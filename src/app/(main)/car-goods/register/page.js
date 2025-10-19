@@ -37,10 +37,12 @@ export default async function RegisterPage({ searchParams }) {
 
   const dealerList = await getDealerList(session.agentId);
   const expdCdList = await getCDList('08');   // 상품화비 지출 항목 코드 목록
+  const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
 
   return <RegPage session={session}
-                  carPurDetail={carPurDetail}
                   dealerList={dealerList.data}
                   expdCdList={expdCdList.data}
+                  evdcCdList={evdcCDList.data}
+                  carPurDetail={carPurDetail}
    />;
 }
