@@ -68,6 +68,26 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
     router.replace("/inventory-finance/register");
   };
 
+  // 재고 금융 한도 조회 api 호출
+  const getCarLoanCorpList = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarLoanCorpList?agentId=${session.agentId}`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+      if (!response.ok) {
+          throw new Error('재고금융 업체별 한도 조회에 실패했습니다.');
+      }
+      const data = await response.json();
+      return data;
+
+    } catch (error) {
+        console.error('재고금융 업체별 한도 조회 오류:', error);
+        throw error;
+    }
+  };
 
   // 재고금융 등록 API 호출
   const insertInventoryFinance = async () => {
