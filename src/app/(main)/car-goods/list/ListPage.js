@@ -1700,6 +1700,27 @@ export default function ProductCostList(props) {
                               onClick={e => {
                                 e.preventDefault();
                                 e.stopPropagation();
+                                router.push(`/car-goods/edit/${car.CAR_REG_ID}`);
+                              }}
+                              style={{
+                                border: "none",
+                                background: "none",
+                                padding: 0,
+                                color: "inherit",
+                                cursor: "pointer",
+                                width: "100%",
+                                textAlign: "left",
+                              }}
+                            >
+                              상품화비용 수정
+                            </button>
+                          </li>
+                          <li className="select__option">
+                            <button
+                              type="button"
+                              onClick={e => {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 handleGoodsFeeCarRemoveModalOpen(car, "all");
                               }}
                               style={{
