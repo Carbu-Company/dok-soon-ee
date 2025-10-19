@@ -23,8 +23,6 @@ export default async function RegisterPage() {
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록
   const carKndList = await getCDList('92');   // 차량 종류 코드 목록
 
-  console.log(carKndList);
-
   return <RegPage session={session}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
