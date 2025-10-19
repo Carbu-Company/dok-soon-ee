@@ -2,38 +2,24 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from 'next/navigation';
-import CarSearchModal from "@/components/modal/CarSearchModal";
 import Image from "next/image";
 
-export default function EditPage({ 
-  
-    session, 
-    carPurInfo = [],
-    expdCdList = [],
-    evdcCdList = [],
-    goodsFeeDetail = {},
-    updateGoodsFee = async (data) => {}
-}) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCar, setSelectedCar] = useState(null);
+export default function EditPage(param) {
+  let { session, carPurInfo = [], expdCdList = [], evdcCdList = [], carGoodsInfo = [], updateGoodsFee = async (data)=>{} } = param;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   // 상품화비용 행 상태 초기값(빈 배열로 시작)
   const [productCostRows, setProductCostRows] = useState([]);
 
-  // goodsFeeDetail이 있으면 테이블 행으로 매핑하여 초기화
+  // carGoodsInfo(또는 undefined/null)를 상품화비용 테이블로 초기화
   useEffect(() => {
-    if (!goodsFeeDetail) return;
-
-    // API에서 단일 객체 또는 배열로 올 수 있으므로 normalize
-    const details = Array.isArray(goodsFeeDetail)
-      ? goodsFeeDetail
-      : goodsFeeDetail.GOODS_FEE_SEQ || goodsFeeDetail.EXPD_ITEM_CD
-      ? [goodsFeeDetail]
+    if (!carGoodsInfo) return;
+    const details = Array.isArray(carGoodsInfo)
+      ? carGoodsInfo
+      : carGoodsInfo.GOODS_FEE_SEQ || carGoodsInfo.EXPD_ITEM_CD
+      ? [carGoodsInfo]
       : [];
-
     if (details.length === 0) return;
-
     const mappedRows = details.map((d, idx) => {
       // 지출구분(EXPD_SCT_CD): '01' -> dealer, else company
       const expenseType = d.EXPD_SCT_CD === '01' ? 'dealer' : 'company';
@@ -61,20 +47,8 @@ export default function EditPage({
         remarks: d.RMRK || d.REMARK || ''
       };
     });
-
     setProductCostRows(mappedRows);
-  }, [goodsFeeDetail]);
-
-  // 페이지 로드 시 모달 자동 열기 (한 번만 실행)
-  useEffect(() => {
-    // 차량 정보가 없으면 모달을 자동으로 열기 (페이지 로드 시에만)
-    if (!carPurInfo || !carPurInfo.CAR_REG_ID) {
-      console.log('차량 정보 없음 - 모달 열기');
-      setIsModalOpen(true);
-    } else {
-      console.log('차량 정보 있음 - 모달 열지 않음');
-    }
-  }, []); // 빈 의존성 배열로 변경하여 한 번만 실행
+  }, [carGoodsInfo]);
 
   // 제시구분 코드를 텍스트로 변환하는 함수
   const getCarStatusText = (statusCode) => {
@@ -84,21 +58,6 @@ export default function EditPage({
       '003': '알선판매'
     };
     return statusMap[statusCode] || statusCode || '';
-  };
-
-  // 차량 선택 핸들러
-  const handleCarSelect = (car) => {
-    console.log('선택된 차량:', car);
-    setSelectedCar(car);
-    setIsModalOpen(false);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCarSearchClick = () => {
-    setIsModalOpen(true);
   };
 
   // 상품화비용 행 추가
@@ -197,13 +156,13 @@ export default function EditPage({
 
     // 클릭 시 현재 테이블 상태 로그 출력
     console.log('updateGoodsFeeHandler - productCostRows:', productCostRows);
-    console.log('updateGoodsFeeHandler - carRegId:', carPurInfo?.CAR_REG_ID || selectedCar?.CAR_REG_ID || null);
+    console.log('updateGoodsFeeHandler - carRegId:', carPurInfo?.CAR_REG_ID || null);
 
     setLoading(true);
     try {
       const payloadRows = productCostRows.map((row) => ({
         goodsFeeSeq: row.id,
-        carRegId: carPurInfo?.CAR_REG_ID || selectedCar?.CAR_REG_ID || '',
+        carRegId: carPurInfo?.CAR_REG_ID || '',
         expdItemCd: row.productItem || '',
         expdItemNm: expdCdList.find(item => item.CD === row.productItem)?.CD_NM || '',
         expdSctCd: row.expenseType === 'dealer' ? '01' : '02',
@@ -277,7 +236,7 @@ export default function EditPage({
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">상품화비용 등록</h2>
+        <h2 className="container__title">상품화비용 수정</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">
@@ -299,14 +258,6 @@ export default function EditPage({
       <div className="table-wrap">
         <div className="table-wrap__head">
           <h2 className="table-wrap__title">기준차량</h2>
-          <button
-            className="btn btn--dark btn--padding--r20"
-            type="button"
-            id="openBtn"
-            onClick={handleCarSearchClick}
-          >
-            <span className="ico ico--add"></span>차량검색
-          </button>
         </div>
         <table className="table">
           <colgroup>
@@ -324,15 +275,15 @@ export default function EditPage({
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>{selectedCar?.CAR_STAT_NM || (carPurInfo && carPurInfo.CAR_STAT_NM) || ""}</td>
+              <td>{carPurInfo?.CAR_STAT_NM || ""}</td>
               <th>차량번호</th>
-              <td>{selectedCar?.CAR_NO || (carPurInfo && carPurInfo.CAR_NO) || ""}</td>
+              <td>{carPurInfo?.CAR_NO || ""}</td>
               <th>매입딜러</th>
-              <td>{selectedCar?.DLR_NM || (carPurInfo && carPurInfo.DLR_NM) || ""}</td>
+              <td>{carPurInfo?.DLR_NM || ""}</td>
               <th>차량명</th>
-              <td>{selectedCar?.CAR_NM || (carPurInfo && carPurInfo.CAR_NM) || ""}</td>
+              <td>{carPurInfo?.CAR_NM || ""}</td>
               <th>매입일</th>
-              <td>{selectedCar?.CAR_PUR_DT || (carPurInfo && carPurInfo.CAR_PUR_DT) || ""}</td>
+              <td>{carPurInfo?.CAR_PUR_DT || ""}</td>
             </tr>
           </tbody>
         </table>
@@ -709,14 +660,6 @@ export default function EditPage({
           {loading ? '수정 중...' : '확인'}
         </button>
       </div>
-
-      {/* 차량 검색 모달 */}
-      <CarSearchModal 
-        open={isModalOpen} 
-        onClose={handleModalClose} 
-        onCarSelect={handleCarSelect}
-        agentId={session}
-      />
     </main>
   );
 }

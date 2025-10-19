@@ -2,20 +2,10 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from 'next/navigation';
-import CarSearchModal from "@/components/modal/CarSearchModal";
 import Image from "next/image";
 
-export default function EditPage({ 
-  
-    session, 
-    carGoodsInfo = [],
-    expdCdList = [],
-    evdcCdList = [],
-    goodsFeeDetail = {},
-    updateGoodsFee = async (data) => {}
-}) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCar, setSelectedCar] = useState(null);
+export default function EditPage(param) {
+  let { session, carPurInfo = [], expdCdList = [], evdcCdList = [], goodsFeeDetail = {}, updateGoodsFee = async (data)=>{} } = param;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   // 상품화비용 행 상태 초기값(빈 배열로 시작)
@@ -65,17 +55,6 @@ export default function EditPage({
     setProductCostRows(mappedRows);
   }, [goodsFeeDetail]);
 
-  // 페이지 로드 시 모달 자동 열기 (한 번만 실행)
-  useEffect(() => {
-    // 차량 정보가 없으면 모달을 자동으로 열기 (페이지 로드 시에만)
-    if (!carGoodsInfo || !carGoodsInfo.CAR_REG_ID) {
-      console.log('차량 정보 없음 - 모달 열기');
-      setIsModalOpen(true);
-    } else {
-      console.log('차량 정보 있음 - 모달 열지 않음');
-    }
-  }, []); // 빈 의존성 배열로 변경하여 한 번만 실행
-
   // 제시구분 코드를 텍스트로 변환하는 함수
   const getCarStatusText = (statusCode) => {
     const statusMap = {
@@ -84,21 +63,6 @@ export default function EditPage({
       '003': '알선판매'
     };
     return statusMap[statusCode] || statusCode || '';
-  };
-
-  // 차량 선택 핸들러
-  const handleCarSelect = (car) => {
-    console.log('선택된 차량:', car);
-    setSelectedCar(car);
-    setIsModalOpen(false);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleCarSearchClick = () => {
-    setIsModalOpen(true);
   };
 
   // 상품화비용 행 추가
@@ -197,13 +161,13 @@ export default function EditPage({
 
     // 클릭 시 현재 테이블 상태 로그 출력
     console.log('updateGoodsFeeHandler - productCostRows:', productCostRows);
-    console.log('updateGoodsFeeHandler - carRegId:', carGoodsInfo?.CAR_REG_ID || selectedCar?.CAR_REG_ID || null);
+    console.log('updateGoodsFeeHandler - carRegId:', carPurInfo?.CAR_REG_ID || null);
 
     setLoading(true);
     try {
       const payloadRows = productCostRows.map((row) => ({
         goodsFeeSeq: row.id,
-        carRegId: carGoodsInfo?.CAR_REG_ID || selectedCar?.CAR_REG_ID || '',
+        carRegId: carPurInfo?.CAR_REG_ID || '',
         expdItemCd: row.productItem || '',
         expdItemNm: expdCdList.find(item => item.CD === row.productItem)?.CD_NM || '',
         expdSctCd: row.expenseType === 'dealer' ? '01' : '02',
@@ -299,14 +263,6 @@ export default function EditPage({
       <div className="table-wrap">
         <div className="table-wrap__head">
           <h2 className="table-wrap__title">기준차량</h2>
-          <button
-            className="btn btn--dark btn--padding--r20"
-            type="button"
-            id="openBtn"
-            onClick={handleCarSearchClick}
-          >
-            <span className="ico ico--add"></span>차량검색
-          </button>
         </div>
         <table className="table">
           <colgroup>
@@ -324,15 +280,15 @@ export default function EditPage({
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>{selectedCar?.CAR_STAT_NM || (carGoodsInfo && carGoodsInfo.CAR_STAT_NM) || ""}</td>
+              <td>{carPurInfo?.CAR_STAT_NM || ""}</td>
               <th>차량번호</th>
-              <td>{selectedCar?.CAR_NO || (carGoodsInfo && carGoodsInfo.CAR_NO) || ""}</td>
+              <td>{carPurInfo?.CAR_NO || ""}</td>
               <th>매입딜러</th>
-              <td>{selectedCar?.DLR_NM || (carGoodsInfo && carGoodsInfo.DLR_NM) || ""}</td>
+              <td>{carPurInfo?.DLR_NM || ""}</td>
               <th>차량명</th>
-              <td>{selectedCar?.CAR_NM || (carGoodsInfo && carGoodsInfo.CAR_NM) || ""}</td>
+              <td>{carPurInfo?.CAR_NM || ""}</td>
               <th>매입일</th>
-              <td>{selectedCar?.CAR_PUR_DT || (carGoodsInfo && carGoodsInfo.CAR_PUR_DT) || ""}</td>
+              <td>{carPurInfo?.CAR_PUR_DT || ""}</td>
             </tr>
           </tbody>
         </table>
@@ -709,14 +665,6 @@ export default function EditPage({
           {loading ? '수정 중...' : '확인'}
         </button>
       </div>
-
-      {/* 차량 검색 모달 */}
-      <CarSearchModal 
-        open={isModalOpen} 
-        onClose={handleModalClose} 
-        onCarSelect={handleCarSelect}
-        agentId={session}
-      />
     </main>
   );
 }

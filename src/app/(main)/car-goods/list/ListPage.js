@@ -1721,7 +1721,7 @@ export default function ProductCostList(props) {
                               onClick={e => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                handleGoodsFeeCarRemoveModalOpen(car, "all");
+                                handleGoodsFeeCarRemoveModalOpen(car, "one");
                               }}
                               style={{
                                 border: "none",

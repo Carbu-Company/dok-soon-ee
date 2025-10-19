@@ -20,9 +20,6 @@ export default async function EditorPage({ params }) {
     return updateGoodsFee(data);
   }
 
-  console.log('goodsFeeDetail**********', goodsFeeDetail);
-
-
   return <EditPage session={session}
                    carPurInfo={carPurInfo.data}
                    expdCdList={expdCdList.data}

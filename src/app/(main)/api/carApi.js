@@ -158,7 +158,7 @@ export const getNoticeStatus = (agentId) =>
 export const getGoodsFeeList = (payload) => apiPost("getGoodsFeeList", payload);
 export const getGoodsFeeCarSumList = (payload) =>
   apiPost("getGoodsFeeCarSumList", payload);
-export const getCarGoodsInfo = (params) => apiGet("getCarGoodsInfo", params);
+export const getCarGoodsInfo = (carRegId) => apiGet("getCarGoodsInfo", { carRegId });
 export const getGoodsFeeDetail = (goodsFeeSeq) =>
   apiGet("getGoodsFeeDetail", { goodsFeeSeq });
 export const getGoodsFeeCarSummary = (payload) =>
