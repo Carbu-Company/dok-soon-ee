@@ -12,6 +12,7 @@ export default async function EditorPage({ params }) {
 
   const carPurInfo = await getCarPurInfo(id);
   const expdCdList = await getCDList('08');
+  const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const goodsFeeDetail = await getGoodsFeeDetail(goodsfee);
 
   async function updateGoodsFeeAction(data) {
@@ -25,6 +26,7 @@ export default async function EditorPage({ params }) {
   return <EditPage session={session}
                    carPurInfo={carPurInfo.data}
                    expdCdList={expdCdList.data}
+                   evdcCdList={evdcCDList.data}
                    goodsFeeDetail={goodsFeeDetail.data}
                    updateGoodsFee={updateGoodsFeeAction}
    />;

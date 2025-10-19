@@ -10,6 +10,7 @@ export default function EditPage({
     session, 
     carPurInfo = [],
     expdCdList = [],
+    evdcCdList = [],
     goodsFeeDetail = {},
     updateGoodsFee = async (data) => {}
 }) {
@@ -574,10 +575,13 @@ export default function EditPage({
                       className="select__input"
                       type="hidden"
                       name={`expenseProof_${row.id}`}
-                      defaultValue="value1"
+                      value={row.expenseProof}
+                      onChange={(e) => updateProductCostRow(row.id, 'expenseProof', e.target.value)}
                     />
                     <button className="select__toggle" type="button">
-                      <span className="select__text">선택</span>
+                      <span className="select__text">
+                        {evdcCdList.find(item => item.CD === row.expenseProof)?.CD_NM || '선택'}
+                      </span>
                       <Image
                         className="select__arrow"
                         src="/images/ico-dropdown.svg"
@@ -588,19 +592,17 @@ export default function EditPage({
                     </button>
 
                     <ul className="select__menu">
-                      <li className="select__option select__option--selected" data-value="value1">
-                        선택
-                      </li>
-                      <li className="select__option" data-value="value2">
-                        전자세금계산서
-                      </li>
-                      <li className="select__option" data-value="value3">
-                        카드영수증
-                      </li>
-                      <li className="select__option" data-value="value3">
-                        현금영수증
-                      </li>
-                      {/* 필요 시 더 추가 (10개 초과 시 내부 스크롤) */}
+                      <li className="select__option select__option--selected" data-value="">선택</li>
+                      {evdcCdList.map((item) => (
+                        <li 
+                          key={item.CD}
+                          className={`select__option ${row.expenseProof === item.CD ? 'select__option--selected' : ''}`}
+                          data-value={item.CD}
+                          onClick={() => updateProductCostRow(row.id, 'expenseProof', item.CD)}
+                        >
+                          {item.CD_NM}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </td>
