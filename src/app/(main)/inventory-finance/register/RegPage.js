@@ -14,9 +14,19 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
 
   const [companyLoanLimit, setCompanyLoanLimit] = useState([]);
 
+  const formatNum = (v) => {
+    if (v == null || v === '') return '-';
+    const n = Number(v);
+    if (Number.isNaN(n)) return v;
+    return n.toLocaleString();
+  };
+
   // 대출회사 선택 상태 관리 (콤보 박스)
   const [isLoanCompSelectOpen, setIsLoanCompSelectOpen] = useState(false);
   const [loanCompCd, setLoanCompCd] = useState('');
+
+  // 선택된 대출회사 정보(실제 데이터 필드명 기준)
+  const selectedLoanComp = loanCompList.find(c => c.LOAN_CORP_CD === loanCompCd) || null;
 
   // 대출금액 선택 상태 관리
   const [loanAmt, setLoanAmt] = useState('');
@@ -246,7 +256,7 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                     />
                     <button className="select__toggle" type="button" onClick={() => setIsLoanCompSelectOpen(!isLoanCompSelectOpen)}>
                       <span className="select__text">
-                        {loanCompCd ? loanCompList.find(item => item.CD === loanCompCd)?.CD_NM : '선택'}
+                        {loanCompCd ? (selectedLoanComp?.LOAN_CORP_NM || '선택') : '선택'}
                       </span>
                       <Image
                         className="select__arrow"
@@ -265,11 +275,11 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                         선택
                       </li>
                       {loanCompList.map((comp) => (
-                        <li key={comp.CD} className={`select__option ${loanCompCd === comp.CD ? 'select__option--selected' : ''}`} data-value={comp.CD} onClick={() => {
-                          setLoanCompCd(comp.CD);
+                        <li key={comp.LOAN_CORP_CD} className={`select__option ${loanCompCd === comp.LOAN_CORP_CD ? 'select__option--selected' : ''}`} data-value={comp.LOAN_CORP_CD} onClick={() => {
+                          setLoanCompCd(comp.LOAN_CORP_CD);
                           setIsLoanCompSelectOpen(false);
                         }}>
-                          {comp.CD_NM}
+                          {comp.LOAN_CORP_NM}
                         </li>
                       ))}
                     </ul>
@@ -277,9 +287,9 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                 </div>
               </td>
               <th>총한도</th>
-              <td>500,000,000</td>
+              <td>{selectedLoanComp ? formatNum(selectedLoanComp.TOT_LMT_AMT) : '-'}</td>
               <th>잔여한도</th>
-              <td>250,000,000 (50%)</td>
+              <td>{selectedLoanComp ? `${formatNum(selectedLoanComp.TOT_LMT_AMT - (selectedLoanComp.TOT_LOAN_AMT || 0))} (${selectedLoanComp.TOT_LOAN_AMT ? Math.round(((selectedLoanComp.TOT_LMT_AMT - (selectedLoanComp.TOT_LOAN_AMT || 0)) / selectedLoanComp.TOT_LMT_AMT) * 100) : 0}%)` : '-'}</td>
             </tr>
             <tr>
               <th>

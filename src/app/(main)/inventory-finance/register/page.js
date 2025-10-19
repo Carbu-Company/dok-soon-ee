@@ -3,6 +3,7 @@ import { verifySession } from "@/lib/auth";
 import RegPage from "@/app/(main)/inventory-finance/register/RegPage";
 import { getSuggestOne } from "./api";
 import { getDealerList, getCDList, getCompanyLoanLimit } from "@/app/(main)/common/api";
+import { getCarLoanCorpList } from "@/app/(main)/api/carApi";
 
 export default async function RegisterPage({ searchParams }) {
   const cookieStore = await cookies();
@@ -38,10 +39,13 @@ export default async function RegisterPage({ searchParams }) {
 
 
   const dealerList = await getDealerList(session.agentId);
-  const loanCompList = await getCDList('05');   // 대출회사 코드 목록
+//   const loanCompList = await getCDList('05');   // 대출회사 코드 목록
+  const loanCompList = await getCarLoanCorpList(session.agentId);
   const companyLoanLimit = await getCompanyLoanLimit(session.agentId);   // 상사 대출회사 한도
-
-  console.log(companyLoanLimit);
+  
+  console.log('dealerList**********', dealerList.data);
+  console.log('loanCompList**********', loanCompList.data);
+  console.log('companyLoanLimit**********', companyLoanLimit);
 
   return <RegPage session={session}
                   carPurDetail={carPurDetail} 

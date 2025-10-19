@@ -176,7 +176,7 @@ export const deleteCarLoan = (params) => apiGet("deleteCarLoan", params);
 export const insertAgentLoanCorp = (payload) => apiPost("insertAgentLoanCorp", payload);
 export const updateAgentLoanCorp = (payload) => apiPost("updateAgentLoanCorp", payload);
 export const deleteAgentLoanCorp = (params) => apiGet("deleteAgentLoanCorp", params);
-
+export const getCarLoanCorpList = (agentId) => apiGet("getCarLoanCorpList", { agentId });
 
 /* ------------------------------ 계좌 2.0 ------------------------------ */
 // 계좌 목록 조회
