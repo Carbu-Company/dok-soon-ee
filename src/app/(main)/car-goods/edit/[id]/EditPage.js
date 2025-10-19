@@ -8,7 +8,7 @@ import Image from "next/image";
 export default function EditPage({ 
   
     session, 
-    carGoodsInfo = [],
+    carPurInfo = [],
     expdCdList = [],
     evdcCdList = [],
     goodsFeeDetail = {},
@@ -68,7 +68,7 @@ export default function EditPage({
   // 페이지 로드 시 모달 자동 열기 (한 번만 실행)
   useEffect(() => {
     // 차량 정보가 없으면 모달을 자동으로 열기 (페이지 로드 시에만)
-    if (!carGoodsInfo || !carGoodsInfo.CAR_REG_ID) {
+    if (!carPurInfo || !carPurInfo.CAR_REG_ID) {
       console.log('차량 정보 없음 - 모달 열기');
       setIsModalOpen(true);
     } else {
@@ -197,13 +197,13 @@ export default function EditPage({
 
     // 클릭 시 현재 테이블 상태 로그 출력
     console.log('updateGoodsFeeHandler - productCostRows:', productCostRows);
-    console.log('updateGoodsFeeHandler - carRegId:', carGoodsInfo?.CAR_REG_ID || selectedCar?.CAR_REG_ID || null);
+    console.log('updateGoodsFeeHandler - carRegId:', carPurInfo?.CAR_REG_ID || selectedCar?.CAR_REG_ID || null);
 
     setLoading(true);
     try {
       const payloadRows = productCostRows.map((row) => ({
         goodsFeeSeq: row.id,
-        carRegId: carGoodsInfo?.CAR_REG_ID || selectedCar?.CAR_REG_ID || '',
+        carRegId: carPurInfo?.CAR_REG_ID || selectedCar?.CAR_REG_ID || '',
         expdItemCd: row.productItem || '',
         expdItemNm: expdCdList.find(item => item.CD === row.productItem)?.CD_NM || '',
         expdSctCd: row.expenseType === 'dealer' ? '01' : '02',
@@ -277,7 +277,7 @@ export default function EditPage({
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">상품화비용 수정</h2>
+        <h2 className="container__title">상품화비용 등록</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">
@@ -324,15 +324,15 @@ export default function EditPage({
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>{selectedCar?.CAR_STAT_NM || (carGoodsInfo && carGoodsInfo.CAR_STAT_NM) || ""}</td>
+              <td>{selectedCar?.CAR_STAT_NM || (carPurInfo && carPurInfo.CAR_STAT_NM) || ""}</td>
               <th>차량번호</th>
-              <td>{selectedCar?.CAR_NO || (carGoodsInfo && carGoodsInfo.CAR_NO) || ""}</td>
+              <td>{selectedCar?.CAR_NO || (carPurInfo && carPurInfo.CAR_NO) || ""}</td>
               <th>매입딜러</th>
-              <td>{selectedCar?.DLR_NM || (carGoodsInfo && carGoodsInfo.DLR_NM) || ""}</td>
+              <td>{selectedCar?.DLR_NM || (carPurInfo && carPurInfo.DLR_NM) || ""}</td>
               <th>차량명</th>
-              <td>{selectedCar?.CAR_NM || (carGoodsInfo && carGoodsInfo.CAR_NM) || ""}</td>
+              <td>{selectedCar?.CAR_NM || (carPurInfo && carPurInfo.CAR_NM) || ""}</td>
               <th>매입일</th>
-              <td>{selectedCar?.CAR_PUR_DT || (carGoodsInfo && carGoodsInfo.CAR_PUR_DT) || ""}</td>
+              <td>{selectedCar?.CAR_PUR_DT || (carPurInfo && carPurInfo.CAR_PUR_DT) || ""}</td>
             </tr>
           </tbody>
         </table>
