@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
+import InterestPaymentModal from "@/components/modal/InterestPaymentModal";
 
 export default function InventoryFinanceList(props) {
   const router = useRouter();
@@ -65,6 +66,9 @@ export default function InventoryFinanceList(props) {
   const [isPurchaseRemoveModalOpen, setIsPurchaseRemoveModalOpen] = useState(false);
   const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
   const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
+  // 딜러 이자납 모달 관련 state
+  const [isInterestPaymentModalOpen, setIsInterestPaymentModalOpen] = useState(false);
+  const [interestPaymentCar, setInterestPaymentCar] = useState(null);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -390,6 +394,8 @@ export default function InventoryFinanceList(props) {
           {/*<p className="guidebox__desc">※ 이자계산, 신규/연장/추가처리</p>*/}
         </div>
       </div>
+
+      <InterestPaymentModal open={isInterestPaymentModalOpen} onClose={() => setIsInterestPaymentModalOpen(false)} car={interestPaymentCar} />
 
       <div className="table-wrap">
         <h2 className="table-wrap__title">검색</h2>
@@ -1415,7 +1421,8 @@ export default function InventoryFinanceList(props) {
                           href="#"
                           onClick={e => {
                             e.preventDefault();
-                            openModal("3");
+                            setInterestPaymentCar(car);
+                            setIsInterestPaymentModalOpen(true);
                           }}
                         >
                           딜러 이자납 등록
