@@ -4,7 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CarSearchModal from "@/components/modal/CarSearchModal";
 
-export default function InventoryFinanceRegisterPage({ session = null, carPurDetail = [], dealerList = [], loanCompList = [] }) {
+export default function InventoryFinanceEditPage({ 
+  session = null, 
+  carPurInfo = [], 
+  dealerList = [], 
+  companyLoanLimit = [], 
+  loanDetail = {}, 
+  updateCarLoan = async (data)=>{}
+ }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,30 +30,30 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
 
   // 대출회사 선택 상태 관리 (콤보 박스)
   const [isLoanCompSelectOpen, setIsLoanCompSelectOpen] = useState(false);
-  const [loanCompCd, setLoanCompCd] = useState('');
+  const [loanCompCd, setLoanCompCd] = useState(loanDetail.LOAN_CORP_CD || '');
 
   // 선택된 대출회사 정보(실제 데이터 필드명 기준)
   const selectedLoanComp = loanCompList.find(c => c.LOAN_CORP_CD === loanCompCd) || null;
 
   // 대출금액 선택 상태 관리
-  const [loanAmt, setLoanAmt] = useState('');
-  const [loanDt, setLoanDt] = useState('');
+  const [loanAmt, setLoanAmt] = useState(loanDetail.LOAN_AMT || 0);
+  const [loanDt, setLoanDt] = useState(loanDetail.LOAN_DT || '');
 
   // 개월수 콤보 선택
   const [isLoanMmCntSelectOpen, setIsLoanMmCntSelectOpen] = useState(false);
-  const [loanMmCnt, setLoanMmCnt] = useState('');
+  const [loanMmCnt, setLoanMmCnt] = useState(loanDetail.LOAN_MM_CNT || '');
 
-  // 캐피탈이율 선택 상태 관리
-  const [loanCorpIntrRt, setLoanCorpIntrRt] = useState('');
+  // 캐피탈이율 
+  const [loanCorpIntrRt, setLoanCorpIntrRt] = useState(loanDetail.LOAN_MM_CNT || '');
 
-  // 딜러이율 선택 상태 관리
-  const [dlrAplyIntrRt, setDlrAplyIntrRt] = useState('');
+  // 딜러이율 
+  const [dlrAplyIntrRt, setDlrAplyIntrRt] = useState(loanDetail.DLR_APLY_INTR_RT || '');
 
   // 대출유형 선택 상태 관리
-  const [loanSctCd, setLoanSctCd] = useState('');
+  const [loanSctCd, setLoanSctCd] = useState(loanDetail.LOAN_SCT_CD || '');
 
   // 특이사항 선택 상태 관리
-  const [loanMemo, setLoanMemo] = useState('');
+  const [loanMemo, setLoanMemo] = useState(loanDetail.LOAN_MEMO || '');
 
   // 제시구분 코드를 텍스트로 변환하는 함수
   const getCarStatusText = (statusCode) => {
@@ -57,115 +64,6 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
     };
     return statusMap[statusCode] || statusCode || '';
   };
-  
-  useEffect(() => {
-    // URL 쿼리 파라미터에서 showModal이 true이면 모달을 열기
-    if (searchParams.get("showModal") === "true") {
-      setIsModalOpen(true);
-    }
-  }, [searchParams]);
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-    // URL에서 쿼리 파라미터 제거
-    router.replace("/inventory-finance/register");
-  };
-
-  const handleCarSelect = carData => {
-    console.log('선택된 차량:', carData);
-    setSelectedCar(carData);
-    setIsModalOpen(false);
-    router.replace("/inventory-finance/register");
-  };
-
-  // 재고 금융 한도 조회 api 호출
-  const getCarLoanCorpList = async () => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarLoanCorpList?agentId=${session.agentId}`, {
-          method: 'GET',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      });
-      if (!response.ok) {
-          throw new Error('재고금융 업체별 한도 조회에 실패했습니다.');
-      }
-      const data = await response.json();
-      return data;
-
-    } catch (error) {
-        console.error('재고금융 업체별 한도 조회 오류:', error);
-        throw error;
-    }
-  };
-
-  // 재고금융 등록 API 호출
-  const insertInventoryFinance = async () => {
-    const carRegId = selectedCar?.CAR_REG_ID || (carPurDetail && carPurDetail.CAR_REG_ID);
-    if (!carRegId) {
-      alert('차량 정보가 없습니다. 차량을 먼저 선택해주세요.');
-      setIsModalOpen(true); // 모달을 다시 열기
-      return;
-    }
-
-    console.log('loanCompCd', loanCompCd);    // 대출회사 코드
-    console.log('loanAmt', loanAmt);    // 대출금액
-    console.log('loanDt', loanDt);    // 대출실행일
-    console.log('loanMmCnt', loanMmCnt);    // 대출기간
-    console.log('loanCorpIntrRt', loanCorpIntrRt);    // 캐피탈이율
-    console.log('dlrAplyIntrRt', dlrAplyIntrRt);    // 딜러이율
-    console.log('loanSctCd', loanSctCd);    // 대출유형
-    console.log('loanMemo', loanMemo);    // 특이사항
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const formValues = {
-        carRegId: carRegId,               // 차량 등록 ID
-        loanCompCd: loanCompCd,           // 대출회사 코드
-        loanAmt: loanAmt,                 // 대출금액
-        loanDt: loanDt,                   // 대출실행일
-        loanMmCnt: loanMmCnt,             // 대출기간
-        loanCorpIntrRt: loanCorpIntrRt,   // 캐피탈이율
-        dlrAplyIntrRt: dlrAplyIntrRt,     // 딜러이율
-        loanSctCd: loanSctCd,             // 대출유형
-        loanMemo: loanMemo,               // 특이사항
-        regrId: session?.usrId || '',     // 등록자 ID
-        modrId: session?.usrId || '',     // 수정자 ID
-      };
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertCarLoan`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formValues)
-      });
-
-      const res = await response.json();
-      
-      if (!res.success) {
-        throw new Error(res.message || '재고금융 등록에 실패했습니다');
-      }
-
-      return res;
-
-      await Promise.all(promises);
-      
-      alert('재고금융이 성공적으로 등록되었습니다.');
-      setLoading(false);
-      // 성공 후 목록 페이지로 이동하거나 필요한 처리
-      // router.push('/inventory-finance/list');
-      
-    } catch (error) {
-      console.error('재고금융 등록 오류:', error);
-      setError(error.message);
-      alert('재고금융 등록 중 오류가 발생했습니다: ' + error.message);
-      setLoading(false);
-    }
-  };
-
 
 
   return (
