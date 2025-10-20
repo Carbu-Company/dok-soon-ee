@@ -1429,7 +1429,7 @@ export default function InventoryFinanceList(props) {
                         </a>
                       </li>
                       <li className="select__option">
-                        <a href="#">재고금융 수정</a>
+                      <Link href={`/inventory-finance/edit/${car.CAR_REG_ID}/${car.LOAN_ID}`}>재고금융 수정</Link>
                       </li>
 
                       <li className="select__option">
