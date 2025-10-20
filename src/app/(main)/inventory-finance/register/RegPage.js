@@ -23,10 +23,10 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
 
   // 대출회사 선택 상태 관리 (콤보 박스)
   const [isLoanCompSelectOpen, setIsLoanCompSelectOpen] = useState(false);
-  const [loanCompCd, setLoanCompCd] = useState('');
+  const [loanCorpCd, setloanCorpCd] = useState('');
 
   // 선택된 대출회사 정보(실제 데이터 필드명 기준)
-  const selectedLoanComp = loanCompList.find(c => c.LOAN_CORP_CD === loanCompCd) || null;
+  const selectedLoanComp = loanCompList.find(c => c.LOAN_CORP_CD === loanCorpCd) || null;
 
   // 대출금액 선택 상태 관리
   const [loanAmt, setLoanAmt] = useState('');
@@ -108,7 +108,9 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
       return;
     }
 
-    console.log('loanCompCd', loanCompCd);    // 대출회사 코드
+    console.log('session.agentId', session.agentId);
+    console.log('carRegId', carRegId);    // 차량 등록 ID
+    console.log('loanCorpCd', loanCorpCd);    // 대출회사 코드
     console.log('loanAmt', loanAmt);    // 대출금액
     console.log('loanDt', loanDt);    // 대출실행일
     console.log('loanMmCnt', loanMmCnt);    // 대출기간
@@ -122,8 +124,9 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
 
     try {
       const formValues = {
+        agentId: session.agentId,         // 대행사 ID
         carRegId: carRegId,               // 차량 등록 ID
-        loanCompCd: loanCompCd,           // 대출회사 코드
+        loanCorpCd: loanCorpCd,           // 대출회사 코드
         loanAmt: loanAmt,                 // 대출금액
         loanDt: loanDt,                   // 대출실행일
         loanMmCnt: loanMmCnt,             // 대출기간
@@ -131,8 +134,7 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
         dlrAplyIntrRt: dlrAplyIntrRt,     // 딜러이율
         loanSctCd: loanSctCd,             // 대출유형
         loanMemo: loanMemo,               // 특이사항
-        regrId: session?.usrId || '',     // 등록자 ID
-        modrId: session?.usrId || '',     // 수정자 ID
+        usrId: session?.usrId || '',     // 등록자 ID
       };
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertCarLoan`, {
@@ -251,12 +253,12 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                     <input
                       className="select__input"
                       type="hidden"
-                      name="loanCompCd"
-                      value={loanCompCd || ''}
+                      name="loanCorpCd"
+                      value={loanCorpCd || ''}
                     />
                     <button className="select__toggle" type="button" onClick={() => setIsLoanCompSelectOpen(!isLoanCompSelectOpen)}>
                       <span className="select__text">
-                        {loanCompCd ? (selectedLoanComp?.LOAN_CORP_NM || '선택') : '선택'}
+                        {loanCorpCd ? (selectedLoanComp?.LOAN_CORP_NM || '선택') : '선택'}
                       </span>
                       <Image
                         className="select__arrow"
@@ -268,15 +270,15 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                     </button>
 
                     <ul className={`select__menu ${isLoanCompSelectOpen ? 'active' : ''}`}>
-                      <li className={`select__option ${!loanCompCd ? 'select__option--selected' : ''}`} data-value="" onClick={() => {
-                        setLoanCompCd('');
+                      <li className={`select__option ${!loanCorpCd ? 'select__option--selected' : ''}`} data-value="" onClick={() => {
+                        setloanCorpCd('');
                         setIsLoanCompSelectOpen(false);
                       }}>
                         선택
                       </li>
                       {loanCompList.map((comp) => (
-                        <li key={comp.LOAN_CORP_CD} className={`select__option ${loanCompCd === comp.LOAN_CORP_CD ? 'select__option--selected' : ''}`} data-value={comp.LOAN_CORP_CD} onClick={() => {
-                          setLoanCompCd(comp.LOAN_CORP_CD);
+                        <li key={comp.LOAN_CORP_CD} className={`select__option ${loanCorpCd === comp.LOAN_CORP_CD ? 'select__option--selected' : ''}`} data-value={comp.LOAN_CORP_CD} onClick={() => {
+                          setloanCorpCd(comp.LOAN_CORP_CD);
                           setIsLoanCompSelectOpen(false);
                         }}>
                           {comp.LOAN_CORP_NM}

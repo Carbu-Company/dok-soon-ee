@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CarSearchModal from "@/components/modal/CarSearchModal";
 
-export default function InventoryFinanceEditPage({ 
+export default function EditPage({ 
   session = null, 
-  carPurInfo = [], 
+  carPurDetail = [], 
   dealerList = [], 
   companyLoanLimit = [], 
   loanDetail = {}, 
@@ -18,8 +18,6 @@ export default function InventoryFinanceEditPage({
   const [selectedCar, setSelectedCar] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const [companyLoanLimit, setCompanyLoanLimit] = useState([]);
 
   const formatNum = (v) => {
     if (v == null || v === '') return '-';
@@ -33,7 +31,7 @@ export default function InventoryFinanceEditPage({
   const [loanCompCd, setLoanCompCd] = useState(loanDetail.LOAN_CORP_CD || '');
 
   // 선택된 대출회사 정보(실제 데이터 필드명 기준)
-  const selectedLoanComp = loanCompList.find(c => c.LOAN_CORP_CD === loanCompCd) || null;
+  const selectedLoanComp = companyLoanLimit.find(c => c.LOAN_CORP_CD === loanCompCd) || null;
 
   // 대출금액 선택 상태 관리
   const [loanAmt, setLoanAmt] = useState(loanDetail.LOAN_AMT || 0);
@@ -65,6 +63,73 @@ export default function InventoryFinanceEditPage({
     return statusMap[statusCode] || statusCode || '';
   };
 
+
+  // 재고금융 등록 API 호출
+  const updateInventoryFinance = async () => {
+    const carRegId = selectedCar?.CAR_REG_ID || (carPurDetail && carPurDetail.CAR_REG_ID);
+    if (!carRegId) {
+      alert('차량 정보가 없습니다. 차량을 먼저 선택해주세요.');
+      setIsModalOpen(true); // 모달을 다시 열기
+      return;
+    }
+
+    console.log('loanCompCd', loanCompCd);    // 대출회사 코드
+    console.log('loanAmt', loanAmt);    // 대출금액
+    console.log('loanDt', loanDt);    // 대출실행일
+    console.log('loanMmCnt', loanMmCnt);    // 대출기간
+    console.log('loanCorpIntrRt', loanCorpIntrRt);    // 캐피탈이율
+    console.log('dlrAplyIntrRt', dlrAplyIntrRt);    // 딜러이율
+    console.log('loanSctCd', loanSctCd);    // 대출유형
+    console.log('loanMemo', loanMemo);    // 특이사항
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const formValues = {
+        carRegId: carRegId,               // 차량 등록 ID
+        loanCompCd: loanCompCd,           // 대출회사 코드
+        loanAmt: loanAmt,                 // 대출금액
+        loanDt: loanDt,                   // 대출실행일
+        loanMmCnt: loanMmCnt,             // 대출기간
+        loanCorpIntrRt: loanCorpIntrRt,   // 캐피탈이율
+        dlrAplyIntrRt: dlrAplyIntrRt,     // 딜러이율
+        loanSctCd: loanSctCd,             // 대출유형
+        loanMemo: loanMemo,               // 특이사항
+        regrId: session?.usrId || '',     // 등록자 ID
+        modrId: session?.usrId || '',     // 수정자 ID
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarLoan`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formValues)
+      });
+
+      const res = await response.json();
+      
+      if (!res.success) {
+        throw new Error(res.message || '재고금융 수정이 실패했습니다');
+      }
+
+      return res;
+
+      await Promise.all(promises);
+      
+      alert('재고금융이 성공적으로 수정정되었습니다.');
+      setLoading(false);
+      // 성공 후 목록 페이지로 이동하거나 필요한 처리
+      // router.push('/inventory-finance/list');
+      
+    } catch (error) {
+      console.error('재고금융 수정 오류:', error);
+      setError(error.message);
+      alert('재고금융 수정 중 오류가 발생했습니다: ' + error.message);
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="container container--page">
@@ -172,7 +237,7 @@ export default function InventoryFinanceEditPage({
                       }}>
                         선택
                       </li>
-                      {loanCompList.map((comp) => (
+                      {companyLoanLimit.map((comp) => (
                         <li key={comp.LOAN_CORP_CD} className={`select__option ${loanCompCd === comp.LOAN_CORP_CD ? 'select__option--selected' : ''}`} data-value={comp.LOAN_CORP_CD} onClick={() => {
                           setLoanCompCd(comp.LOAN_CORP_CD);
                           setIsLoanCompSelectOpen(false);
@@ -445,28 +510,12 @@ export default function InventoryFinanceEditPage({
         <button 
           className="btn btn--primary" 
           type="button" 
-          onClick={insertInventoryFinance}
+          onClick={updateInventoryFinance}
           disabled={loading}
         >
           {loading ? '등록 중...' : '확인'}
         </button>
       </div>
-
-      {/*
-        <div className="container__btns">
-          <button className="btn btn--light" type="button">취소</button>
-          <button className="btn btn--primary" type="button" disabled>확인</button>
-          <button className="btn btn--primary" type="button">확인</button>
-        </div>
-        */}
-
-      {/* 차량 선택 모달 */}
-      <CarSearchModal
-        open={isModalOpen}
-        onClose={handleModalClose}
-        onCarSelect={handleCarSelect}
-        agentId={session}
-      />
     </main>
   );
 }

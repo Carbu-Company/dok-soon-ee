@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import EditPage from "@/app/(main)/car-goods/edit/[id]/[goodsfee]/EditPage";
+import EditPage from "@/app/(main)/inventory-finance/edit/[id]/[loan]/EditPage";
 import { getCarPurInfo, getDealerList, getCDList, getCompanyLoanLimit, getCarLoanIdOneInfo, updateGoodsFee } from "@/app/(main)/api/carApi";
 
 export default async function EditorPage({ params }) {
@@ -21,7 +21,7 @@ export default async function EditorPage({ params }) {
   }
 
   return <EditPage session={session}
-                   carPurInfo={carPurInfo.data}
+  carPurDetail={carPurInfo.data}
                    dealerList={dealerList.data}
                    companyLoanLimit={companyLoanLimit.data}    // loanCompList 대신 사용해야 되고, 콤보에서 선택시 한도 및 잔여한도 안내
                    loanDetail={loanDetail.data}
