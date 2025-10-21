@@ -26,7 +26,7 @@ export default function InventoryFinanceRegisterPage({
 
   // 대출회사 선택 상태 관리 (콤보 박스)
   const [isLoanCompSelectOpen, setIsLoanCompSelectOpen] = useState(false);
-  const [loanCorpCd, setloanCorpCd] = useState('');
+  const [loanCorpCd, setLoanCorpCd] = useState('');
 
   // 선택된 대출회사 정보(실제 데이터 필드명 기준)
   const selectedLoanComp = loanCompList.find(c => c.LOAN_CORP_CD === loanCorpCd) || null;
@@ -40,10 +40,10 @@ export default function InventoryFinanceRegisterPage({
   const [loanMmCnt, setLoanMmCnt] = useState('');
 
   // 캐피탈이율 선택 상태 관리
-  const [loanCorpIntrRt, setLoanCorpIntrRt] = useState('');
+  const [corpIntrRt, setCorpIntrRt] = useState('');
 
   // 딜러이율 선택 상태 관리
-  const [dlrAplyIntrRt, setDlrAplyIntrRt] = useState('');
+  const [dlrIntrRt, setDlrIntrRt] = useState('');
 
   // 월 이자 계산
   const [mmCorpIntrAmt, setMmCorpIntrAmt] = useState(0);
@@ -55,21 +55,21 @@ export default function InventoryFinanceRegisterPage({
 
   useEffect(() => {
     console.log('loanAmt', loanAmt);
-    console.log('loanCorpIntrRt', loanCorpIntrRt);
+    console.log('corpIntrRt', corpIntrRt);
     console.log('loanMmCnt', loanMmCnt);
     console.log('dlrAplyIntrRt', dlrAplyIntrRt);
 
-    if (loanAmt && loanCorpIntrRt && loanMmCnt) {
-      setMmCorpIntrAmt(Number((Number(loanAmt) * Number(loanCorpIntrRt) / 100 / 12).toFixed(0)));
-      setTotCorpPayIntrAmt(Number((Number(loanAmt) * Number(loanCorpIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
+    if (loanAmt && corpIntrRt && loanMmCnt) {
+      setMmCorpIntrAmt(Number((Number(loanAmt) * Number(corpIntrRt) / 100 / 12).toFixed(0)));
+      setTotCorpPayIntrAmt(Number((Number(loanAmt) * Number(corpIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
     }
 
-    if (loanAmt && dlrAplyIntrRt && loanMmCnt) {
-      setMmDlrIntrAmt(Number((Number(loanAmt) * Number(dlrAplyIntrRt) / 100 / 12).toFixed(0)));
-      setTotDlrPayIntrAmt(Number((Number(loanAmt) * Number(dlrAplyIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
+    if (loanAmt && dlrIntrRt && loanMmCnt) {
+      setMmDlrIntrAmt(Number((Number(loanAmt) * Number(dlrIntrRt) / 100 / 12).toFixed(0)));
+      setTotDlrPayIntrAmt(Number((Number(loanAmt) * Number(dlrIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
     }
 
-  }, [loanAmt, loanMmCnt, loanCorpIntrRt, dlrAplyIntrRt]);
+  }, [loanAmt, loanMmCnt, corpIntrRt, dlrIntrRt]);
 
   // 대출유형 선택 상태 관리
   const [loanSctCd, setLoanSctCd] = useState('');
@@ -153,17 +153,23 @@ export default function InventoryFinanceRegisterPage({
 
     try {
       const formValues = {
-        agentId: session.agentId,         // 대행사 ID
+        agentId: session.agentId,         // 상사 ID
         carRegId: carRegId,               // 차량 등록 ID
-        loanCorpCd: loanCorpCd,           // 대출회사 코드
+        loanCorpCd: loanCorpCd,           // 대출 업체 코드
+        loanStatcd: '10',                 // 대출 상태 코드 (진행중: 10, 상환완료: 20, 취소: 30)
         loanAmt: loanAmt,                 // 대출금액
         loanDt: loanDt,                   // 대출실행일
         loanMmCnt: loanMmCnt,             // 대출기간
-        loanCorpIntrRt: loanCorpIntrRt,   // 캐피탈이율
-        dlrAplyIntrRt: dlrAplyIntrRt,     // 딜러이율
-        loanSctCd: loanSctCd,             // 대출유형
-        loanMemo: loanMemo,               // 특이사항
-        usrId: session?.usrId || '',     // 등록자 ID
+        corpIntrRt: corpIntrRt,           // 캐피탈 이자율
+        corpMmIntrAmt: mmCorpIntrAmt,     // 캐피탈 월 이자액
+        corpTotPayIntrAmt: totCorpPayIntrAmt, // 캐피탈 총 납입 이자액
+        dlrIntrRt: dlrIntrRt,             // 딜러 이자율
+        dlrMmIntrAmt: mmDlrIntrAmt,       // 딜러 월 이자액
+        dlrTotPayIntrAmt: totDlrPayIntrAmt, // 딜러 총 납입 이자액
+        rpyFcstDt: loanDt,                // 상환 예정 일자
+        loanSctCd: loanSctCd,             // 대출 구분 코드
+        loanMemo: loanMemo,               // 대출 메모
+        usrId: session?.usrId || '',      // 사용자 ID
       };
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertCarLoan`, {
@@ -182,13 +188,6 @@ export default function InventoryFinanceRegisterPage({
 
       return res;
 
-      await Promise.all(promises);
-      
-      alert('재고금융이 성공적으로 등록되었습니다.');
-      setLoading(false);
-      // 성공 후 목록 페이지로 이동하거나 필요한 처리
-      // router.push('/inventory-finance/list');
-      
     } catch (error) {
       console.error('재고금융 등록 오류:', error);
       setError(error.message);
@@ -196,8 +195,6 @@ export default function InventoryFinanceRegisterPage({
       setLoading(false);
     }
   };
-
-
 
   return (
     <main className="container container--page">
@@ -439,11 +436,11 @@ export default function InventoryFinanceRegisterPage({
                       type="text"
                       className="input__field center"
                       placeholder="이율"
-                      value={loanCorpIntrRt}
+                      value={corpIntrRt}
                       onChange={(e) => {
                         const value = e.target.value;
                         if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                          setLoanCorpIntrRt(value);
+                          setCorpIntrRt(value);
                         }
                       }}
                     />
@@ -451,7 +448,7 @@ export default function InventoryFinanceRegisterPage({
                       <button
                         type="button"
                         className="jsInputClear input__clear ico ico--input-delete"
-                        onClick={() => setLoanCorpIntrRt('')}
+                        onClick={() => setCorpIntrRt('')}
                       >
                         삭제
                       </button>
@@ -484,11 +481,11 @@ export default function InventoryFinanceRegisterPage({
                       type="text"
                       className="input__field center"
                       placeholder="이율"
-                      value={dlrAplyIntrRt}
+                      value={dlrIntrRt}
                       onChange={(e) => {
                         const value = e.target.value;
                         if (value === '' || /^\d*\.?\d*$/.test(value)) {
-                          setDlrAplyIntrRt(value);
+                          setDlrIntrRt(value);
                         }
                       }}
                     />
@@ -496,7 +493,7 @@ export default function InventoryFinanceRegisterPage({
                       <button
                         type="button"
                         className="jsInputClear input__clear ico ico--input-delete"
-                        onClick={() => setDlrAplyIntrRt('')}
+                        onClick={() => setDlrIntrRt('')}
                       >
                         삭제
                       </button>

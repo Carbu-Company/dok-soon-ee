@@ -1402,10 +1402,10 @@ export default function InventoryFinanceList(props) {
               <td>{car.LOAN_AMT.toLocaleString()}</td>
               <td>{car.LOAN_DT}</td>
               <td>{car.LOAN_MM_CNT}개월</td>
-              <td>{car.DLR_APLY_INTR_RT}</td>
-              <td>{car.MM_INTR_AMT?.toLocaleString()}</td>
-              <td>{car.TOT_INTR_AMT?.toLocaleString()}</td>
-              <td>{car.TOT_PAY_INTR_AMT?.toLocaleString()}</td>
+              <td>{car.DLR_INTR_RT}</td>
+              <td>{car.DLR_MM_INTR_AMT?.toLocaleString()}</td>
+              <td>{car.DLR_TOT_PAY_INTR_AMT?.toLocaleString()}</td>
+              <td>{car.TOT_INTR_PAY_AMT?.toLocaleString()}</td>
               <td>{car.RCNT_PAY_DTIME}</td>
               <td>{car.LOAN_STAT_NM}</td>
               <td>

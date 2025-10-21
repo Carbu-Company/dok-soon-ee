@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import RegPage from "@/app/(main)/inventory-finance/register/RegPage";
 import { getSuggestOne } from "./api";
-import { getDealerList, getCDList, getCompanyLoanLimit } from "@/app/(main)/common/api";
+import { getDealerList } from "@/app/(main)/common/api";
 import { getCarLoanCorpList } from "@/app/(main)/api/carApi";
 
 export default async function RegisterPage({ searchParams }) {

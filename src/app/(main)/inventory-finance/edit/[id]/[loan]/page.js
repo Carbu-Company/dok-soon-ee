@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import EditPage from "@/app/(main)/inventory-finance/edit/[id]/[loan]/EditPage";
-import { getCarPurInfo, getDealerList, getCDList, getCompanyLoanLimit, getCarLoanIdOneInfo, updateGoodsFee } from "@/app/(main)/api/carApi";
+import { getCarPurInfo, getDealerList, getCarLoanIdOneInfo, getCarLoanCorpList } from "@/app/(main)/api/carApi";
 
 export default async function EditorPage({ params }) {
   const cookieStore = await cookies();
@@ -15,10 +15,8 @@ export default async function EditorPage({ params }) {
   const loanCompList = await getCarLoanCorpList(session.agentId);
   const loanDetail = await getCarLoanIdOneInfo(loan);   // 상사 대출회사 한도
 
-  async function updateCarLoanAction(data) {
-    "use server";
-    return updateCarLoan(data);
-  }
+
+  console.log('loanDetail', loanDetail.data);
 
   return <EditPage session={session}
                    carPurDetail={carPurInfo.data}
