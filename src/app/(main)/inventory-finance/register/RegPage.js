@@ -42,6 +42,22 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
   // 딜러이율 선택 상태 관리
   const [dlrAplyIntrRt, setDlrAplyIntrRt] = useState('');
 
+  // 월 이자 계산
+  const [mmCorpIntrAmt, setMmCorpIntrAmt] = useState(0);
+  const [mmDlrIntrAmt, setMmDlrIntrAmt] = useState(0);
+  // 총 이자 계산
+  const [totCorpPayIntrAmt, setTotCorpPayIntrAmt] = useState(0);
+  const [totDlrPayIntrAmt, setTotDlrPayIntrAmt] = useState(0);
+
+  useEffect(() => {
+    if (loanCorpIntrRt && loanMmCnt && dlrAplyIntrRt) {
+      setMmCorpIntrAmt((loanAmt * loanCorpIntrRt / 100 / 12).toFixed(0));
+      setMmDlrIntrAmt((loanAmt * dlrAplyIntrRt / 100 / 12).toFixed(0));
+      setTotCorpPayIntrAmt((loanAmt * loanCorpIntrRt / 100 * loanMmCnt).toFixed(0));
+      setTotDlrPayIntrAmt((loanAmt * dlrAplyIntrRt / 100 * loanMmCnt).toFixed(0));
+    }
+  },[loanAmt, loanMmCnt, loanCorpIntrRt, dlrAplyIntrRt]);
+
   // 대출유형 선택 상태 관리
   const [loanSctCd, setLoanSctCd] = useState('');
 
@@ -427,9 +443,9 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                 </div>
               </td>
               <th>월 이자</th>
-              <td>83,333</td>
+              <td>{mmCorpIntrAmt?.toLocaleString() || '0'}</td>
               <th>총 이자</th>
-              <td>500,000</td>
+              <td>{totCorpPayIntrAmt?.toLocaleString() || '0'}</td>
             </tr>
             <tr>
               <th>
@@ -472,9 +488,9 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                 </div>
               </td>
               <th>월 이자</th>
-              <td>83,333</td>
+              <td>{mmDlrIntrAmt?.toLocaleString() || '0'}</td>
               <th>총 이자</th>
-              <td>500,000</td>
+              <td>{totDlrPayIntrAmt?.toLocaleString() || '0'}</td>
             </tr>
 
             <tr>
