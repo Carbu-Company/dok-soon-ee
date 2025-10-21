@@ -45,18 +45,24 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
   // 월 이자 계산
   const [mmCorpIntrAmt, setMmCorpIntrAmt] = useState(0);
   const [mmDlrIntrAmt, setMmDlrIntrAmt] = useState(0);
+
   // 총 이자 계산
   const [totCorpPayIntrAmt, setTotCorpPayIntrAmt] = useState(0);
   const [totDlrPayIntrAmt, setTotDlrPayIntrAmt] = useState(0);
 
   useEffect(() => {
-    if (loanCorpIntrRt && loanMmCnt && dlrAplyIntrRt) {
+
+    if ( loanAmt && loanCorpIntrRt && loanMmCnt) {
       setMmCorpIntrAmt((loanAmt * loanCorpIntrRt / 100 / 12).toFixed(0));
-      setMmDlrIntrAmt((loanAmt * dlrAplyIntrRt / 100 / 12).toFixed(0));
       setTotCorpPayIntrAmt((loanAmt * loanCorpIntrRt / 100 * loanMmCnt).toFixed(0));
+    }
+
+    if ( loanAmt && dlrAplyIntrRt && loanMmCnt ) {
+      setMmDlrIntrAmt((loanAmt * dlrAplyIntrRt / 100 / 12).toFixed(0));
       setTotDlrPayIntrAmt((loanAmt * dlrAplyIntrRt / 100 * loanMmCnt).toFixed(0));
     }
-  },[loanAmt, loanMmCnt, loanCorpIntrRt, dlrAplyIntrRt]);
+
+  },[loanAmt],[loanMmCnt],[loanCorpIntrRt],[dlrAplyIntrRt]);
 
   // 대출유형 선택 상태 관리
   const [loanSctCd, setLoanSctCd] = useState('');
