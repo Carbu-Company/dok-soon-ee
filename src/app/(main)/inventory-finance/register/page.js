@@ -19,9 +19,6 @@ export default async function RegisterPage({ searchParams }) {
   } 
   */  
 
-  //console.log(session.agentId);
-
-  
   // searchParams를 await로 처리
   const resolvedSearchParams = await searchParams;
   
@@ -37,20 +34,15 @@ export default async function RegisterPage({ searchParams }) {
   // 테스트를 위해 차량 정보를 null로 설정 (모달이 항상 열리도록)
   carPurDetail = null;
 
-
   const dealerList = await getDealerList(session.agentId);
-//   const loanCompList = await getCDList('05');   // 대출회사 코드 목록
   const loanCompList = await getCarLoanCorpList(session.agentId);
-  const companyLoanLimit = await getCompanyLoanLimit(session.agentId);   // 상사 대출회사 한도
-  
+
   console.log('dealerList**********', dealerList.data);
   console.log('loanCompList**********', loanCompList.data);
-  console.log('companyLoanLimit**********', companyLoanLimit);
 
   return <RegPage session={session}
                   carPurDetail={carPurDetail} 
                   dealerList={dealerList.data}
                   loanCompList={loanCompList.data}
-                  companyLoanLimit={companyLoanLimit.data}    // loanCompList 대신 사용해야 되고, 콤보에서 선택시 한도 및 잔여한도 안내
    />;
 }

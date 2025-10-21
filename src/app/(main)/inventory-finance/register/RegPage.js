@@ -4,15 +4,18 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CarSearchModal from "@/components/modal/CarSearchModal";
 
-export default function InventoryFinanceRegisterPage({ session = null, carPurDetail = [], dealerList = [], loanCompList = [] }) {
+export default function InventoryFinanceRegisterPage({ 
+  session = null, 
+  carPurDetail = [], 
+  dealerList = [], 
+  loanCompList = [] 
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const [companyLoanLimit, setCompanyLoanLimit] = useState([]);
 
   const formatNum = (v) => {
     if (v == null || v === '') return '-';
@@ -66,7 +69,7 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
       setTotDlrPayIntrAmt(Number((Number(loanAmt) * Number(dlrAplyIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
     }
 
-  }, [loanAmt, loanCorpIntrRt, loanMmCnt, dlrAplyIntrRt]);
+  }, [loanAmt, loanMmCnt, loanCorpIntrRt, dlrAplyIntrRt]);
 
   // 대출유형 선택 상태 관리
   const [loanSctCd, setLoanSctCd] = useState('');
@@ -329,8 +332,10 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                     type="text" 
                     className="input__field" 
                     placeholder="금액" 
-                    value={loanAmt || ''}
-                    onChange={(e) => setLoanAmt(e.target.value)}
+                    name="loanAmt"
+                    value={loanAmt ? Number(loanAmt).toLocaleString() : '0'}
+                    onChange={(e) => setLoanAmt(e.target.value.replace(/[^\d]/g, ''))}
+                    onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
                     <button

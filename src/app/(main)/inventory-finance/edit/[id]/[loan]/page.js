@@ -12,7 +12,7 @@ export default async function EditorPage({ params }) {
 
   const carPurInfo = await getCarPurInfo(id);
   const dealerList = await getDealerList(session.agentId);
-  const companyLoanLimit = await getCompanyLoanLimit(session.agentId);   // 상사 대출회사 한도
+  const loanCompList = await getCarLoanCorpList(session.agentId);
   const loanDetail = await getCarLoanIdOneInfo(loan);   // 상사 대출회사 한도
 
   async function updateCarLoanAction(data) {
@@ -21,10 +21,9 @@ export default async function EditorPage({ params }) {
   }
 
   return <EditPage session={session}
-  carPurDetail={carPurInfo.data}
+                   carPurDetail={carPurInfo.data}
                    dealerList={dealerList.data}
-                   companyLoanLimit={companyLoanLimit.data}    // loanCompList 대신 사용해야 되고, 콤보에서 선택시 한도 및 잔여한도 안내
+                   loanCompList={loanCompList.data}    // loanCompList 대신 사용해야 되고, 콤보에서 선택시 한도 및 잔여한도 안내
                    loanDetail={loanDetail.data}
-                   updateCarLoan={updateCarLoanAction}
    />;
 }

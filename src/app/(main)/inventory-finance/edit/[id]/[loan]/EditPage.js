@@ -8,9 +8,8 @@ export default function EditPage({
   session = null, 
   carPurDetail = [], 
   dealerList = [], 
-  companyLoanLimit = [], 
-  loanDetail = {}, 
-  updateCarLoan = async (data)=>{}
+  loanCompList = [], 
+  loanDetail = {}
  }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,7 +30,7 @@ export default function EditPage({
   const [loanCompCd, setLoanCompCd] = useState(loanDetail.LOAN_CORP_CD || '');
 
   // 선택된 대출회사 정보(실제 데이터 필드명 기준)
-  const selectedLoanComp = companyLoanLimit.find(c => c.LOAN_CORP_CD === loanCompCd) || null;
+  const selectedLoanComp = loanCompList.find(c => c.LOAN_CORP_CD === loanCompCd) || null;
 
   // 대출금액 선택 상태 관리
   const [loanAmt, setLoanAmt] = useState(loanDetail.LOAN_AMT || 0);
@@ -42,10 +41,36 @@ export default function EditPage({
   const [loanMmCnt, setLoanMmCnt] = useState(loanDetail.LOAN_MM_CNT || '');
 
   // 캐피탈이율 
-  const [loanCorpIntrRt, setLoanCorpIntrRt] = useState(loanDetail.LOAN_MM_CNT || '');
+  const [loanCorpIntrRt, setLoanCorpIntrRt] = useState(loanDetail.LOAN_CORP_INTR_RT || '');
 
   // 딜러이율 
   const [dlrAplyIntrRt, setDlrAplyIntrRt] = useState(loanDetail.DLR_APLY_INTR_RT || '');
+
+  // 월 이자 계산
+  const [mmCorpIntrAmt, setMmCorpIntrAmt] = useState(loanDetail.DLR_APLY_INTR_RT || 0);
+  const [mmDlrIntrAmt, setMmDlrIntrAmt] = useState(loanDetail.DLR_APLY_INTR_RT || 0);
+
+  // 총 이자 계산
+  const [totCorpPayIntrAmt, setTotCorpPayIntrAmt] = useState(loanDetail.DLR_APLY_INTR_RT || 0);
+  const [totDlrPayIntrAmt, setTotDlrPayIntrAmt] = useState(loanDetail.TOT_PAY_INTR_AMT || 0);
+
+  useEffect(() => {
+    console.log('loanAmt', loanAmt);
+    console.log('loanCorpIntrRt', loanCorpIntrRt);
+    console.log('loanMmCnt', loanMmCnt);
+    console.log('dlrAplyIntrRt', dlrAplyIntrRt);
+
+    if (loanAmt && loanCorpIntrRt && loanMmCnt) {
+      setMmCorpIntrAmt(Number((Number(loanAmt) * Number(loanCorpIntrRt) / 100 / 12).toFixed(0)));
+      setTotCorpPayIntrAmt(Number((Number(loanAmt) * Number(loanCorpIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
+    }
+
+    if (loanAmt && dlrAplyIntrRt && loanMmCnt) {
+      setMmDlrIntrAmt(Number((Number(loanAmt) * Number(dlrAplyIntrRt) / 100 / 12).toFixed(0)));
+      setTotDlrPayIntrAmt(Number((Number(loanAmt) * Number(dlrAplyIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
+    }
+
+  }, [loanAmt, loanMmCnt, loanCorpIntrRt, dlrAplyIntrRt]);
 
   // 대출유형 선택 상태 관리
   const [loanSctCd, setLoanSctCd] = useState(loanDetail.LOAN_SCT_CD || '');
@@ -178,7 +203,7 @@ export default function EditPage({
           <tbody>
             <tr>
               <th>제시구분</th>
-              <td>{getCarStatusText(selectedCar?.CAR_STAT_CD || (carPurDetail && carPurDetail.CAR_STAT_CD))}</td>
+              <td>{selectedCar?.CAR_STAT_NM || (carPurDetail && carPurDetail.CAR_STAT_NM))}</td>
               <th>차량번호</th>
               <td>{selectedCar?.CAR_NO || (carPurDetail && carPurDetail.CAR_NO) || ""}</td>
               <th>매입딜러</th>
@@ -214,12 +239,12 @@ export default function EditPage({
                     <input
                       className="select__input"
                       type="hidden"
-                      name="loanCompCd"
-                      value={loanCompCd || ''}
+                      name="loanCorpCd"
+                      value={loanCorpCd || ''}
                     />
                     <button className="select__toggle" type="button" onClick={() => setIsLoanCompSelectOpen(!isLoanCompSelectOpen)}>
                       <span className="select__text">
-                        {loanCompCd ? (selectedLoanComp?.LOAN_CORP_NM || '선택') : '선택'}
+                        {loanCorpCd ? (selectedLoanComp?.LOAN_CORP_NM || '선택') : '선택'}
                       </span>
                       <Image
                         className="select__arrow"
@@ -231,15 +256,15 @@ export default function EditPage({
                     </button>
 
                     <ul className={`select__menu ${isLoanCompSelectOpen ? 'active' : ''}`}>
-                      <li className={`select__option ${!loanCompCd ? 'select__option--selected' : ''}`} data-value="" onClick={() => {
-                        setLoanCompCd('');
+                      <li className={`select__option ${!loanCorpCd ? 'select__option--selected' : ''}`} data-value="" onClick={() => {
+                        setloanCorpCd('');
                         setIsLoanCompSelectOpen(false);
                       }}>
                         선택
                       </li>
-                      {companyLoanLimit.map((comp) => (
-                        <li key={comp.LOAN_CORP_CD} className={`select__option ${loanCompCd === comp.LOAN_CORP_CD ? 'select__option--selected' : ''}`} data-value={comp.LOAN_CORP_CD} onClick={() => {
-                          setLoanCompCd(comp.LOAN_CORP_CD);
+                      {loanCompList.map((comp) => (
+                        <li key={comp.LOAN_CORP_CD} className={`select__option ${loanCorpCd === comp.LOAN_CORP_CD ? 'select__option--selected' : ''}`} data-value={comp.LOAN_CORP_CD} onClick={() => {
+                          setloanCorpCd(comp.LOAN_CORP_CD);
                           setIsLoanCompSelectOpen(false);
                         }}>
                           {comp.LOAN_CORP_NM}
@@ -264,8 +289,10 @@ export default function EditPage({
                     type="text" 
                     className="input__field" 
                     placeholder="금액" 
-                    value={loanAmt || ''}
-                    onChange={(e) => setLoanAmt(e.target.value)}
+                    name="loanAmt"
+                    value={loanAmt ? Number(loanAmt).toLocaleString() : '0'}
+                    onChange={(e) => setLoanAmt(e.target.value.replace(/[^\d]/g, ''))}
+                    onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
                     <button
@@ -316,7 +343,11 @@ export default function EditPage({
                       name="loanMmCnt"
                       defaultValue=""
                     />
-                    <button className="select__toggle" type="button">
+                    <button 
+                      className="select__toggle" 
+                      type="button"
+                      onClick={() => setIsLoanMmCntSelectOpen(!isLoanMmCntSelectOpen)}
+                    >
                       <span className="select__text">{loanMmCnt || '선택'}</span>
                       <Image
                         className="select__arrow"
@@ -326,21 +357,20 @@ export default function EditPage({
                         alt=""
                       />
                     </button>
-                    <ul className="select__menu">
-                      <li className="select__option" data-value="1">1</li>
-                      <li className="select__option" data-value="2">2</li>
-                      <li className="select__option" data-value="3">3</li>
-                      <li className="select__option" data-value="4">4</li>
-                      <li className="select__option" data-value="5">5</li>
-                      <li className="select__option" data-value="6">6</li>
-                      <li className="select__option" data-value="7">7</li>
-                      <li className="select__option" data-value="8">8</li>
-                      <li className="select__option" data-value="9">9</li>
-                      <li className="select__option" data-value="10">10</li>
-                      <li className="select__option" data-value="11">11</li>
-                      <li className="select__option" data-value="12">12</li>
-                      <li className="select__option" data-value="24">24</li>
-                      <li className="select__option" data-value="36">36</li>
+                    <ul className={`select__menu ${isLoanMmCntSelectOpen ? 'active' : ''}`}>
+                      {[1,2,3,4,5,6,7,8,9,10,11,12,24,36].map((month) => (
+                        <li 
+                          key={month}
+                          className="select__option" 
+                          data-value={month}
+                          onClick={() => {
+                            setLoanMmCnt(month);
+                            setIsLoanMmCntSelectOpen(false);
+                          }}
+                        >
+                          {month}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                   <span className="input-help">개월</span>
@@ -388,9 +418,9 @@ export default function EditPage({
                 </div>
               </td>
               <th>월 이자</th>
-              <td>83,333</td>
+              <td>{mmCorpIntrAmt?.toLocaleString() || '0'} 원 </td>
               <th>총 이자</th>
-              <td>500,000</td>
+              <td>{totCorpPayIntrAmt?.toLocaleString() || '0'} 원</td>
             </tr>
             <tr>
               <th>
@@ -433,9 +463,9 @@ export default function EditPage({
                 </div>
               </td>
               <th>월 이자</th>
-              <td>83,333</td>
+              <td>{mmDlrIntrAmt?.toLocaleString() || '0'} 원</td>
               <th>총 이자</th>
-              <td>500,000</td>
+              <td>{totDlrPayIntrAmt?.toLocaleString() || '0'} 원</td>
             </tr>
 
             <tr>
@@ -510,12 +540,28 @@ export default function EditPage({
         <button 
           className="btn btn--primary" 
           type="button" 
-          onClick={updateInventoryFinance}
+          onClick={insertInventoryFinance}
           disabled={loading}
         >
           {loading ? '등록 중...' : '확인'}
         </button>
       </div>
+
+      {/*
+        <div className="container__btns">
+          <button className="btn btn--light" type="button">취소</button>
+          <button className="btn btn--primary" type="button" disabled>확인</button>
+          <button className="btn btn--primary" type="button">확인</button>
+        </div>
+        */}
+
+      {/* 차량 선택 모달 */}
+      <CarSearchModal
+        open={isModalOpen}
+        onClose={handleModalClose}
+        onCarSelect={handleCarSelect}
+        agentId={session}
+      />
     </main>
   );
 }
