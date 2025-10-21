@@ -51,18 +51,22 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
   const [totDlrPayIntrAmt, setTotDlrPayIntrAmt] = useState(0);
 
   useEffect(() => {
+    console.log('loanAmt', loanAmt);
+    console.log('loanCorpIntrRt', loanCorpIntrRt);
+    console.log('loanMmCnt', loanMmCnt);
+    console.log('dlrAplyIntrRt', dlrAplyIntrRt);
 
-    if ( loanAmt && loanCorpIntrRt && loanMmCnt) {
-      setMmCorpIntrAmt((loanAmt * loanCorpIntrRt / 100 / 12).toFixed(0));
-      setTotCorpPayIntrAmt((loanAmt * loanCorpIntrRt / 100 * loanMmCnt).toFixed(0));
+    if (loanAmt && loanCorpIntrRt && loanMmCnt) {
+      setMmCorpIntrAmt(Number((Number(loanAmt) * Number(loanCorpIntrRt) / 100 / 12).toFixed(0)));
+      setTotCorpPayIntrAmt(Number((Number(loanAmt) * Number(loanCorpIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
     }
 
-    if ( loanAmt && dlrAplyIntrRt && loanMmCnt ) {
-      setMmDlrIntrAmt((loanAmt * dlrAplyIntrRt / 100 / 12).toFixed(0));
-      setTotDlrPayIntrAmt((loanAmt * dlrAplyIntrRt / 100 * loanMmCnt).toFixed(0));
+    if (loanAmt && dlrAplyIntrRt && loanMmCnt) {
+      setMmDlrIntrAmt(Number((Number(loanAmt) * Number(dlrAplyIntrRt) / 100 / 12).toFixed(0)));
+      setTotDlrPayIntrAmt(Number((Number(loanAmt) * Number(dlrAplyIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
     }
 
-  },[loanAmt],[loanMmCnt],[loanCorpIntrRt],[dlrAplyIntrRt]);
+  }, [loanAmt, loanCorpIntrRt, loanMmCnt, dlrAplyIntrRt]);
 
   // 대출유형 선택 상태 관리
   const [loanSctCd, setLoanSctCd] = useState('');
@@ -377,7 +381,11 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                       name="loanMmCnt"
                       defaultValue=""
                     />
-                    <button className="select__toggle" type="button">
+                    <button 
+                      className="select__toggle" 
+                      type="button"
+                      onClick={() => setIsLoanMmCntSelectOpen(!isLoanMmCntSelectOpen)}
+                    >
                       <span className="select__text">{loanMmCnt || '선택'}</span>
                       <Image
                         className="select__arrow"
@@ -387,21 +395,20 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                         alt=""
                       />
                     </button>
-                    <ul className="select__menu">
-                      <li className="select__option" data-value="1">1</li>
-                      <li className="select__option" data-value="2">2</li>
-                      <li className="select__option" data-value="3">3</li>
-                      <li className="select__option" data-value="4">4</li>
-                      <li className="select__option" data-value="5">5</li>
-                      <li className="select__option" data-value="6">6</li>
-                      <li className="select__option" data-value="7">7</li>
-                      <li className="select__option" data-value="8">8</li>
-                      <li className="select__option" data-value="9">9</li>
-                      <li className="select__option" data-value="10">10</li>
-                      <li className="select__option" data-value="11">11</li>
-                      <li className="select__option" data-value="12">12</li>
-                      <li className="select__option" data-value="24">24</li>
-                      <li className="select__option" data-value="36">36</li>
+                    <ul className={`select__menu ${isLoanMmCntSelectOpen ? 'active' : ''}`}>
+                      {[1,2,3,4,5,6,7,8,9,10,11,12,24,36].map((month) => (
+                        <li 
+                          key={month}
+                          className="select__option" 
+                          data-value={month}
+                          onClick={() => {
+                            setLoanMmCnt(month);
+                            setIsLoanMmCntSelectOpen(false);
+                          }}
+                        >
+                          {month}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                   <span className="input-help">개월</span>
@@ -449,9 +456,9 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                 </div>
               </td>
               <th>월 이자</th>
-              <td>{mmCorpIntrAmt?.toLocaleString() || '0'}</td>
+              <td>{mmCorpIntrAmt?.toLocaleString() || '0'} 원 </td>
               <th>총 이자</th>
-              <td>{totCorpPayIntrAmt?.toLocaleString() || '0'}</td>
+              <td>{totCorpPayIntrAmt?.toLocaleString() || '0'} 원</td>
             </tr>
             <tr>
               <th>
@@ -494,9 +501,9 @@ export default function InventoryFinanceRegisterPage({ session = null, carPurDet
                 </div>
               </td>
               <th>월 이자</th>
-              <td>{mmDlrIntrAmt?.toLocaleString() || '0'}</td>
+              <td>{mmDlrIntrAmt?.toLocaleString() || '0'} 원</td>
               <th>총 이자</th>
-              <td>{totDlrPayIntrAmt?.toLocaleString() || '0'}</td>
+              <td>{totDlrPayIntrAmt?.toLocaleString() || '0'} 원</td>
             </tr>
 
             <tr>
