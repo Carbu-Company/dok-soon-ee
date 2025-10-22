@@ -62,10 +62,11 @@ export default function InventoryFinanceList(props) {
   const [startDt, setStartDt] = useState("");
   const [endDt, setEndDt] = useState("");
 
-  // 매입취소/삭제 모달 관련 state
-  const [isPurchaseRemoveModalOpen, setIsPurchaseRemoveModalOpen] = useState(false);
-  const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
-  const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
+  // 재고금융 삭제 모달 관련 state
+  const [isLoanCarRemoveModalOpen, setIsLoanCarRemoveModalOpen] = useState(false);
+  const [selectedLoanCarForRemove, setSelectedLoanCarForRemove] = useState(null);
+  const [selectedLoanCarTypeForRemove, setSelectedLoanCarTypeForRemove] = useState(null);
+
   // 딜러 이자납 모달 관련 state
   const [isInterestPaymentModalOpen, setIsInterestPaymentModalOpen] = useState(false);
   const [interestPaymentCar, setInterestPaymentCar] = useState(null);
@@ -314,6 +315,26 @@ export default function InventoryFinanceList(props) {
     handleSearch(1);
   };
 
+  // 매입취소/삭제 모달 관련 핸들러
+  const handleLoanCarRemoveModalOpen = (car, type) => {
+    setSelectedLoanCarForRemove(car);
+    setSelectedLoanCarTypeForRemove(type);
+    setIsLoanCarRemoveModalOpen(true);
+  };
+
+  const handleLoanCarRemoveModalClose = () => {
+    setIsLoanCarRemoveModalOpen(false);
+    setSelectedLoanCarForRemove(null);
+  };
+
+  const handleLoanCarRemoveConfirm = async () => {
+    // TODO: 실제 매입취소/삭제 API 호출 구현
+    console.log("비용 전체 삭제 확인:", selectedLoanCarForRemove);
+    // API 호출 후 성공하면 모달 닫기 및 목록 새로고침
+    handleLoanCarRemoveModalClose();
+    // handleSearch(currentPage); // 목록 새로고침
+  };
+
   /**
    * 페이지 처리
    */
@@ -423,9 +444,22 @@ export default function InventoryFinanceList(props) {
                   <div className="input__utils">
                     <button
                       type="button"
-                      className="jsInputClear input__clear ico ico--input-delete"
+                      onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleLoanCarRemoveModalOpen(car, "one");
+                      }}
+                      style={{
+                        border: "none",
+                        background: "none",
+                        padding: 0,
+                        color: "inherit",
+                        cursor: "pointer",
+                        width: "100%",
+                        textAlign: "left",
+                      }}
                     >
-                      삭제
+                      비용 전체 삭제
                     </button>
                   </div>
                 </div>
@@ -1437,15 +1471,25 @@ export default function InventoryFinanceList(props) {
                       </li>
 
                       <li className="select__option">
-                        <a
-                          href="#"
+                        <button
+                          type="button"
                           onClick={e => {
                             e.preventDefault();
-                            openModal("4");
+                            e.stopPropagation();
+                            handleLoanCarRemoveModalOpen(car, "one");
+                          }}
+                          style={{
+                            border: "none",
+                            background: "none",
+                            padding: 0,
+                            color: "inherit",
+                            cursor: "pointer",
+                            width: "100%",
+                            textAlign: "left",
                           }}
                         >
                           재고금융 삭제
-                        </a>
+                        </button>
                       </li>
                     </ul>
                   </div>
