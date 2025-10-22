@@ -25,6 +25,8 @@ export default function EditPage({
     return n.toLocaleString();
   };
 
+  const [loanId, setLoanId] = useState(loanDetail.LOAN_ID || '');
+
   // 대출회사 선택 상태 관리 (콤보 박스)
   const [isLoanCompSelectOpen, setIsLoanCompSelectOpen] = useState(false);
   const [loanCorpCd, setLoanCorpCd] = useState(loanDetail.LOAN_CORP_CD || '');
@@ -51,31 +53,31 @@ export default function EditPage({
   const [dlrIntrRt, setDlrIntrRt] = useState(loanDetail.DLR_INTR_RT || '');
 
   // 월 이자 계산
-  const [mmCorpIntrAmt, setMmCorpIntrAmt] = useState(loanDetail.MM_CORP_INTR_AMT || 0);
-  const [mmDlrIntrAmt, setMmDlrIntrAmt] = useState(loanDetail.MM_DLR_INTR_AMT || 0);
+  const [corpMmIntrAmt, setcorpMmIntrAmt] = useState(loanDetail.MM_CORP_INTR_AMT || 0);
+  const [dlrMmIntrAmt, setdlrMmIntrAmt] = useState(loanDetail.MM_DLR_INTR_AMT || 0);
 
   // 총 이자 계산
-  const [totCorpPayIntrAmt, setTotCorpPayIntrAmt] = useState(loanDetail.TOT_CORP_PAY_INTR_AMT || 0);
-  const [totDlrPayIntrAmt, setTotDlrPayIntrAmt] = useState(loanDetail.TOT_DLR_PAY_INTR_AMT || 0);
+  const [corpTotPayIntrAmt, setcorpTotPayIntrAmt] = useState(loanDetail.TOT_CORP_PAY_INTR_AMT || 0);
+  const [dlrTotayIntrAmt, setdlrTotayIntrAmt] = useState(loanDetail.TOT_DLR_PAY_INTR_AMT || 0);
 
   useEffect(() => {
     console.log('loanAmt', loanAmt);
     console.log('corpIntrRt', corpIntrRt);
     console.log('loanMmCnt', loanMmCnt);
     console.log('dlrIntrRt', dlrIntrRt);
-    console.log('mmCorpIntrAmt', mmCorpIntrAmt);    // 캐피탈 월 이자액
-    console.log('totCorpPayIntrAmt', totCorpPayIntrAmt);    // 캐피탈 총 납입 이자액
-    console.log('mmDlrIntrAmt', mmDlrIntrAmt);    // 딜러 월 이자액
-    console.log('totDlrPayIntrAmt', totDlrPayIntrAmt);    // 딜러 총 납입 이자액
+    console.log('corpMmIntrAmt', corpMmIntrAmt);    // 캐피탈 월 이자액
+    console.log('corpTotPayIntrAmt', corpTotPayIntrAmt);    // 캐피탈 총 납입 이자액
+    console.log('dlrMmIntrAmt', dlrMmIntrAmt);    // 딜러 월 이자액
+    console.log('dlrTotayIntrAmt', dlrTotayIntrAmt);    // 딜러 총 납입 이자액
 
     if (loanAmt && corpIntrRt && loanMmCnt) {
-      setMmCorpIntrAmt(Number((Number(loanAmt) * Number(corpIntrRt) / 100 / 12).toFixed(0)));
-      setTotCorpPayIntrAmt(Number((Number(loanAmt) * Number(corpIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
+      setcorpMmIntrAmt(Number((Number(loanAmt) * Number(corpIntrRt) / 100 / 12).toFixed(0)));
+      setcorpTotPayIntrAmt(Number((Number(loanAmt) * Number(corpIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
     }
 
     if (loanAmt && dlrIntrRt && loanMmCnt) {
-      setMmDlrIntrAmt(Number((Number(loanAmt) * Number(dlrIntrRt) / 100 / 12).toFixed(0)));
-      setTotDlrPayIntrAmt(Number((Number(loanAmt) * Number(dlrIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
+      setdlrMmIntrAmt(Number((Number(loanAmt) * Number(dlrIntrRt) / 100 / 12).toFixed(0)));
+      setdlrTotayIntrAmt(Number((Number(loanAmt) * Number(dlrIntrRt) / 100 * Number(loanMmCnt) / 12).toFixed(0)));
     }
 
   }, [loanAmt, loanMmCnt, corpIntrRt, dlrIntrRt]);
@@ -86,17 +88,6 @@ export default function EditPage({
   // 특이사항 선택 상태 관리
   const [loanMemo, setLoanMemo] = useState(loanDetail.LOAN_MEMO || '');
 
-  // 제시구분 코드를 텍스트로 변환하는 함수
-  const getCarStatusText = (statusCode) => {
-    const statusMap = {
-      '001': '상사매입',
-      '002': '일반판매',
-      '003': '알선판매'
-    };
-    return statusMap[statusCode] || statusCode || '';
-  };
-
-
   // 재고금융 등록 API 호출
   const updateInventoryFinance = async () => {
     const carRegId = selectedCar?.CAR_REG_ID || (carPurDetail && carPurDetail.CAR_REG_ID);
@@ -106,16 +97,52 @@ export default function EditPage({
       return;
     }
 
+    // 캐피탈사
+    if(!loanCorpCd) {
+      alert('캐피탈사를 선택해주세요.');
+      return;
+    }
+
+    // 대출금액
+    if(!loanAmt) {
+      alert('대출금액을 입력해주세요.');
+      return;
+    }
+
+    // 대출실행일
+    if(!loanDt) {
+      alert('대출실행일을 선택해주세요.');
+      return;
+    }
+
+    // 대출기간
+    if(!loanMmCnt) {
+      alert('대출기간을 선택해주세요.');
+      return;
+    }
+
+    // 캐피탈이율
+    if(!corpIntrRt) {
+      alert('캐피탈 이자율을 입력해주세요.');
+      return;
+    }
+
+    // 딜러이율
+    if(!dlrIntrRt) {
+      alert('딜러 적용 이자율을 입력해주세요.');
+      return;
+    }
+    console.log('loanId', loanId);
     console.log('loanCorpCd', loanCorpCd);    // 대출회사 코드
     console.log('loanAmt', loanAmt);    // 대출금액
     console.log('loanDt', loanDt);    // 대출실행일
     console.log('loanMmCnt', loanMmCnt);    // 대출기간
     console.log('corpIntrRt', corpIntrRt);    // 캐피탈이율
-    console.log('mmCorpIntrAmt', mmCorpIntrAmt);    // 캐피탈 월 이자액
-    console.log('totCorpPayIntrAmt', totCorpPayIntrAmt);    // 캐피탈 총 납입 이자액
+    console.log('corpMmIntrAmt', corpMmIntrAmt);    // 캐피탈 월 이자액
+    console.log('corpTotPayIntrAmt', corpTotPayIntrAmt);    // 캐피탈 총 납입 이자액
     console.log('dlrIntrRt', dlrIntrRt);    // 딜러이율
-    console.log('mmDlrIntrAmt', mmDlrIntrAmt);    // 딜러 월 이자액
-    console.log('totDlrPayIntrAmt', totDlrPayIntrAmt);    // 딜러 총 납입 이자액
+    console.log('dlrMmIntrAmt', dlrMmIntrAmt);    // 딜러 월 이자액
+    console.log('dlrTotayIntrAmt', dlrTotayIntrAmt);    // 딜러 총 납입 이자액
     console.log('loanSctCd', loanSctCd);    // 대출유형
     console.log('loanMemo', loanMemo);    // 특이사항
 
@@ -124,19 +151,20 @@ export default function EditPage({
 
     try {
       const formValues = {
+        loanId : loanId,
         agentId: session.agentId,         // 상사 ID
         carRegId: carRegId,               // 차량 등록 ID
         loanCorpCd: loanCorpCd,           // 대출 업체 코드
-        loanStatcd: '10',                 // 대출 상태 코드 (진행중: 10, 상환완료: 20, 취소: 30)
+        loanStatCd: '10',                 // 대출 상태 코드 (진행중: 10, 상환완료: 20, 취소: 30)
         loanAmt: loanAmt,                 // 대출금액
         loanDt: loanDt,                   // 대출실행일
         loanMmCnt: loanMmCnt,             // 대출기간
         corpIntrRt: corpIntrRt,           // 캐피탈 이자율
-        corpMmIntrAmt: mmCorpIntrAmt,     // 캐피탈 월 이자액
-        corpTotPayIntrAmt: totCorpPayIntrAmt, // 캐피탈 총 납입 이자액
+        corpMmIntrAmt: corpMmIntrAmt,     // 캐피탈 월 이자액
+        corpTotPayIntrAmt: corpTotPayIntrAmt, // 캐피탈 총 납입 이자액
         dlrIntrRt: dlrIntrRt,             // 딜러 이자율
-        dlrMmIntrAmt: mmDlrIntrAmt,       // 딜러 월 이자액
-        dlrTotPayIntrAmt: totDlrPayIntrAmt, // 딜러 총 납입 이자액
+        dlrMmIntrAmt: dlrMmIntrAmt,       // 딜러 월 이자액
+        dlrTotPayIntrAmt: dlrTotayIntrAmt, // 딜러 총 납입 이자액
         rpyFcstDt: loanDt,                // 상환 예정 일자
         loanSctCd: loanSctCd,             // 대출 구분 코드
         loanMemo: loanMemo,               // 대출 메모
@@ -152,19 +180,16 @@ export default function EditPage({
       });
 
       const res = await response.json();
-      
-      if (!res.success) {
-        throw new Error(res.message || '재고금융 수정이 실패했습니다');
-      }
 
-      return res;
-
-      await Promise.all(promises);
-      
-      alert('재고금융이 성공적으로 수정정되었습니다.');
       setLoading(false);
-      // 성공 후 목록 페이지로 이동하거나 필요한 처리
-      // router.push('/inventory-finance/list');
+      alert('재고금융 수정이 완료 되었습니다.'); // 테스트용 알림
+
+      if (res.success) {
+        router.push('/inventory-finance/inventory-list');
+        return { success: true, res, error: null };
+      } else {
+        throw new Error(res.message || '재고금융 수정에 실패했습니다');
+      }
       
     } catch (error) {
       console.error('재고금융 수정 오류:', error);
@@ -436,9 +461,9 @@ export default function EditPage({
                 </div>
               </td>
               <th>월 이자</th>
-              <td>{mmCorpIntrAmt?.toLocaleString() || '0'} 원 </td>
+              <td>{corpMmIntrAmt?.toLocaleString() || '0'} 원 </td>
               <th>총 이자</th>
-              <td>{totCorpPayIntrAmt?.toLocaleString() || '0'} 원</td>
+              <td>{corpTotPayIntrAmt?.toLocaleString() || '0'} 원</td>
             </tr>
             <tr>
               <th>
@@ -481,9 +506,9 @@ export default function EditPage({
                 </div>
               </td>
               <th>월 이자</th>
-              <td>{mmDlrIntrAmt?.toLocaleString() || '0'} 원</td>
+              <td>{dlrMmIntrAmt?.toLocaleString() || '0'} 원</td>
               <th>총 이자</th>
-              <td>{totDlrPayIntrAmt?.toLocaleString() || '0'} 원</td>
+              <td>{dlrTotayIntrAmt?.toLocaleString() || '0'} 원</td>
             </tr>
 
             <tr>
@@ -552,16 +577,13 @@ export default function EditPage({
         >
           취소
         </button>
-        <button className="btn btn--primary" type="button" disabled>
-          확인
-        </button>
         <button 
           className="btn btn--primary" 
           type="button" 
           onClick={updateInventoryFinance}
           disabled={loading}
         >
-          {loading ? '등록 중...' : '확인'}
+          확인
         </button>
       </div>
     </main>
