@@ -63,9 +63,9 @@ export default function InventoryFinanceList(props) {
   const [endDt, setEndDt] = useState("");
 
   // 재고금융 삭제 모달 관련 state
-  const [isLoanCarRemoveModalOpen, setIsLoanCarRemoveModalOpen] = useState(false);
-  const [selectedLoanCarForRemove, setSelectedLoanCarForRemove] = useState(null);
-  const [selectedLoanCarTypeForRemove, setSelectedLoanCarTypeForRemove] = useState(null);
+  const [isLoanRemoveModalOpen, setIsLoanRemoveModalOpen] = useState(false);
+  const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
+  const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
 
   // 딜러 이자납 모달 관련 state
   const [isInterestPaymentModalOpen, setIsInterestPaymentModalOpen] = useState(false);
@@ -293,7 +293,7 @@ export default function InventoryFinanceList(props) {
         }
       } else {
         // searchAction이 없으면 /api/purchases 엔드포인트 호출 시도
-        const res = await fetch(`/api/purchases?page=${pageNum}&pageSize=${pageSize}`);
+        const res = await fetch(`/api/purchases?page=${pageNum}&pageSize=${pageSize}`);  /*purchases sbs working*/
         if (!res.ok) throw new Error("서버 응답 에러");
         const json = await res.json();
         const dataArr = Array.isArray(json) ? json : json.data || [];
@@ -316,22 +316,22 @@ export default function InventoryFinanceList(props) {
   };
 
   // 매입취소/삭제 모달 관련 핸들러
-  const handleLoanCarRemoveModalOpen = (car, type) => {
-    setSelectedLoanCarForRemove(car);
-    setSelectedLoanCarTypeForRemove(type);
-    setIsLoanCarRemoveModalOpen(true);
+  const handleLoanRemoveModalOpen = (car, type) => {
+    setSelectedCarForRemove(car);
+    setSelectedCarTypeForRemove(type);
+    setIsLoanRemoveModalOpen(true);
   };
 
-  const handleLoanCarRemoveModalClose = () => {
-    setIsLoanCarRemoveModalOpen(false);
-    setSelectedLoanCarForRemove(null);
+  const handleLoanRemoveModalClose = () => {
+    setIsLoanRemoveModalOpen(false);
+    setSelectedCarForRemove(null);
   };
 
-  const handleLoanCarRemoveConfirm = async () => {
+  const handleLoanRemoveConfirm = async () => {
     // TODO: 실제 매입취소/삭제 API 호출 구현
-    console.log("비용 전체 삭제 확인:", selectedLoanCarForRemove);
+    console.log("비용 전체 삭제 확인:", selectedCarForRemove);
     // API 호출 후 성공하면 모달 닫기 및 목록 새로고침
-    handleLoanCarRemoveModalClose();
+    handleLoanRemoveModalClose();
     // handleSearch(currentPage); // 목록 새로고침
   };
 
@@ -1585,6 +1585,16 @@ export default function InventoryFinanceList(props) {
           </tfoot>
         </table>
       </div>
+
+      {/* 재고금융 삭제 모달 */}
+      <CarLoanRemoveModal
+        car={selectedCarForRemove}
+        flagType={selectedCarTypeForRemove}
+        open={isLoanRemoveModalOpen}
+        onClose={handleLoanRemoveModalClose}
+        onConfirm={handleLoanRemoveConfirm}
+      />
+
     </main>
   );
 }

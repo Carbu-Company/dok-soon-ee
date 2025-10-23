@@ -21,26 +21,26 @@ export default function CarLoanRemoveModal(props) {
           },
         });
         if (!response.ok) {
-          const errorMessage = '비용 전체 삭제처리에 실패했습니다.';
+          const errorMessage = '재고금융 삭제처리에 실패했습니다.';
           alert(errorMessage);
           return;
         }
       }
       else if (flagType === 'one') {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/deleteLoanFee?LoanFeeSeq=${carData.Loan_FEE_SEQ}&usrId=${props.session?.usrId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/deleteCarIntrPay?loanId=${carData.LOAN_ID}&paySeq=${carData.LOAN_ID}&usrId=${props.session?.usrId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
         });
         if (!response.ok) {
-          const errorMessage = '비용 개별 삭제처리에 실패했습니다.';
+          const errorMessage = '이자납입건 삭제처리에 실패했습니다.';
           alert(errorMessage);
           return;
         }
       }
 
-      const successMessage = flagType === 'cancel' ? '상품화비용 삭제에  성공했습니다.' : '매입차량 삭제에 성공했습니다.';
+      const successMessage = flagType === 'cancel' ? '재고금융 삭제에 성공했습니다.' : '이자납인건 삭제에 성공했습니다.';
       alert(successMessage);
       onConfirm();
       onClose();
@@ -48,7 +48,7 @@ export default function CarLoanRemoveModal(props) {
       window.location.reload();
 
     } catch (error) {
-        console.error('상품화비용 삭제 오류:', error);
+        console.error('재고금융 삭제 오류:', error);
         throw error;
     }
 
@@ -60,7 +60,7 @@ export default function CarLoanRemoveModal(props) {
       <div className="modal__container">
         <div className="modal__header">
           <h2 id="purchase-remove-modal-title" className="modal__title">
-            {flagType === 'all' ? '비용 전체 삭제처리' : '비용 개별 삭제처리'}
+            {flagType === 'all' ? '재고금융 삭제처리' : '이자납입건 삭제 처리'}
           </h2>
           <div className="modal__utils">
             <button className="modal__btn close" type="button" onClick={onClose} aria-label="닫기">
@@ -74,19 +74,19 @@ export default function CarLoanRemoveModal(props) {
 
           {flagType === 'all' && (
           <div className="notice">
-            <p className="notice__title">비용 전체 삭제처리 하시겠습니까?</p>
+            <p className="notice__title">재고 금융 삭제처리 하시겠습니까?</p>
             <ul className="notice__list">
               <li>
-                차량에 등록된 전체 비용이 삭제됩니다. 삭제 후 복구되지 않습니다.
+                차량에 등록된 재고금융이 삭제됩니다. 삭제 후 복구되지 않습니다.
               </li>
             </ul>
           </div>
           )}
           {flagType === 'one' && (
           <div className="notice">
-            <p className="notice__title">비용 개별 삭제처리 하시겠습니까?</p>
+            <p className="notice__title">이자납입건을 삭제처리 하시겠습니까?</p>
             <ul className="notice__list">
-              <li>비용 개별 삭제처리 후 복구되지 않습니다.</li>
+              <li>이자납입 삭제처리 후 복구되지 않습니다.</li>
             </ul>
           </div>
           )}
@@ -120,11 +120,11 @@ export default function CarLoanRemoveModal(props) {
                   <td>{carData?.PUR_BEF_CAR_NO || '-'}</td>
                 </tr>
                 <tr>
-                  <th>비용 합계</th>
+                  <th>재고금융 대출 금액</th>
                   <td>{carData?.EXPD_AMT.toLocaleString() || '-'}</td>
-                  <th>비용 공급가 합계</th>
+                  <th>총 이자납입 금액</th>
                   <td>{carData?.EXPD_SUP_PRC.toLocaleString() || '-'}</td>
-                  <th>비용 부가세 합계</th>
+                  <th>잔여 이자납입 예정 금액</th>
                   <td>{carData?.EXPD_VAT.toLocaleString() || '-'}</td>
                 </tr>
               </tbody>

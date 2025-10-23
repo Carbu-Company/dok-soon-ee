@@ -1,9 +1,17 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
+import { getCarPurInfo, getCDList } from "@/app/(main)/api/carApi";
 
-export default function InterestPaymentModal({ open = false, onClose = () => {}, car = null }) {
+export default function InterestPaymentModal({ 
+  open = false, 
+  onClose = () => {}, 
+  car = null 
+}) {
   const [paymentDate, setPaymentDate] = useState("");
+
+  // 차량정보 조회
+  const carPurInfo = await getCarPurInfo(car.CAR_REG_ID); 
 
   // 선택된 차량의 최근 이자납일이 있으면 초기값으로 설정할 수 있음
   // 예: useEffect로 car 변경 감지 후 setPaymentDate(car?.RCNT_PAY_DTIME || '')
@@ -46,19 +54,19 @@ export default function InterestPaymentModal({ open = false, onClose = () => {},
               <tbody>
                 <tr>
                   <th>제시구분</th>
-                  <td>상사매입</td>
+                  <td>{carPurInfo?.PRSN_SCT_NM}</td>
                   <th>차량명</th>
-                  <td>그랜저</td>
+                  <td>{carPurInfo?.CAR_NM}</td>
                   <th>차량번호(매입후)</th>
-                  <td>123가1234</td>
+                  <td>{carPurInfo?.CAR_NO}</td>
                 </tr>
                 <tr>
                   <th>매입딜러</th>
-                  <td>홍길동</td>
+                  <td>{carPurInfo?.DLR_NM || '-'}</td>
                   <th>매입일</th>
-                  <td>2025-08-01</td>
+                  <td>{carPurInfo?.CAR_PUR_DT || '-'}</td>
                   <th>차량번호(매입전)</th>
-                  <td>123허1234</td>
+                  <td>{carPurInfo?.PUR_BEF_CAR_NO || '-'}</td>
                 </tr>
               </tbody>
             </table>
@@ -78,19 +86,19 @@ export default function InterestPaymentModal({ open = false, onClose = () => {},
               <tbody>
                 <tr>
                   <th>캐피탈사</th>
-                  <td>메리츠캐피탈</td>
+                  <td>{carData?.LOAN_CORP_NM || '-'}</td>
                   <th>대출금액</th>
-                  <td>30,000,000</td>
+                  <td>{carData?.LOAN_AMT.toLocaleString() || '-'}</td>
                   <th>실행일</th>
-                  <td>2025-08-10</td>
+                  <td>{carData?.LOAN_DT || '-'}</td>
                 </tr>
                 <tr>
                   <th>대출기간</th>
-                  <td>6개월</td>
+                  <td>{carData?.LOAN_CORP_NM || '-'}개월</td>
                   <th>딜러이율</th>
-                  <td>15%</td>
+                  <td>{carData?.DLR_INTR_RT || '-'}%</td>
                   <th>월 이자</th>
-                  <td>100,000</td>
+                  <td>{carData?.DLR_MM_INTR_AMT || '-'}</td>
                 </tr>
               </tbody>
             </table>
@@ -131,7 +139,7 @@ export default function InterestPaymentModal({ open = false, onClose = () => {},
                         className="input__field"
                         placeholder="납입일"
                         autoComplete="off"
-                        value={paymentDate}
+                        value={carData?.DLR_MM_INTR_AMT}
                         onChange={(e) => setPaymentDate(e.target.value)}
                       />
                     </div>
