@@ -8,12 +8,17 @@ export default function InterestPaymentModal({
   onClose = () => {}, 
   car = null 
 }) {
-  const [intrPayAmt, setIntrPayAmt] = useState('');
-  const [intrPayDt, setIntrPayDt] = useState(new Date().toISOString().split('T')[0]);
-  const [regDtime, setRegDtime] = useState(new Date().toISOString().split('T')[0]);
   
   const [loanId, setLoanId] = useState(car?.LOAN_ID || '');
 
+  const [intrPayAmt, setIntrPayAmt] = useState('');
+  const [intrPayDt, setIntrPayDt] = useState(new Date().toISOString().split('T')[0]);
+  const [regDtime, setRegDtime] = useState(new Date().toISOString().split('T')[0]);
+
+
+  /**
+   * 포커스 로직 (안됨)
+   */
   const inputRef = React.useRef(intrPayAmt);
 
   React.useEffect(() => {
@@ -21,13 +26,10 @@ export default function InterestPaymentModal({
       inputRef.current.focus();
     }
   }, [open]);
-  // 차량정보 조회
-  //const carPurInfo = await getCarPurInfo(car?.CAR_REG_ID || ''); 
 
-  // 선택된 차량의 최근 이자납일이 있으면 초기값으로 설정할 수 있음
-  // 예: useEffect로 car 변경 감지 후 setPaymentDate(car?.RCNT_PAY_DTIME || '')
-
-
+  /**
+   * 이자납입 등록
+   */
   const handleConfirm = async () => {
 
     // 이자금액

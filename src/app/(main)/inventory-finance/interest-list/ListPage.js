@@ -60,10 +60,14 @@ export default function InventoryFinanceInterestList( props ) {
   const [startDt, setStartDt] = useState("");
   const [endDt, setEndDt] = useState("");
 
-  // 매입취소/삭제 모달 관련 state
-  const [isPurchaseRemoveModalOpen, setIsPurchaseRemoveModalOpen] = useState(false);
+  // 재고금융 삭제 모달 관련 state
+  const [isLoanRemoveModalOpen, setIsLoanRemoveModalOpen] = useState(false);
   const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
   const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
+
+  // 딜러 이자납 모달 관련 state
+  const [isInterestPaymentModalOpen, setIsInterestPaymentModalOpen] = useState(false);
+  const [interestPaymentCar, setInterestPaymentCar] = useState(null);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -300,6 +304,19 @@ export default function InventoryFinanceInterestList( props ) {
   const handleDtlSearch = () => {
     setSearchBtn(2);
     handleSearch(1);
+  };
+
+
+  // 재고금융 삭제 모달 관련 핸들러
+  const handleLoanRemoveModalOpen = (car, type) => {
+    setSelectedCarForRemove(car);
+    setSelectedCarTypeForRemove(type);
+    setIsLoanRemoveModalOpen(true);
+  };
+
+  const handleLoanRemoveModalClose = () => {
+    setIsLoanRemoveModalOpen(false);
+    setSelectedCarForRemove(null);
   };
 
   /**
@@ -1335,18 +1352,37 @@ export default function InventoryFinanceInterestList( props ) {
 
                     <ul className="select__menu">
                       <li className="select__option">
-                        <a href="#">이자납 수정(등록동일)</a>
-                      </li>
-                      <li className="select__option">
                         <a
                           href="#"
                           onClick={e => {
                             e.preventDefault();
-                            openModal("2");
+                            setInterestPaymentCar(car);
+                            setIsInterestPaymentModalOpen(true);
                           }}
                         >
-                          이자납 삭제
+                          이자납입 수정
                         </a>
+                      </li>
+                      <li className="select__option">
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleLoanRemoveModalOpen(car, "one");
+                          }}
+                          style={{
+                            border: "none",
+                            background: "none",
+                            padding: 0,
+                            color: "inherit",
+                            cursor: "pointer",
+                            width: "100%",
+                            textAlign: "left",
+                          }}
+                        >
+                          이자납입 삭제
+                        </button>
                       </li>
                     </ul>
                   </div>

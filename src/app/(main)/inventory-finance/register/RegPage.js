@@ -55,9 +55,9 @@ export default function InventoryFinanceRegisterPage({
 
   useEffect(() => {
     console.log('loanAmt', loanAmt);
-    console.log('corpIntrRt', corpIntrRt);
     console.log('loanMmCnt', loanMmCnt);
-    console.log('dlrAplyIntrRt', dlrAplyIntrRt);
+    console.log('corpIntrRt', corpIntrRt);
+    console.log('dlrIntrRt', dlrIntrRt);
 
     if (loanAmt && corpIntrRt && loanMmCnt) {
       setcorpMmIntrAmt(Number((Number(loanAmt) * Number(corpIntrRt) / 100 / 12).toFixed(0)));
