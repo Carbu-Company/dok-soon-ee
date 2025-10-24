@@ -445,7 +445,7 @@ export default function InventoryFinanceList(props) {
                       onClick={e => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleLoanCarRemoveModalOpen(car, "all");
+                        handleLoanRemoveModalOpen(car, "all");
                       }}
                       style={{
                         border: "none",

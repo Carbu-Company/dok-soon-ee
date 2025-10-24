@@ -3,15 +3,26 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { getCarPurInfo, getCDList } from "@/app/(main)/api/carApi";
 
-export default async function InterestPaymentModal({ 
+export default function InterestPaymentModal({ 
   open = false, 
   onClose = () => {}, 
   car = null 
 }) {
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [intrPayAmt, setIntrPayAmt] = useState('');
+  const [intrPayDt, setIntrPayDt] = useState(new Date().toISOString().split('T')[0]);
+  const [regDtime, setRegDtime] = useState(new Date().toISOString().split('T')[0]);
+  
+  const [loanId, setLoanId] = useState(car?.LOAN_ID || '');
 
+  const inputRef = React.useRef(intrPayAmt);
+
+  React.useEffect(() => {
+    if (open && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [open]);
   // 차량정보 조회
-  const carPurInfo = await getCarPurInfo(car?.CAR_REG_ID || ''); 
+  //const carPurInfo = await getCarPurInfo(car?.CAR_REG_ID || ''); 
 
   // 선택된 차량의 최근 이자납일이 있으면 초기값으로 설정할 수 있음
   // 예: useEffect로 car 변경 감지 후 setPaymentDate(car?.RCNT_PAY_DTIME || '')
@@ -54,19 +65,21 @@ export default async function InterestPaymentModal({
               <tbody>
                 <tr>
                   <th>제시구분</th>
-                  <td>{carPurInfo?.PRSN_SCT_NM}</td>
+                  <td>
+                    {car?.PRSN_SCT_NM || '-'}
+                  </td>
                   <th>차량명</th>
-                  <td>{carPurInfo?.CAR_NM}</td>
+                  <td>{car?.CAR_NM || '-'}</td>
                   <th>차량번호(매입후)</th>
-                  <td>{carPurInfo?.CAR_NO}</td>
+                  <td>{car?.CAR_NO || '-'}</td>
                 </tr>
                 <tr>
                   <th>매입딜러</th>
-                  <td>{carPurInfo?.DLR_NM || '-'}</td>
+                  <td>{car?.DLR_NM || '-'}</td>
                   <th>매입일</th>
-                  <td>{carPurInfo?.CAR_PUR_DT || '-'}</td>
+                  <td>{car?.CAR_PUR_DT || '-'}</td>
                   <th>차량번호(매입전)</th>
-                  <td>{carPurInfo?.PUR_BEF_CAR_NO || '-'}</td>
+                  <td>{car?.PUR_BEF_CAR_NO || '-'}</td>
                 </tr>
               </tbody>
             </table>
@@ -120,7 +133,14 @@ export default async function InterestPaymentModal({
                   <th>납입이자</th>
                   <td>
                     <div className="input">
-                      <input type="text" className="input__field" placeholder="금액" />
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="금액"
+                        autoFocus
+                        value={intrPayAmt}
+                        onChange={(e) => setIntrPayAmt(e.target.value)}
+                      />
                       <div className="input__utils">
                         <button
                           type="button"
@@ -139,13 +159,13 @@ export default async function InterestPaymentModal({
                         className="input__field"
                         placeholder="납입일"
                         autoComplete="off"
-                        value={paymentDate}
-                        onChange={(e) => setPaymentDate(e.target.value)}
+                        value={intrPayDt}
+                        onChange={(e) => setIntrPayDt(e.target.value)}
                       />
                     </div>
                   </td>
                   <th>등록일</th>
-                  <td>{paymentDate}</td>
+                  <td>{regDtime}</td>
                 </tr>
               </tbody>
             </table>
