@@ -30,13 +30,13 @@ export default function InterestPaymentModal({
 
   const handleConfirm = async () => {
 
-    // 고객구분
+    // 이자금액
     if(!intrPayAmt) {
       alert('이자금액을 입력해주세요.');
       return;
     }
 
-    // 증빙종류
+    // 납입일자
     if(!intrPayDt) {
       alert('납입일자를 선택해주세요.');
       return;
@@ -58,9 +58,9 @@ export default function InterestPaymentModal({
         },
         body: JSON.stringify(formValues)
       });
-      const response = await response.json();
+      const res = await response.json();
 
-      if (!response.ok) {
+      if (!res.ok) {
         const errorMessage = '이자납입 등록에 실패했습니다.';
         alert(errorMessage);
         return;
@@ -239,7 +239,7 @@ export default function InterestPaymentModal({
   
           <div className="modal__btns">
             <button className="btn btn--light close" type="button" onClick={onClose}>취소</button>
-            <button className="btn btn--primary" type="button">확인</button>
+            <button className="btn btn--primary" type="button" onClick={handleConfirm}>확인</button>
           </div>
         </div>
         {/* modal content :: e */}
