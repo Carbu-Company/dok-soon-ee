@@ -316,7 +316,7 @@ export default function InventoryFinanceList(props) {
     handleSearch(1);
   };
 
-  // 매입취소/삭제 모달 관련 핸들러
+  // 재고금융 삭제 모달 관련 핸들러
   const handleLoanRemoveModalOpen = (car, type) => {
     setSelectedCarForRemove(car);
     setSelectedCarTypeForRemove(type);
@@ -416,12 +416,6 @@ export default function InventoryFinanceList(props) {
           {/*<p className="guidebox__desc">※ 이자계산, 신규/연장/추가처리</p>*/}
         </div>
       </div>
-
-      <InterestPaymentModal open={isInterestPaymentModalOpen} 
-                            onClose={() => setIsInterestPaymentModalOpen(false)} 
-                            car={interestPaymentCar} 
-      />
-
       <div className="table-wrap">
         <h2 className="table-wrap__title">검색</h2>
         <table className="table table--lg">
@@ -451,7 +445,7 @@ export default function InventoryFinanceList(props) {
                       onClick={e => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleLoanCarRemoveModalOpen(car, "one");
+                        handleLoanCarRemoveModalOpen(car, "all");
                       }}
                       style={{
                         border: "none",
@@ -1476,7 +1470,7 @@ export default function InventoryFinanceList(props) {
                           onClick={e => {
                             e.preventDefault();
                             e.stopPropagation();
-                            handleLoanCarRemoveModalOpen(car, "one");
+                            handleLoanRemoveModalOpen(car, "all");
                           }}
                           style={{
                             border: "none",
@@ -1593,6 +1587,12 @@ export default function InventoryFinanceList(props) {
         open={isLoanRemoveModalOpen}
         onClose={handleLoanRemoveModalClose}
         onConfirm={handleLoanRemoveConfirm}
+      />
+
+      <InterestPaymentModal 
+        open={isInterestPaymentModalOpen} 
+        onClose={() => setIsInterestPaymentModalOpen(false)} 
+        car={interestPaymentCar} 
       />
 
     </main>
