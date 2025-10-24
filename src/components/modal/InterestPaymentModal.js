@@ -27,6 +27,59 @@ export default function InterestPaymentModal({
   // 선택된 차량의 최근 이자납일이 있으면 초기값으로 설정할 수 있음
   // 예: useEffect로 car 변경 감지 후 setPaymentDate(car?.RCNT_PAY_DTIME || '')
 
+
+  const handleConfirm = async () => {
+
+    // 고객구분
+    if(!intrPayAmt) {
+      alert('이자금액을 입력해주세요.');
+      return;
+    }
+
+    // 증빙종류
+    if(!intrPayDt) {
+      alert('납입일자를 선택해주세요.');
+      return;
+    }
+
+    try {
+
+      const formValues = {
+        loanId,                                              // 대출 ID
+        intrPayAmt,                                          // 이자납입금액
+        intrPayDt,                                           // 이자납입일자
+        usrId: session?.usrId                                // 사용자 ID
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertLoanIntrPay`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formValues)
+      });
+      const response = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = '이자납입 등록에 실패했습니다.';
+        alert(errorMessage);
+        return;
+      }
+
+      const successMessage = '이자납입 등록에 성공했습니다.';
+      alert(successMessage);
+      onConfirm();
+      onClose();
+
+      window.location.reload();
+
+    } catch (error) {
+        console.error('이자납입 등록 오류:', error);
+        throw error;
+    }
+
+  };
+
   return (
     <div className={`modal ${open ? "modal--open" : ""}`} role="dialog" aria-modal="true" aria-labelledby="interest-payment-modal-title">
       <div className="modal__container">

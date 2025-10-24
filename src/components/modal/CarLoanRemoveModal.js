@@ -27,7 +27,7 @@ export default function CarLoanRemoveModal(props) {
         }
       }
       else if (flagType === 'one') {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/deleteCarIntrPay?loanId=${carData.LOAN_ID}&paySeq=${carData.LOAN_ID}&usrId=${props.session?.usrId}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/deleteLoanIntrPay?loanId=${carData.LOAN_ID}&paySeq=${carData.LOAN_ID}&usrId=${props.session?.usrId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
