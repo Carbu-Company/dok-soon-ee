@@ -6,6 +6,7 @@ import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import InterestPaymentModal from "@/components/modal/InterestPaymentModal";
+import CarLoanRemoveModal from "@/components/modal/CarLoanRemoveModal";
 
 export default function InventoryFinanceList(props) {
   const router = useRouter();
@@ -416,7 +417,10 @@ export default function InventoryFinanceList(props) {
         </div>
       </div>
 
-      <InterestPaymentModal open={isInterestPaymentModalOpen} onClose={() => setIsInterestPaymentModalOpen(false)} car={interestPaymentCar} />
+      <InterestPaymentModal open={isInterestPaymentModalOpen} 
+                            onClose={() => setIsInterestPaymentModalOpen(false)} 
+                            car={interestPaymentCar} 
+      />
 
       <div className="table-wrap">
         <h2 className="table-wrap__title">검색</h2>
@@ -1443,11 +1447,9 @@ export default function InventoryFinanceList(props) {
               <td>{car.RCNT_PAY_DTIME}</td>
               <td>{car.LOAN_STAT_NM}</td>
               <td>
-                <div className="input-group input-group--sm input-group--center">
+              <div className="input-group input-group--sm input-group--center">
                   <div className="select select--utils">
-                    <button type="button" className="select__toggle">
-                      더보기
-                    </button>
+                    <button type="button" className="select__toggle">더보기</button>
 
                     <ul className="select__menu">
                       <li className="select__option">
@@ -1465,11 +1467,9 @@ export default function InventoryFinanceList(props) {
                       <li className="select__option">
                       <Link href={`/inventory-finance/edit/${car.CAR_REG_ID}/${car.LOAN_ID}`}>재고금융 수정</Link>
                       </li>
-
                       <li className="select__option">
                         <a href="#">재고금융 연장</a>
                       </li>
-
                       <li className="select__option">
                         <button
                           type="button"

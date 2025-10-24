@@ -3,15 +3,15 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { getCarPurInfo, getCDList } from "@/app/(main)/api/carApi";
 
-export default function InterestPaymentModal({ 
+export default async function InterestPaymentModal({ 
   open = false, 
   onClose = () => {}, 
   car = null 
 }) {
-  const [paymentDate, setPaymentDate] = useState("");
+  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
 
   // 차량정보 조회
-  const carPurInfo = await getCarPurInfo(car.CAR_REG_ID); 
+  const carPurInfo = await getCarPurInfo(car?.CAR_REG_ID || ''); 
 
   // 선택된 차량의 최근 이자납일이 있으면 초기값으로 설정할 수 있음
   // 예: useEffect로 car 변경 감지 후 setPaymentDate(car?.RCNT_PAY_DTIME || '')
@@ -86,19 +86,19 @@ export default function InterestPaymentModal({
               <tbody>
                 <tr>
                   <th>캐피탈사</th>
-                  <td>{carData?.LOAN_CORP_NM || '-'}</td>
+                  <td>{car?.LOAN_CORP_NM || '-'}</td>
                   <th>대출금액</th>
-                  <td>{carData?.LOAN_AMT.toLocaleString() || '-'}</td>
+                  <td>{car?.LOAN_AMT.toLocaleString() || '-'}</td>
                   <th>실행일</th>
-                  <td>{carData?.LOAN_DT || '-'}</td>
+                  <td>{car?.LOAN_DT || '-'}</td>
                 </tr>
                 <tr>
                   <th>대출기간</th>
-                  <td>{carData?.LOAN_CORP_NM || '-'}개월</td>
+                  <td>{car?.LOAN_CORP_NM || '-'}개월</td>
                   <th>딜러이율</th>
-                  <td>{carData?.DLR_INTR_RT || '-'}%</td>
+                  <td>{car?.DLR_INTR_RT || '-'}%</td>
                   <th>월 이자</th>
-                  <td>{carData?.DLR_MM_INTR_AMT || '-'}</td>
+                  <td>{car?.DLR_MM_INTR_AMT || '-'}</td>
                 </tr>
               </tbody>
             </table>
@@ -139,13 +139,13 @@ export default function InterestPaymentModal({
                         className="input__field"
                         placeholder="납입일"
                         autoComplete="off"
-                        value={carData?.DLR_MM_INTR_AMT}
+                        value={paymentDate}
                         onChange={(e) => setPaymentDate(e.target.value)}
                       />
                     </div>
                   </td>
                   <th>등록일</th>
-                  <td>현재일</td>
+                  <td>{paymentDate}</td>
                 </tr>
               </tbody>
             </table>
