@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
+import InterestPayRemoveModal from "@/components/modal/InterestPayRemove";
 
 export default function InventoryFinanceInterestList( props ) {
   const router = useRouter();
@@ -60,10 +61,9 @@ export default function InventoryFinanceInterestList( props ) {
   const [startDt, setStartDt] = useState("");
   const [endDt, setEndDt] = useState("");
 
-  // 재고금융 삭제 모달 관련 state
-  const [isLoanRemoveModalOpen, setIsLoanRemoveModalOpen] = useState(false);
+  // 이자납입 삭제 모달 관련 state
+  const [isIntrPayRemoveModalOpen, setIsIntrPayRemoveModalOpen] = useState(false);
   const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
-  const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
 
   // 딜러 이자납 모달 관련 state
   const [isInterestPaymentModalOpen, setIsInterestPaymentModalOpen] = useState(false);
@@ -283,8 +283,8 @@ export default function InventoryFinanceInterestList( props ) {
           alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
         }
       } else {
-        // searchAction이 없으면 /api/purchases 엔드포인트 호출 시도
-        const res = await fetch(`/api/purchases?page=${pageNum}&pageSize=${pageSize}`);
+        // searchAction이 없으면 /api/IntrPays 엔드포인트 호출 시도
+        const res = await fetch(`/api/IntrPays?page=${pageNum}&pageSize=${pageSize}`);
         if (!res.ok) throw new Error("서버 응답 에러");
         const json = await res.json();
         const dataArr = Array.isArray(json) ? json : json.data || [];
@@ -307,16 +307,23 @@ export default function InventoryFinanceInterestList( props ) {
   };
 
 
-  // 재고금융 삭제 모달 관련 핸들러
-  const handleLoanRemoveModalOpen = (car, type) => {
+  // 매입취소/삭제 모달 관련 핸들러
+  const handleIntrPayRemoveModalOpen = (car, type) => {
     setSelectedCarForRemove(car);
-    setSelectedCarTypeForRemove(type);
-    setIsLoanRemoveModalOpen(true);
+    setIsIntrPayRemoveModalOpen(true);
   };
 
-  const handleLoanRemoveModalClose = () => {
-    setIsLoanRemoveModalOpen(false);
+  const handleIntrPayRemoveModalClose = () => {
+    setIsIntrPayRemoveModalOpen(false);
     setSelectedCarForRemove(null);
+  };
+
+  const handleIntrPayRemoveConfirm = async () => {
+    // TODO: 실제 매입취소/삭제 API 호출 구현
+    console.log("이자납입 삭제 확인:", selectedCarForRemove);
+    // API 호출 후 성공하면 모달 닫기 및 목록 새로고침
+    handleIntrPayRemoveModalClose();
+    // handleSearch(currentPage); // 목록 새로고침
   };
 
   /**
@@ -1279,8 +1286,8 @@ export default function InventoryFinanceInterestList( props ) {
         {/* 이자납 리스트 s */}
         <table className="table">
           <colgroup>
-            <col style={{ width: "250px" }} />
             <col style={{ width: "auto" }} />
+            <col style={{ width: "250px" }} />
             {/*캐피탈사*/}
             <col style={{ width: "130px" }} />
             <col style={{ width: "130px" }} />
@@ -1332,9 +1339,9 @@ export default function InventoryFinanceInterestList( props ) {
               <td>{car.LOAN_AMT.toLocaleString()}</td>
               <td>{car.LOAN_DT}</td>
               <td>{car.LOAN_MM_CNT}개월</td>
-              <td>{car.DLR_APLY_INTR_RT}</td>
-              <td>{car.MM_INTR_AMT?.toLocaleString()}</td>
-              <td>{car.TOT_INTR_AMT?.toLocaleString()}</td>
+              <td>{car.DLR_INTR_RT}</td>
+              <td>{car.DLR_MM_INTR_AMT?.toLocaleString()}</td>
+              <td>{car.DLR_TOT_PAY_INTR_AMT?.toLocaleString()}</td>
               <td>
                 <span className="text-red">{car.INTR_PAY_AMT?.toLocaleString()}</span>
               </td>
@@ -1369,7 +1376,7 @@ export default function InventoryFinanceInterestList( props ) {
                           onClick={e => {
                             e.preventDefault();
                             e.stopPropagation();
-                            handleLoanRemoveModalOpen(car, "one");
+                            handleIntrPayRemoveModalOpen(car);
                           }}
                           style={{
                             border: "none",
@@ -1478,6 +1485,15 @@ export default function InventoryFinanceInterestList( props ) {
           </tfoot>
         </table>
       </div>
+
+      {/* 이자납입 삭제 모달 */}
+      <InterestPayRemoveModal
+        car={selectedCarForRemove}
+        open={isIntrPayRemoveModalOpen}
+        onClose={handleIntrPayRemoveModalClose}
+        onConfirm={handleIntrPayRemoveConfirm}
+        session={props.session}
+      />
     </main>
   );
 }

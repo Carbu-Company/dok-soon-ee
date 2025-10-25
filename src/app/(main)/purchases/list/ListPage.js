@@ -1690,7 +1690,7 @@ export default function ListPage(props) {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 router.push(
-                                  `/car-goods/register?carId=${car.CAR_REG_ID}&openModal=true`
+                                  `/car-goods/register?carRegId=${car.CAR_REG_ID}&openModal=true`
                                 );
                               }}
                               style={{
@@ -1707,10 +1707,10 @@ export default function ListPage(props) {
                             </button>
                           </li>
                           <li className="select__option">
-                            <Link href="/inventory-finance/inventory-list">재고금융 등록</Link>
+                            <Link href={`/inventory-finance/register?carRegId=${car.CAR_REG_ID}`}>재고금융 등록</Link>
                           </li>
                           <li className="select__option">
-                            <Link href="#">판매 처리</Link>
+                            <Link href={`/car-sell/register?carRegId=${car.CAR_REG_ID}`}>판매 처리</Link>
                           </li>
                           <li className="select__option">
                             <Link href={`/purchases/edit/${car.CAR_REG_ID}`}>매입 수정</Link>

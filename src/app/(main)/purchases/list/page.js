@@ -34,7 +34,7 @@ async function searchCarPurSummary(searchParamsWithPage) {
   try {
     const result = await getCarPurSummary(searchParamsWithPage);
 
-    console.log('서버 액션 결과*******************:searchCarPurSummary');
+    //console.log('서버 액션 결과*******************:searchCarPurSummary');
 
     return result;
   } catch (error) {

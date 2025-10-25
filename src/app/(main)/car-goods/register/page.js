@@ -18,22 +18,22 @@ export default async function RegisterPage({ searchParams }) {
   } 
   */  
 
-  //console.log(session.agentId);
-  
   // searchParams를 await로 처리
   const resolvedSearchParams = await searchParams;
+
+  console.log('resolvedSearchParams?.carRegId', resolvedSearchParams?.carRegId);
   
-  // URL 파라미터에서 carId를 확인하여 차량 정보 조회
+  // URL 파라미터에서 carRegId를 확인하여 차량 정보 조회
   let carPurDetail = null;
-  if (resolvedSearchParams?.carId) {
-    carPurDetail = await getSuggestOne(resolvedSearchParams.carId).catch(error => {
-      console.error('매입차량 정보 조회 실패:', error);
+  if (resolvedSearchParams?.carRegId) {
+    carPurDetail = await getSuggestOne(resolvedSearchParams.carRegId).catch(error => {
+      console.error('차량 정보 조회 실패:', error);
       return null; // 에러 발생 시 null 반환
     });
   }
 
   // 테스트를 위해 차량 정보를 null로 설정 (모달이 항상 열리도록)
-  carPurDetail = null;
+  // carPurDetail = null;
 
   const dealerList = await getDealerList(session.agentId);
   const expdCdList = await getCDList('08');   // 상품화비 지출 항목 코드 목록

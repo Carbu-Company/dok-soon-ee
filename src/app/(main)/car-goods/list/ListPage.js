@@ -1678,7 +1678,7 @@ export default function ProductCostList(props) {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 router.push(
-                                  `/car-goods/register?carId=${car.CAR_REG_ID}`
+                                  `/car-goods/register?carRegId=${car.CAR_REG_ID}`
                                 );
                               }}
                               style={{

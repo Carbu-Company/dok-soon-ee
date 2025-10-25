@@ -1587,12 +1587,14 @@ export default function InventoryFinanceList(props) {
         open={isLoanRemoveModalOpen}
         onClose={handleLoanRemoveModalClose}
         onConfirm={handleLoanRemoveConfirm}
+        session={props.session}
       />
 
       <InterestPaymentModal 
         open={isInterestPaymentModalOpen} 
         onClose={() => setIsInterestPaymentModalOpen(false)} 
         car={interestPaymentCar} 
+        session={props.session}
       />
 
     </main>

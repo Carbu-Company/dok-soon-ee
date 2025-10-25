@@ -6,26 +6,18 @@ import { getCarPurInfo, getCDList } from "@/app/(main)/api/carApi";
 export default function InterestPaymentModal({ 
   open = false, 
   onClose = () => {}, 
-  car = null 
+  car = null,
+  session = null
 }) {
-  
-  const [loanId, setLoanId] = useState(car?.LOAN_ID || '');
 
+  const [carData, setCarData] = useState(car);
+  
   const [intrPayAmt, setIntrPayAmt] = useState('');
   const [intrPayDt, setIntrPayDt] = useState(new Date().toISOString().split('T')[0]);
   const [regDtime, setRegDtime] = useState(new Date().toISOString().split('T')[0]);
 
-
-  /**
-   * 포커스 로직 (안됨)
-   */
-  const inputRef = React.useRef(intrPayAmt);
-
-  React.useEffect(() => {
-    if (open && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [open]);
+  const [dlrTotPayIntrAmt, setDlrTotPayIntrAmt] = useState(car?.DLR_TOT_PAY_INTR_AMT || 0);
+  const [totPayIntrAmt, setTotPayIntrAmt] = useState(car?.TOT_PAY_INTR_AMT || 0);
 
   /**
    * 이자납입 등록
@@ -44,10 +36,15 @@ export default function InterestPaymentModal({
       return;
     }
 
+    if (Number(car?.DLR_TOT_PAY_INTR_AMT) < (Number(intrPayAmt) + Number(car?.TOT_PAY_INTR_AMT))) {
+      alert('이자납입금액이 딜러 총 납입 해야할 이자액을 초과합니다.');
+      return;
+    }
+
     try {
 
       const formValues = {
-        loanId,                                              // 대출 ID
+        loanId: car?.LOAN_ID,                                // 대출 ID
         intrPayAmt,                                          // 이자납입금액
         intrPayDt,                                           // 이자납입일자
         usrId: session?.usrId                                // 사용자 ID
@@ -60,17 +57,17 @@ export default function InterestPaymentModal({
         },
         body: JSON.stringify(formValues)
       });
-      const res = await response.json();
 
-      if (!res.ok) {
+      if (!response.ok) {
         const errorMessage = '이자납입 등록에 실패했습니다.';
         alert(errorMessage);
         return;
       }
 
+      const res = await response.json();
+
       const successMessage = '이자납입 등록에 성공했습니다.';
       alert(successMessage);
-      onConfirm();
       onClose();
 
       window.location.reload();
@@ -123,7 +120,7 @@ export default function InterestPaymentModal({
                   <td>
                     {car?.PRSN_SCT_NM || '-'}
                   </td>
-                  <th>차량명</th>
+                  <th>차량명 {car?.LOAN_ID} SSS</th>
                   <td>{car?.CAR_NM || '-'}</td>
                   <th>차량번호(매입후)</th>
                   <td>{car?.CAR_NO || '-'}</td>

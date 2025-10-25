@@ -25,15 +25,15 @@ export default async function RegisterPage({ searchParams }) {
   
   // URL 파라미터에서 carId를 확인하여 차량 정보 조회
   let carPurDetail = null;
-  if (resolvedSearchParams?.carId) {
-    carPurDetail = await getSuggestOne(resolvedSearchParams.carId).catch(error => {
-      console.error('매입차량 정보 조회 실패:', error);
+  if (resolvedSearchParams?.carRegId) {
+    carPurDetail = await getSuggestOne(resolvedSearchParams.carRegId).catch(error => {
+      console.error('차량 정보 조회 실패:', error);
       return null; // 에러 발생 시 null 반환
     });
   }
 
   // 테스트를 위해 차량 정보를 null로 설정 (모달이 항상 열리도록)
-  carPurDetail = null;
+  // carPurDetail = null;
 
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록
