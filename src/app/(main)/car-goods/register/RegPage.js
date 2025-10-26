@@ -188,6 +188,7 @@ export default function ProductCostRegisterPage({
       // 각 행에 대해 API 호출
       const promises = validRows.map(async (row) => {
         const formValues = {
+          agentId: session?.agentId,     // 상사사 ID
           carRegId: carRegId,           // 차량 등록 ID
           expdItemCd: row.productItem || '',           // 비용 항목 코드
           expdItemNm: expdCdList.find(item => item.CD === row.productItem)?.CD_NM || '',  // 비용 항목명

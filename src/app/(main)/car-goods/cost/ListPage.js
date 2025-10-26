@@ -1528,6 +1528,7 @@ export default function ProductCostList(props) {
             <col style={{ width: "150px" }} />
             <col style={{ width: "100px" }} />
             <col style={{ width: "100px" }} />
+            <col style={{ width: "100px" }} />
           </colgroup>
           <thead>
             <tr>
@@ -1550,6 +1551,7 @@ export default function ProductCostList(props) {
               <th>부가세</th>
               <th>정산반영</th>
               <th>결제일</th>
+              <th>등록일일</th>
               <th>지출증빙</th>
 
               <th>바로가기</th>
@@ -1571,6 +1573,7 @@ export default function ProductCostList(props) {
 
                 <td>{car.ADJ_INCLUS_YN}</td>
                 <td>{car.EXPD_DT.toLocaleString()}</td>
+                <td>{car.REG_DTIME}</td>
                 <td>{car.EXPD_EVDC_NM}</td>
 
                 <td>
