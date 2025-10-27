@@ -251,12 +251,56 @@ export default function Header() {
           <Link href="/car-sell/list" className="header__gnb-menu">
             매도(판매)/정산
           </Link>
-          <Link href="/cash-receipts/list" className="header__gnb-menu">
-            현금영수증
-          </Link>
-          <Link href="/electronic-tax-invoice/list" className="header__gnb-menu">
-            전자세금계산서
-          </Link>
+          {/* 현금영수증 드롭다운 */}
+          <div className="select">
+            <button className="select__toggle" type="button">
+              <span className="header__gnb-menu">현금영수증</span>
+              <Image
+                className="select__arrow"
+                src="/images/ico-dropdown.svg"
+                alt=""
+                width={10}
+                height={10}
+              />
+            </button>
+            <ul className="select__menu">
+              <li className="select__option select__option--selected">
+                <Link href="/cash-receipts/register" className="select__option-link">
+                  현금영수증 발행
+                </Link>
+              </li>
+              <li className="select__option">
+                <Link href="/cash-receipts/list" className="select__option-link">
+                  발행 리스트
+                </Link>
+              </li>
+            </ul>
+          </div>
+          {/* 전자세금계산서 드롭다운 */}
+          <div className="select">
+            <button className="select__toggle" type="button">
+              <span className="header__gnb-menu">전자세금계산서</span>
+              <Image
+                className="select__arrow"
+                src="/images/ico-dropdown.svg"
+                alt=""
+                width={10}
+                height={10}
+              />
+            </button>
+            <ul className="select__menu">
+              <li className="select__option select__option--selected">
+                <Link href="/electronic-tax-invoice/register" className="select__option-link">
+                  전자세금계산서 발행
+                </Link>
+              </li>
+              <li className="select__option">
+                <Link href="/electronic-tax-invoice/list" className="select__option-link">
+                  발행 리스트
+                </Link>
+              </li>
+            </ul>
+          </div>
           <Link href="/car-concil/list" className="header__gnb-menu">
             타상사알선판매
           </Link>
