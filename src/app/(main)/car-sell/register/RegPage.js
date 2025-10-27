@@ -258,8 +258,8 @@ export default function SalesRegisterPage({
 
 
     const formValues = {    
-      carRegId: carPurDetail.CAR_REG_ID,                        // 매입차량 ID
-      carSaleDt,                                                // 판매일
+      carRegId: carPurDetail.CAR_REG_ID,                       // 매입차량 ID
+      carSaleDt,                                               // 판매일
       saleRegDt: new Date().toISOString().split('T')[0],       // 등록일
       agentId: session?.agentId,                               // 상사사 ID
       dlrId: selectedSellDealer,                               // 딜러 ID
