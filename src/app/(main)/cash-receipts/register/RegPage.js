@@ -512,7 +512,7 @@ export default function CashReceiptRegisterPage({
       <div className="table-wrap">
         <div className="table-wrap__head">
           <h2 className="table-wrap__title">
-            발행대기 목록<span>Total {pagination?.totalCount || pendingList?.length || 0}건</span>
+            발행대상 목록<span>Total {pagination?.totalCount || pendingList?.length || 0}건</span>
           </h2>
           <div className="input-group">
             <button
