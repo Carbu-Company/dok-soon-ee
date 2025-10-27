@@ -524,7 +524,7 @@ export default function CashReceiptList(props) {
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">현금영수증 리스트</h2>
+        <h2 className="container__title">영수증 발행 리스트</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">매도처리 후 매출증빙과 연계 필요(1:N)</p>

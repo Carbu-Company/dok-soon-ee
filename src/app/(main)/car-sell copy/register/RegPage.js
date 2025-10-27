@@ -39,8 +39,7 @@ export default function SalesRegisterPage({
   evdcCdList = [], 
   parkingLocationList = [], 
   sellTpList = [],
-  carPurDetail = [],
-  carSelDetail = []
+  carPurDetail = []
 }) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -159,13 +158,13 @@ export default function SalesRegisterPage({
   /////////////////////////////////////////////////////////////////////////////
 
   // 담당 딜러
-  const [selectedSellDealer, setSelectedSellDealer] = useState(carSelDetail?.DLR_ID || '');
+  const [selectedSellDealer, setSelectedSellDealer] = useState("");
   const [isSellDealerSelectOpen, setIsSellDealerSelectOpen] = useState(false);
 
   // 판매금액 선택 상태 관리
-  const [sellAmt, setSellAmt] = useState(carSelDetail?.SALE_AMT || '0');
-  const [sellSupPrc, setSellSupPrc] = useState(carSelDetail?.SALE_SUP_PRC || '0');
-  const [sellVat, setSellVat] = useState(carSelDetail?.SALE_VAT || '0');
+  const [sellAmt, setSellAmt] = useState('0');
+  const [sellSupPrc, setSellSupPrc] = useState('0');
+  const [sellVat, setSellVat] = useState('0');
 
   // 매입금액이 변경될 때 공급가액과 부가세 계산
   useEffect(() => {
@@ -200,20 +199,20 @@ export default function SalesRegisterPage({
 
   
   // 판매유형 선택 상태 관리
-  const [selectedSellType, setSelectedSellType] = useState(carSelDetail?.SALE_TP_CD || '');
+  const [selectedSellType, setSelectedSellType] = useState("");
   const [isSellTypeSelectOpen, setIsSellTypeSelectOpen] = useState(false);
 
   // 판매일 선택 상태 관리
-  const [carSaleDt, setCarSaleDt] = useState(carSelDetail?.CAR_SALE_DT || '');
+  const [carSaleDt, setCarSaleDt] = useState('');
 
   // 상사매도비 선택 상태 관리
-  const [agentSelCost, setAgentSelCost] = useState(carSelDetail?.AGENT_SEL_COST || '0');
+  const [agentSelCost, setAgentSelCost] = useState('0');
 
   // 성능보험료 선택 상태 관리
-  const [perfInfeAmt, setPerfInfeAmt] = useState(carSelDetail?.PERF_INFE_AMT || '0');
+  const [perfInfeAmt, setPerfInfeAmt] = useState('0');
 
   // 차량번호(출고) 선택 상태 관리
-  const [outCarNo, setOutCarNo] = useState(carSelDetail?.SALE_CAR_NO || '');
+  const [outCarNo, setOutCarNo] = useState('');
 
   // selectedCar가 변경될 때 차량번호(출고) 초기값 설정
   useEffect(() => {
@@ -223,7 +222,7 @@ export default function SalesRegisterPage({
   }, [selectedCar]);
 
   // 특이사항 선택 상태 관리
-  const [sellMemo, setSellMemo] = useState(carSelDetail?.SALE_DESC || '');
+  const [sellMemo, setSellMemo] = useState('');
 
   // 관련 서류 첨부 상태 관리
   const [attachedSellFiles, setAttachedSellFiles] = useState([]);

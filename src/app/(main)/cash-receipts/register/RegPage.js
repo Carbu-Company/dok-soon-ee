@@ -4,12 +4,6 @@ import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 import Pagination from "@/components/ui/pagination";
-import { 
-  getCashBillList, 
-  getCashBillAmount, 
-  getReceiptIssueList, 
-  getReceiptIssueSummary 
-} from "@/app/(main)/api/carApi";
 
 // ===== 상수 정의 =====
 const TRANSACTION_TYPE = {
@@ -136,24 +130,7 @@ export default function CashReceiptRegisterPage({
           alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
         }
       } else {
-        // searchAction이 없을 때 carApi 사용
-        const searchParamsWithPage = {
-          ...getDefaultParams(pageNum),
-          ...searchParams,
-        };
-
-        const result = await getCashBillList(searchParamsWithPage);
-        
-        if (result.success) {
-          const responseData = result.data?.list || [];
-          const paginationInfo = result.data?.pagination || {};
-
-          setPendingList(responseData);
-          setTotalPages(paginationInfo.totalPages || 1);
-          setCurrentPage(paginationInfo.currentPage || pageNum);
-        } else {
-          alert("검색 중 오류가 발생했습니다: " + (result?.error || "unknown"));
-        }
+        console.error("searchAction이 없습니다.");
       }
     } catch (error) {
       console.error("검색 에러:", error);

@@ -1629,7 +1629,7 @@ export default function SalesVehicleList(props) {
 
                     <ul className="select__menu">
                       <li className="select__option">
-                      <Link href={`/car-sell/edit/${car.CAR_REG_ID}`}>판매차량 수정</Link>
+                      <Link href={`/purchases/edit/${car.CAR_REG_ID}`}>매입 수정</Link>
                       </li>
                       <li className="select__option">
                       <button
