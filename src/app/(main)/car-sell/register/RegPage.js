@@ -78,9 +78,11 @@ export default function SalesRegisterPage({
   }, []); // 빈 의존성 배열로 변경하여 한 번만 실행
 
 
-  // 차량 선택 핸들러
+  // 차량 선택 핸들러  (sbs work - 선택한 차량으로 매입차량 정보 조회)
   const handleCarSelect = (car) => {
     console.log('선택된 차량:', car);
+
+    const carPurDetail = await getCarPurInfo(car.CAR_REG_ID);
     setSelectedCar(car);
     setIsModalOpen(false);
   };

@@ -4,7 +4,7 @@ import RegPage from "@/app/(main)/car-sell/register/RegPage";
 import { getSuggestOne } from "./api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
-export default async function RegisterPage({ searchParams }) {
+export default async function RegisterPage() {
   const cookieStore = await cookies();
   const session = await verifySession(cookieStore.get("session")?.value).catch(console.error);
 
@@ -18,26 +18,8 @@ export default async function RegisterPage({ searchParams }) {
   } 
   */  
 
-  //console.log(session.agentId);
-  
-  // searchParams를 await로 처리
-  const resolvedSearchParams = await searchParams;
-
-  console.log('resolvedSearchParams.carRegId:****' + resolvedSearchParams.carRegId)
-  
-  // URL 파라미터에서 carId를 확인하여 차량 정보 조회
-  let carPurDetail = null;
-  if (resolvedSearchParams?.carRegId) {
-    carPurDetail = await getSuggestOne(resolvedSearchParams.carRegId).catch(error => {
-      console.error('차량 정보 조회 실패:', error);
-      return null; // 에러 발생 시 null 반환
-    });
-  }
-
-  console.log('carPurDetail*********:' + carPurDetail)
-
   // 테스트를 위해 차량 정보를 null로 설정 (모달이 항상 열리도록)
-  // carPurDetail = null;
+  const carPurDetail = null;
 
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록
