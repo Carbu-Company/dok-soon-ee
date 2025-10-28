@@ -22,6 +22,8 @@ export default async function RegisterPage({ searchParams }) {
   
   // searchParams를 await로 처리
   const resolvedSearchParams = await searchParams;
+
+  console.log('resolvedSearchParams.carRegId:****' + resolvedSearchParams.carRegId)
   
   // URL 파라미터에서 carId를 확인하여 차량 정보 조회
   let carPurDetail = null;
@@ -31,6 +33,8 @@ export default async function RegisterPage({ searchParams }) {
       return null; // 에러 발생 시 null 반환
     });
   }
+
+  console.log('carPurDetail*********:' + carPurDetail)
 
   // 테스트를 위해 차량 정보를 null로 설정 (모달이 항상 열리도록)
   // carPurDetail = null;
