@@ -26,7 +26,7 @@ export default async function EditorPage({ params }) {
   const carPurDetail = await getSuggestOne(id);
   const carSelDetail = await getCarSelInfo(id);
 
-  console.log('carPurDetail:', carPurDetail);
+  console.log('carSelDetail.selInfo:', carSelDetail.selInfo);
 
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록
@@ -44,7 +44,7 @@ export default async function EditorPage({ params }) {
                   parkingLocationList={parkingLocationList.data}
                   sellTpList={sellTpList.data}
                   carPurDetail={carPurDetail}
-                  carSelDetail={carSelDetail.carSelInfo}
+                  carSelDetail={carSelDetail.selInfo}
                   carSelFileList={carSelDetail.fileList}
                   carSelCustList={carSelDetail.custList}
    />;

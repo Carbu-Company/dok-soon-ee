@@ -108,10 +108,12 @@ export default function SalesRegisterPage({
       const updatedCustomers = buyerCustomers.map(cust => ({
         ...cust,
         customerName: customer.CUST_NM || '',
-        residentNumber: customer.CUST_NO || '',
+        residentNumber: customer.SSN || '',
+        businessNumber: customer.BRNO || '',
         phone: customer.CUST_PHON || '',
-        address: customer.CUST_ADDR || '',
-        zipCode: customer.CUST_ZIP || ''
+        address: customer.ADDR1 || '',
+        addressDetail: customer.ADDR2 || '',
+        zipCode: customer.ZIP || ''
       }));
       setBuyerCustomers(updatedCustomers);
     }
@@ -133,6 +135,7 @@ export default function SalesRegisterPage({
       residentNumber: '',
       businessNumber: '',
       phone: '',
+      zipCode: '',
       address: '',
       memo: '',
       shareRate: ''
@@ -240,6 +243,7 @@ export default function SalesRegisterPage({
       phone: '',
       zip: '',
       address: '',
+      addressDetail: '',
       memo: '',
       shareRate: ''
     }
