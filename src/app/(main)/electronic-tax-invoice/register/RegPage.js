@@ -6,6 +6,11 @@ import Pagination from "@/components/ui/pagination";
 import Image from "next/image";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 
+/**
+ * 리스트 항목 변경하기. 2025.10.28
+ * 선택	차량명	차량번호	해당딜러	매출항목	거래금액	주문자명	연락처	사업자등록번호	매출일	홈택스처리	발행하기
+ */
+
 export default function ElectronicTaxInvoicePage(props) {
   
   const router = useRouter();
