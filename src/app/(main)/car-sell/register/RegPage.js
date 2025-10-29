@@ -39,8 +39,11 @@ export default function SalesRegisterPage({
   evdcCdList = [], 
   parkingLocationList = [], 
   sellTpList = [],
-  carPurDetail = []
+  carPurInfo = [],
+  searchAction
 }) {
+
+  const [carPurDetail, setCarPurDetail] = useState(carPurInfo);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
@@ -82,11 +85,18 @@ export default function SalesRegisterPage({
   const handleCarSelect = (car) => {
     console.log('선택된 차량:', car);
 
-    const carPurDetail = await getCarPurInfo(car.CAR_REG_ID);
+    // sbs working ...
+    const result = await searchAction(car.carRegId);
+    console.log('서버 액션 응답:', result);
+
+    if (result && result.success) {
+      const responseData = result.data?.purInfo || [];
+
+      setCarPurDetail(responseData);
+    }
     setSelectedCar(car);
     setIsModalOpen(false);
   };
-  
 
   const handleModalClose = () => {
     setIsModalOpen(false);

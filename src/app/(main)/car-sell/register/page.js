@@ -18,8 +18,31 @@ export default async function RegisterPage() {
   } 
   */  
 
+  // Server Action 정의
+  async function getCarPurInfo(carRegId) {
+    "use server";
+    
+    try {
+      const purInfo = await getSuggestOne(carRegId);
+
+      console.log('서버 액션 결과*******************:getSuggestOne' + purInfo);
+
+      return {
+        success: purInfo.success,
+        data: {
+          purInfo: purInfo
+        },
+        error: purInfo.error
+      };
+
+    } catch (error) {
+      console.error('검색 중 오류 발생:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
   // 테스트를 위해 차량 정보를 null로 설정 (모달이 항상 열리도록)
-  const carPurDetail = null;
+  const carPurInfo = null;
 
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록
@@ -36,6 +59,7 @@ export default async function RegisterPage() {
                   evdcCdList={evdcCDList.data}
                   parkingLocationList={parkingLocationList.data}
                   sellTpList={sellTpList.data}
-                  carPurDetail={carPurDetail}
-   />;
+                  carPurInfo={carPurInfo}
+                  searchAction={getCarPurInfo}
+  />;
 }

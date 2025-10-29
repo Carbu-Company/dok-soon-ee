@@ -7,7 +7,13 @@ import { getAcqTax } from '@/app/(main)/common/script.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 import CarSearchModal from "@/components/modal/CarSearchModal"
 
-export default function RegPage({ session = null, dealerList = [], carKndList = [], evdcCdList = [], parkingLocationList = [], carPurDetail = [] }) {
+export default function RegPage({ 
+  session = null, 
+  dealerList = [], 
+  carKndList = [], 
+  evdcCdList = [], 
+  parkingLocationList = [], 
+  carPurDetail = [] }) {
 
   // 매입딜러 선택 상태 관리 (콤보 박스)
   const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
