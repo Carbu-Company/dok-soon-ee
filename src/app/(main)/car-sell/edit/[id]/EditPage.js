@@ -39,8 +39,10 @@ export default function SalesRegisterPage({
   evdcCdList = [], 
   parkingLocationList = [], 
   sellTpList = [],
-  carPurDetail = [],
-  carSelDetail = []
+  carPurDetail = {},
+  carSelDetail = {},
+  carSelFileList = [],
+  carSelCustList = []
 }) {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
