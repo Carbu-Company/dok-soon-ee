@@ -5,6 +5,13 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 import Pagination from "@/components/ui/pagination";
 
+
+
+/**
+ * 리스트 항목 변경하기. 2025.10.28
+ * 선택 매출일	차량명	차량번호	해당딜러	매출항목	거래금액	주문자명	연락처	거래유형	식별번호	제외처리	발행하기
+ */
+
 // ===== 상수 정의 =====
 const TRANSACTION_TYPE = {
   INCOME_DEDUCTION: '01',  // 소득공제용
