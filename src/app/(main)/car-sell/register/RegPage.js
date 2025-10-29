@@ -86,7 +86,7 @@ export default function SalesRegisterPage({
     console.log('선택된 차량:', car);
 
     // sbs working ...
-    const result = await searchAction(car.carRegId);
+    const result = await searchAction(car.CAR_REG_ID);
     console.log('서버 액션 응답:', result);
 
     if (result && result.success) {
