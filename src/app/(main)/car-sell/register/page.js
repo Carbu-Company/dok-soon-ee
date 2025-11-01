@@ -4,7 +4,7 @@ import RegPage from "@/app/(main)/car-sell/register/RegPage";
 import { getSuggestOne } from "./api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
-export default async function RegisterPage() {
+export default async function RegisterPage({ searchParams }) {
   const cookieStore = await cookies();
   const session = await verifySession(cookieStore.get("session")?.value).catch(console.error);
 
@@ -18,6 +18,9 @@ export default async function RegisterPage() {
   } 
   */  
 
+  // searchParams를 await로 처리
+  const resolvedSearchParams = await searchParams;
+
   // Server Action 정의
   async function getCarPurInfo(carRegId) {
     "use server";
@@ -25,7 +28,7 @@ export default async function RegisterPage() {
     try {
       const purInfo = await getSuggestOne(carRegId);
 
-      console.log('서버 액션 결과*******************:getSuggestOne' + purInfo);
+      console.log('서버 액션 결과*******************:getSuggestOne', purInfo);
 
       return {
         success: purInfo.success,
@@ -41,8 +44,16 @@ export default async function RegisterPage() {
     }
   }
 
-  // 테스트를 위해 차량 정보를 null로 설정 (모달이 항상 열리도록)
-  const carPurInfo = null;
+  // URL 파라미터에서 carRegId를 확인하여 차량 정보 조회
+  let carPurInfo = null;
+  if (resolvedSearchParams?.carRegId) {
+    console.log('URL에서 carRegId 발견:', resolvedSearchParams.carRegId);
+    carPurInfo = await getSuggestOne(resolvedSearchParams.carRegId).catch(error => {
+      console.error('차량 정보 조회 실패:', error);
+      return null; // 에러 발생 시 null 반환
+    });
+    console.log('조회된 차량 정보:', carPurInfo);
+  }
 
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록

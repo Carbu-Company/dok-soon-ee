@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import CarSearchModal from "@/components/modal/CarSearchModal";
 import CustSearchModal from "@/components/modal/CustSearchModal";
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '@/lib/util.js'
@@ -42,6 +42,8 @@ export default function SalesRegisterPage({
   carPurInfo = [],
   searchAction
 }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [carPurDetail, setCarPurDetail] = useState(carPurInfo);
 
@@ -52,37 +54,59 @@ export default function SalesRegisterPage({
 
   console.log(sellTpList);
 
-  // URL 파라미터를 확인해서 모달을 자동으로 열기
+  // URL 파라미터에서 carRegId를 확인하여 차량 정보 로드
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      const openModal = urlParams.get("openModal");
-
-      if (openModal === "true") {
-        setIsModalOpen(true);
-      }
+    const carRegId = searchParams.get('carRegId');
+    
+    if (carRegId && searchAction) {
+      console.log('URL에서 carRegId 발견:', carRegId);
+      // carRegId로 차량 정보를 조회
+      const loadCarInfo = async () => {
+        try {
+          const result = await searchAction(carRegId);
+          console.log('차량 정보 로드 결과:', result);
+          
+          if (result && result.success) {
+            const responseData = result.data?.purInfo || [];
+            setCarPurDetail(responseData);
+            console.log('차량 정보 설정 완료');
+          }
+        } catch (error) {
+          console.error('차량 정보 로드 실패:', error);
+        }
+      };
+      
+      loadCarInfo();
     }
-  }, []);
+  }, [searchParams, searchAction]);
 
-  // 페이지 로드 시 모달 자동 열기 (한 번만 실행)
+  // 페이지 로드 시 모달 자동 열기 (차량 정보가 없을 때만)
   useEffect(() => {
     console.log('=== RegPage useEffect 실행 ===');
     console.log('session:', session);
     console.log('session?.agentId:', session?.agentId);
     console.log('carPurDetail:', carPurDetail);
     
-    // 차량 정보가 없으면 모달을 자동으로 열기 (페이지 로드 시에만)
+    const carRegId = searchParams.get('carRegId');
+    
+    // URL에 carRegId가 있으면 모달을 열지 않음
+    if (carRegId) {
+      console.log('URL에 carRegId가 있음 - 모달 열지 않음');
+      return;
+    }
+    
+    // 차량 정보가 없으면 모달을 자동으로 열기
     if (!carPurDetail || !carPurDetail.CAR_REG_ID) {
       console.log('차량 정보 없음 - 모달 열기');
       setIsModalOpen(true);
     } else {
       console.log('차량 정보 있음 - 모달 열지 않음');
     }
-  }, []); // 빈 의존성 배열로 변경하여 한 번만 실행
+  }, [carPurDetail, searchParams]); // carPurDetail과 searchParams 의존성 추가
 
 
   // 차량 선택 핸들러  (sbs work - 선택한 차량으로 매입차량 정보 조회)
-  const handleCarSelect = (car) => {
+  const handleCarSelect = async (car) => {
     console.log('선택된 차량:', car);
 
     // sbs working ...

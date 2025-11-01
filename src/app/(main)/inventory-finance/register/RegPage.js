@@ -78,11 +78,26 @@ export default function InventoryFinanceRegisterPage({
   const [loanMemo, setLoanMemo] = useState('');
 
   useEffect(() => {
+    // URL에서 carRegId가 있으면 해당 차량 정보를 로드
+    const carRegId = searchParams.get("carRegId");
+    
+    if (carRegId) {
+      console.log('URL에서 carRegId 발견:', carRegId);
+      // carRegId가 있으면 모달을 열지 않고 차량 정보를 설정
+      // 실제로는 API를 호출해서 차량 정보를 가져와야 하지만
+      // 여기서는 carRegId만으로 selectedCar를 설정
+      setSelectedCar({ CAR_REG_ID: carRegId });
+      return;
+    }
+    
     // URL 쿼리 파라미터에서 showModal이 true이면 모달을 열기
     if (searchParams.get("showModal") === "true") {
       setIsModalOpen(true);
+    } else if (!carPurDetail || !carPurDetail.CAR_REG_ID) {
+      // 차량 정보가 없으면 모달을 자동으로 열기
+      setIsModalOpen(true);
     }
-  }, [searchParams]);
+  }, [searchParams, carPurDetail]);
 
   const handleModalClose = () => {
     setIsModalOpen(false);

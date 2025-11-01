@@ -253,6 +253,10 @@ export const getMgtKey = async (params = {}) => {
 export const getCDList = (grpCD) => apiGet("getCDList", { grpCD });
 export const getCustomerList = (params) => apiGet("getCustomerList", params);
 
+/* -------------------------------- 차량 검색 -------------------------------- */
+export const getCarSearchList = (agentId, carNo) => 
+  apiGet("getCarSearchList", { agentId, carNo });
+
 /* -------------------------------- 팝빌 API -------------------------------- */
 
 /* 현금영수증 */

@@ -21,6 +21,29 @@ export default async function RegisterPage({ searchParams }) {
 
   // searchParams를 await로 처리
   const resolvedSearchParams = await searchParams;
+
+  // Server Action 정의
+  async function getCarPurInfo(carRegId) {
+    "use server";
+    
+    try {
+      const purInfo = await getSuggestOne(carRegId);
+
+      console.log('서버 액션 결과*******************:getSuggestOne' + purInfo);
+
+      return {
+        success: purInfo.success,
+        data: {
+          purInfo: purInfo
+        },
+        error: purInfo.error
+      };
+
+    } catch (error) {
+      console.error('검색 중 오류 발생:', error);
+      return { success: false, error: error.message };
+    }
+  }
   
   // URL 파라미터에서 carId를 확인하여 차량 정보 조회
   let carPurDetail = null;
