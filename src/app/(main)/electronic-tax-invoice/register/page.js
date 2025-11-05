@@ -1,18 +1,18 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import RegPage from "@/app/(main)/electronic-tax-invoice/register/RegPage";
-import { getCarTaxList, getCarTaxSummary } from "./api";
+import { getTradeIssueList, getTradeIssueSummary } from "@/app/(main)/electronic-tax-invoice/register/api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
 // Server Action 정의
-async function searchCarTaxList(searchParamsWithPage) {
+async function searchTradeIssueList(searchParamsWithPage) {
   "use server";
-  
+
   try {
-    const result = await getCarTaxList(searchParamsWithPage);
+    const result = await getTradeIssueList(searchParamsWithPage);
 
     console.log('서버 액션 결과*******************:', { 
-      carTaxListLength: result?.data?.carTaxList?.length, 
+      tradeIssueListLength: result?.data?.carlist?.length, 
       totalCount: result?.data?.pagination?.totalCount,
       page: searchParamsWithPage.page,
       pageSize: searchParamsWithPage.pageSize 
@@ -27,11 +27,11 @@ async function searchCarTaxList(searchParamsWithPage) {
 
 
 // Server Action 정의
-async function searchCarTaxSummary(searchParamsWithPage) {
+async function searchTradeIssueSummary(searchParamsWithPage) {
   "use server";
   
   try {
-    const result = await getCarTaxSummary(searchParamsWithPage);
+    const result = await getTradeIssueSummary(searchParamsWithPage);
 
     return result;
   } catch (error) {
@@ -42,13 +42,13 @@ async function searchCarTaxSummary(searchParamsWithPage) {
 
 
 // Server Action 정의
-async function searchCarTaxListAndSummary(searchParamsWithPage) {
+async function searchTradeIssueListAndSummary(searchParamsWithPage) {
   "use server";
   
   try {
     const [listResult, summaryResult] = await Promise.all([
-      getCarTaxList(searchParamsWithPage),
-      getCarTaxSummary(searchParamsWithPage)
+      getTradeIssueList(searchParamsWithPage),
+      getTradeIssueSummary(searchParamsWithPage)
     ]);
 
     return {
@@ -101,21 +101,22 @@ export default async function CarTaxList() {
     dtlNtsNo: '',
     dtlMemo: '',
     orderItem: '01', // 발행일
-    ordAscDesc: 'desc'
+    ordAscDesc: 'desc',
+    taxGubun: '001'      // 004: 현금영수증, 001: 전자세금계산서
   };
 
-  const carTaxList = await searchCarTaxList({ ...defaultParams, ...searchParams });
+  const tradeIssueList = await searchTradeIssueList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
   const saleItemList = await getCDList('21');   // 매출품명목록
   const crStatList = await getCDList('22');   // 현금영수증 전송 상태 목록 
-  const carTaxSummary = await searchCarTaxSummary({ ...defaultParams, ...searchParams });
+  const tradeIssueSummary = await searchTradeIssueSummary({ ...defaultParams, ...searchParams });
 
   return <RegPage session={session}
-                   carList={carTaxList}
+                   carList={tradeIssueList}
                    dealerList={dealerList.data}
                    saleItemList={saleItemList.data}
                    crStatList={crStatList.data}
-                   searchAction={searchCarTaxListAndSummary}
-                   carSummary={carTaxSummary}
+                   searchAction={searchTradeIssueListAndSummary}
+                   tradeIssueSummary={tradeIssueSummary}
    />;
 }

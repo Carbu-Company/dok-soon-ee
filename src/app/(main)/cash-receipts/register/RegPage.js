@@ -520,31 +520,37 @@ export default function CashReceiptRegisterPage({
 
         <table className="table">
           <colgroup>
-            <col style={{ width: "80px" }} />
-            <col style={{ width: "100px" }} />
-            <col style={{ width: "200px" }} />
-            <col style={{ width: "300px" }} />
-            <col style={{ width: "100px" }} />
-            <col style={{ width: "320px" }} />
+            <col style={{ width: "50px" }} />
+            <col style={{ width: "50px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "180px" }} />
             <col style={{ width: "100px" }} />
             <col style={{ width: "120px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "120px" }} />
+            <col style={{ width: "130px" }} />
             <col style={{ width: "auto" }} />
+            <col style={{ width: "150px" }} />
             <col style={{ width: "120px" }} />
-            <col style={{ width: "80px" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "100px" }} />
           </colgroup>
           <thead>
             <tr>
+              <th>번호</th>
               <th>선택</th>
-              <th>문서</th>
-              <th>거래일시</th>
-              <th>국세청승인번호</th>
-              <th>거래구분</th>
-              <th>식별번호</th>
-              <th>고객명</th>
+              <th>매출일</th>
+              <th>차량명</th>
+              <th>차량번호</th>
               <th>담당딜러</th>
-              <th>품명</th>
+              <th>매출항목</th>
               <th>거래금액</th>
-              <th>상태</th>
+              <th>주문자명</th>
+              <th>연락처</th>
+              <th>거래유형</th>
+              <th>식별번호</th>
+              <th>제외처리</th>
+              <th>발행하기</th>
             </tr>
           </thead>
           <tbody>
@@ -552,6 +558,7 @@ export default function CashReceiptRegisterPage({
               const isSelected = selectedItems.some(selected => selected.index === index);
               return (
                 <tr key={index} className={isSelected ? 'table__row--selected' : ''}>
+                  <td>{index + 1}</td>
                   <td>
                     <div className="form-option form-option--icon">
                       <label className="form-option__label">
@@ -565,16 +572,18 @@ export default function CashReceiptRegisterPage({
                       </label>
                     </div>
                   </td>
-                  <td>{item.TRADE_SCT_NM}</td>
-                  <td>{item.TRADE_DT}</td>
-                  <td>{item.NTS_CONF_NO}</td>
+                  <td>{item.CAR_DT}</td>
+                  <td>{item.CAR_NM}</td>
+                  <td>{item.CAR_NO}</td>
+                  <td>{item.DLR_NM}</td>
+                  <td>{item.TRADE_ITEM_NM}</td>
+                  <td>{item.TRADE_ITEM_AMT?.toLocaleString()}</td>
+                  <td>{item.CUST_NM}</td>
+                  <td>{item.CUST_PHON}</td>
                   <td>{item.TRADE_TP_NM}</td>
                   <td>{item.RCGN_NO}</td>
-                  <td>{item.CUST_NM}</td>
-                  <td>{item.DLR_NM}</td>
-                  <td>{item.CAR_NM} {item.CAR_NO}</td>
-                  <td>{item.TRADE_AMT}</td>
-                  <td>{item.CR_TRNS_STAT_NM}</td>
+                  <td><button className="btn btn--primary">제외하기</button></td>
+                  <td><button className="btn btn--primary">발행하기</button></td>
                 </tr>
               );
             })}

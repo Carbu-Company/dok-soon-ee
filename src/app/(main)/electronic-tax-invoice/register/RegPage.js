@@ -1,5 +1,5 @@
 'use client'
-import { useRouter } from "next/navigation";
+import { ServerInsertedHTMLContext, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
@@ -22,6 +22,7 @@ export default function ElectronicTaxInvoicePage(props) {
   // props 값 가져오기
   const [loading, setLoading] = useState(false);
 
+
   // 초기 데이터: 서버에서 전달된 데이터 구조 처리
   const initialCarListData = props.carList?.data?.carlist || [];
   const initialPagination = props.carList?.data?.pagination || {};
@@ -30,6 +31,8 @@ export default function ElectronicTaxInvoicePage(props) {
   const initialCarTaxSummary = props.carSummary?.data || [];
 
   const [carList, setCarList] = useState(initialCarListData);
+    
+  const [selectedItems, setSelectedItems] = useState([]);
   const [pagination, setPagination] = useState(initialPagination);
   const [totalPages, setTotalPages] = useState(initialPagination.totalPages || 1);
 
@@ -314,6 +317,24 @@ export default function ElectronicTaxInvoicePage(props) {
   const handlePageChange = async page => {
     await handleSearch(page);
   };
+
+  // 아이템 선택/해제 핸들러
+  const handleItemSelect = (item, index) => {
+    setSelectedItems(prev => {
+      // 인덱스로만 비교하여 다중 선택 가능하도록 수정
+      const isSelected = prev.some(selected => selected.index === index);
+      
+      if (isSelected) {
+        // 선택 해제
+        return prev.filter(selected => selected.index !== index);
+      } else {
+        // 선택 추가
+        const itemId = `${index}_${item.CAR_REG_ID || item.NTS_CONF_NO || index}`;
+        return [...prev, { ...item, index, itemId }];
+      }
+    });
+  };
+
 
   const openModal = (id) => {
     if (typeof window !== "undefined" && window.openModal) {
@@ -1426,115 +1447,71 @@ export default function ElectronicTaxInvoicePage(props) {
   
           <table className="table">
             <colgroup>
-              <col style={{ width: "auto" }} />
-              {/* --> */}
-              <col style={{ width: "80px" }} />
-              <col style={{ width: "120px" }} />
-              <col style={{ width: "120px" }} />
-              <col style={{ width: "auto" }} />
-              {/*거래처명*/}
-  
-              <col style={{ width: "200px" }} />
-              <col style={{ width: "150px" }} />
-              <col style={{ width: "auto" }} />
-              {/*품목명*/}
-  
-              <col style={{ width: "130px" }} />
-              <col style={{ width: "130px" }} />
-              <col style={{ width: "130px" }} />
-              <col style={{ width: "100px" }} />
-  
-              <col style={{ width: "100px" }} />
-              <col style={{ width: "100px" }} />
+            <col style={{ width: "50px" }} />
+            <col style={{ width: "50px" }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "120px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "120px" }} />
+            <col style={{ width: "130px" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "100px" }} />
             </colgroup>
             <thead>
               <tr>
-                <th>
-                  차량정보
-                  <div className="tooltip">
-                    <button className="jsTooltipBtn tooltip__btn btn btn--ico"><span className="ico ico--help">보기</span></button>
-                    <div className="tooltip__box">
-                      <p>차량번호 / 담당딜러 / 차량명 / 매입일 / 매입금액</p>
-                    </div>
-                  </div>
-                </th>
-                <th>문서</th>
-                <th>작성일자</th>
-                <th>발행일자</th>
-                <th>거래처</th>
-                <th>등록번호</th>
-                <th>판매딜러</th>
-                <th>품목명</th>
-                <th>공급가액</th>
-                <th>세액</th>
-                <th>합계금액</th>
-                <th>상태</th>
-                <th>바로가기</th>
-                <th>보기</th>
+                <th>No</th>
+                <th>선택</th>
+                <th>차량명</th>
+                <th>차량번호</th>
+                <th>해당딜러</th>
+                <th>매출항목</th>
+                <th>거래금액</th>
+                <th>주문자명</th>
+                <th>연락처</th>
+                <th>사업자등록번호</th>
+                <th>매출일</th>
+                <th>홈택스처리</th>
+                <th>발행하기</th>
               </tr>
             </thead>
             <tbody>
-              {carList.map((item, index) => (
-              <tr key={item.TAX_MGMTKEY}>
-                <td>{item.CAR_NO} / {item.DLR_NM} / {item.CAR_NM} / {item.CAR_PUR_DT} / {item.PUR_AMT?.toLocaleString()}</td>
-                <td>일반</td>
-                <td>{item.MK_DT}</td>
-                <td>{item.TRADE_DTIME}</td>
-                <td>{item.BUYR_MTL_NM}</td>
-                <td>{item.BUYR_BRNO}</td>
-                <td>{item.SEL_DLR_NM}</td>
-                <td>{item.ITEM_NM}</td>
-                <td>{item.TOT_SUP_PRC?.toLocaleString()}</td>
-                <td>{item.TOT_VAT?.toLocaleString()}</td>
-                <td>{item.TOT_AMT?.toLocaleString()}</td>
-                <td>{item.TXBL_TRNS_STAT_NM}</td>
-  
-                <td>
-                  <div className="input-group input-group--sm input-group--center">
-                    <div className="select select--utils">
-                      <button type="button" className="select__toggle">더보기</button>
-  
-                      <ul className="select__menu">
-                        <li className="select__option">
-                          <a href="#">계산서인쇄</a>
-                        </li>
-                        <li className="select__option">
-                          <a href="#">알림톡전송</a>
-                        </li>
-                        <li className="select__option">
-                          <a href="#">메일전송</a>
-                        </li>
-                        <li className="select__option">
-                          <a href="#">Fax전송</a>
-                        </li>
-                        <li className="select__option">
-                          <a
-                            href="#"
-                            onClick={() => {
-                              if (typeof window !== 'undefined' && typeof (window.openModal) === 'function') {
-                                window.openModal('1');
-                              }
-                            }}
-                          >
-                            취소발행
-                          </a>
-                        </li>
-                      </ul>
+            {carList.map((item, index) => {
+              const isSelected = selectedItems.some(selected => selected.index === index);
+              return (
+                <tr key={index} className={isSelected ? 'table__row--selected' : ''}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <div className="form-option form-option--icon">
+                      <label className="form-option__label">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleItemSelect(item, index)}
+                          className="form-option__checkbox--round"
+                        />
+                        <span className="form-option__title">선택</span>
+                      </label>
                     </div>
-                  </div>
-                </td>
-                <td>
-                  <button
-                    type="button"
-                    className="btn btn--light btn--sm"
-                    onClick={() => router.push(`/detail/electronic-tax-invoice/${item.TAX_MGMTKEY}`)}
-                  >
-                    상세보기
-                  </button>
-                </td>
-              </tr>
-              ))}
-            </tbody>
+                  </td>
+                  <td>{item.CAR_NM}</td>
+                  <td>{item.CAR_NO}</td>
+                  <td>{item.DLR_NM}</td>
+                  <td>{item.TRADE_ITEM_NM}</td>
+                  <td>{item.TRADE_ITEM_AMT?.toLocaleString()}</td>
+                  <td>{item.CUST_NM}</td>
+                  <td>{item.CUST_PHON}</td>
+                  <td>{item.CUST_BRNO}</td>
+                  <td>{item.CAR_DT}</td>
+                  <td><button className="btn btn--primary">제외하기</button></td>
+                  <td><button className="btn btn--primary">발행하기</button></td>
+                </tr>
+              );
+            })}
+          </tbody>
           </table>
   
           <Pagination
