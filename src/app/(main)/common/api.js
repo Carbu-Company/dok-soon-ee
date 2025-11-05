@@ -35,3 +35,14 @@ export async function getCompanyLoanLimit(agentId) {
     return { success: false, data: [], error: error.message };
   }
 }
+
+
+export async function getAgentPurCst(agentId) {
+  try {
+    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getAgentPurCst?agentId=${agentId}`).then(res => res.json());
+    return { success: true, data, error: null };
+  } catch (error) {
+    console.error("getAgentPurCst Error:", error);
+    return { success: false, data: [], error: error.message };
+  }
+}

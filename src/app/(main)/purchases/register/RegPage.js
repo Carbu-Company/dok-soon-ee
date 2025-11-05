@@ -13,7 +13,8 @@ export default function RegPage({
   carKndList = [], 
   evdcCdList = [], 
   parkingLocationList = [], 
-  carPurDetail = [] }) {
+  carPurDetail = [], 
+  purCst = '0' }) {
 
   // 매입딜러 선택 상태 관리 (콤보 박스)
   const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
@@ -58,9 +59,8 @@ export default function RegPage({
       setPurVat(0);
     }
   }, [purAmt]);
-
   // 상사매입비 
-  const [agentPurCst, setAgentPurCst] = useState('0');
+  const [agentPurCst, setAgentPurCst] = useState(purCst || '0');
 
   // 매입일 선택 상태 관리
   const [carPurDt, setCarPurDt] = useState('');
@@ -170,10 +170,10 @@ export default function RegPage({
         setGainTax(taxAmount);
 
         const carKndValue = carKndCd.split('|')[1];
-        setAgentPurCst(carKndValue);
+        setAgentPurCst(purCst);
       }
       else {
-        setAgentPurCst('0');
+        setAgentPurCst(purCst);
         setGainTax('0');
       }
     }

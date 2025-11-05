@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import RegPage from "@/app/(main)/purchases/register/RegPage";
-import { getDealerList, getCDList } from "@/app/(main)/common/api";
+import { getDealerList, getCDList, getAgentPurCst } from "@/app/(main)/common/api";
 
 export default async function RegisterPage() {
   const cookieStore = await cookies();
@@ -23,10 +23,15 @@ export default async function RegisterPage() {
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록
   const carKndList = await getCDList('92');   // 차량 종류 코드 목록
 
+  // 상사 매입비 값 가져오기.
+  const purCst = await getAgentPurCst(session.agentId);
+  console.log('purCst', purCst.data.TRADE_ITEM_AMT);
+
   return <RegPage session={session}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
                    parkingLocationList={parkingLocationList.data}
                    carKndList={carKndList.data}
+                   purCst={purCst.data.TRADE_ITEM_AMT}
    />;
 }
