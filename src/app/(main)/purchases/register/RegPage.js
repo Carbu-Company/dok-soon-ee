@@ -14,6 +14,7 @@ export default function RegPage({
   evdcCdList = [], 
   parkingLocationList = [], 
   carPurDetail = [], 
+  cstTypeCdList = [], 
   purCst = '0' }) {
 
   // 매입딜러 선택 상태 관리 (콤보 박스)
@@ -28,6 +29,10 @@ export default function RegPage({
   const [isEvdcCdSelectOpen, setIsEvdcCdSelectOpen] = useState(false);
   const [evdcCd, setEvdcCd] = useState('');
 
+  // 비용 발급 코드 선택 상태 관리 (콤보 박스)
+  const [isCstTypeCdSelectOpen, setIsCstTypeCdSelectOpen] = useState(false);
+  const [cstTypeCd, setCstTypeCd] = useState('');
+    
   // 주차위치 선택 상태 관리 (콤보 박스)
   const [isParkingCdSelectOpen, setIsParkingCdSelectOpen] = useState(false);
   const [parkingCd, setParkingCd] = useState('');
@@ -268,6 +273,7 @@ export default function RegPage({
     console.log('carPurDt', carPurDt);    // 매입일
     console.log('agentPurCst', agentPurCst);    // 상사매입비
     console.log('brokerageDate', brokerageDate);    // 상사매입비 입금일
+    console.log('cstTypeCd', cstTypeCd);    // 비용 발급 코드
     console.log('carRegDt', carRegDt);    // 이전일
     console.log('txblIssuDt', txblIssuDt);    // 발행일
     console.log('carNo', carNo);    // 차량번호(매입후)
@@ -385,7 +391,8 @@ export default function RegPage({
       purVat,                                                    // 부가세
       carPurDt,                                                  // 매입일   
       agentPurCst,                                               // 상사매입비
-      brokerageDate,                                             // 상사매입비 입금일
+      brokerageDate,                                             // 상사매입비 입금일'
+      cstTypeCd,                                                 // 비용 발급 코드
       gainTax,                                                   // 취득세
       carNm,                                                     // 차량명
       carNo,                                                     // 차량번호(매입후)
@@ -611,6 +618,47 @@ export default function RegPage({
                       onChange={(e) => setBrokerageDate(e.target.value)}
                       value={brokerageDate || ''} 
                     />
+                  </div>
+
+                  <div className="select w120">
+                    <input 
+                      className="select__input" 
+                      type="hidden" 
+                      name="carKndCd" 
+                      value={cstTypeCd || ''} 
+                    />
+                    <button 
+                      className="select__toggle" 
+                      type="button"
+                      onClick={() => setIsCstTypeCdSelectOpen(!isCstTypeCdSelectOpen)}
+                    >
+                      <span className="select__text">
+                        {cstTypeCd ? cstTypeCdList.find(c => c.CD === cstTypeCd)?.CD_NM || '해당없음' : '해당없음'}
+                      </span>
+                      <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
+                    </button>
+                    <ul className="select__menu" style={{ display: isCstTypeCdSelectOpen ? 'block' : 'none' }}>
+                      <li 
+                        key="default-cstType"
+                        className={`select__option ${!cstTypeCd ? 'select__option--selected' : ''}`}
+                        data-value="000"
+                        onClick={() => {
+                          setCstTypeCd('');
+                          setIsCstTypeCdSelectOpen(false);
+                        }}
+                      >해당없음</li>
+                      {cstTypeCdList && cstTypeCdList.map((cstType) => (
+                        <li 
+                          key={`cstType-${cstType.CD}`}
+                          className={`select__option ${cstTypeCd === cstType.CD ? 'select__option--selected' : ''}`}
+                          data-value={`${cstType.CD}`}
+                          onClick={() => {
+                            setCstTypeCd(`${cstType.CD}`);
+                            setIsCstTypeCdSelectOpen(false);
+                          }}
+                        >{cstType.CD_NM}</li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </td>

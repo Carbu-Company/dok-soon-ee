@@ -22,6 +22,7 @@ export default async function RegisterPage() {
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록
   const carKndList = await getCDList('92');   // 차량 종류 코드 목록
+  const cstTypeCdList = await getCDList('29');   // 비용 발급 코드 목록
 
   // 상사 매입비 값 가져오기.
   const purCst = await getAgentPurCst(session.agentId);
@@ -32,6 +33,7 @@ export default async function RegisterPage() {
                    evdcCdList={evdcCDList.data}
                    parkingLocationList={parkingLocationList.data}
                    carKndList={carKndList.data}
+                   cstTypeCdList={cstTypeCdList.data}
                    purCst={purCst.data.TRADE_ITEM_AMT}
    />;
 }
