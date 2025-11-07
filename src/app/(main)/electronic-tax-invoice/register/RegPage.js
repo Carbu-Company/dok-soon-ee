@@ -434,7 +434,7 @@ export default function ElectronicTaxInvoicePage(props) {
     return (
       <main className="container container--page">
         <div className="container__head">
-          <h2 className="container__title">전자세금계산서 관리</h2>
+          <h2 className="container__title">전자세금계산서 발행</h2>
   
           <div className="guidebox">
             <p className="guidebox__title">매도처리 후 매출증빙과 연계 필요(1:1)</p>
@@ -1310,7 +1310,7 @@ export default function ElectronicTaxInvoicePage(props) {
         </div>
   
         <div className="table-wrap">
-          <h2 className="table-wrap__title">발행 리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span></h2>
+          <h2 className="table-wrap__title">발행대상 리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span></h2>
           <div className="table-wrap__head table-wrap__title">
             <button
               type="button"
@@ -1482,7 +1482,7 @@ export default function ElectronicTaxInvoicePage(props) {
             {carList.map((item, index) => {
               const isSelected = selectedItems.some(selected => selected.index === index);
               return (
-                <tr key={index} className={isSelected ? 'table__row--selected' : ''}>
+                <tr key={item.TRADE_SEQ} className={isSelected ? 'table__row--selected' : ''}>
                   <td>{index + 1}</td>
                   <td>
                     <div className="form-option form-option--icon">

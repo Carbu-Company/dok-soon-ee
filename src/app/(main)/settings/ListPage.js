@@ -340,7 +340,7 @@ export default function SettingsPage(props) {
           {/* 상사 정보 관리 탭 */}
           {activeTab === 'company-info' && (
             <CompanyInfo 
-              agentInfo={agentInfo}
+            companyInfo={agentInfo}
               emailDomains={emailDomains}
               onCompanyInfoChange={handleCompanyInfoChange}
               loading={loading}

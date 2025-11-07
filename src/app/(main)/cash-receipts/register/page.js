@@ -129,7 +129,8 @@ export default async function CashReceiptRegister() {
       saleItemList={saleItemList.data || []}
       crStatList={crStatList.data || []}
       pagination={tradeIssueList.data?.pagination || {}}
-      searchAction={searchTradeIssueList}
+      searchAction={searchTradeIssueListAndSummary}
+      tradeIssueSummary={tradeIssueSummary}
     />
   );
 }

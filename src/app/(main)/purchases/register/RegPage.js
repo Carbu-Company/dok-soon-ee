@@ -575,21 +575,21 @@ export default function RegPage({
 
               <th>매입일</th>
               <td>
-                  <div className="input-group">
-                    <div className="input w200">
-                      <input 
-                        type="date" 
-                        className="input__field" 
-                        placeholder="매입일" 
-                        autoComplete="off"
-                        name='carPurDt'
-                        onChange={(e) => setCarPurDt(e.target.value)}
-                        value={carPurDt || ''} 
-                      />
-                    </div>
-                    <span className="input-help">조합전산 제시일</span>
+                <div className="input-group">
+                  <div className="input w200">
+                    <input 
+                      type="date" 
+                      className="input__field" 
+                      placeholder="매입일" 
+                      autoComplete="off"
+                      name='carPurDt'
+                      onChange={(e) => setCarPurDt(e.target.value)}
+                      value={carPurDt || ''} 
+                    />
                   </div>
-                </td>
+                  <span className="input-help">조합전산 제시일</span>
+                </div>
+              </td>
               <th>상사매입비</th>
               <td>
                 <div className="input-group input-group--sm">

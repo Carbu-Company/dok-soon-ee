@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 import Pagination from "@/components/ui/pagination";
@@ -32,7 +33,8 @@ export default function CashReceiptRegisterPage({
   crTradeTypeList = [],
   carList = [],
   pagination = {},
-  searchAction
+  searchAction,
+  tradeIssueSummary = []
 }) {
 
   const router = useRouter();
@@ -496,7 +498,7 @@ export default function CashReceiptRegisterPage({
       <div className="table-wrap">
         <div className="table-wrap__head">
           <h2 className="table-wrap__title">
-            발행대상 목록<span>Total {pagination?.totalCount || pendingList?.length || 0}건</span>
+            발행대상 리스트<span>Total {pagination?.totalCount || pendingList?.length || 0}건</span>
           </h2>
           <div className="input-group">
             <button
@@ -583,7 +585,20 @@ export default function CashReceiptRegisterPage({
                   <td>{item.TRADE_TP_NM}</td>
                   <td>{item.RCGN_NO}</td>
                   <td><button className="btn btn--primary">제외하기</button></td>
-                  <td><button className="btn btn--primary">발행하기</button></td>
+                  <td>
+                    <button
+                      type="button"
+                      className="btn btn--light btn--sm"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <Link
+                        href={`/cash-receipts/issue/${item.TRADE_SEQ}`}
+                        onClick={e => e.stopPropagation()}
+                      >
+                        발행하기
+                      </Link>
+                    </button>
+                  </td>
                 </tr>
               );
             })}
