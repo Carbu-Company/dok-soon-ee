@@ -1,7 +1,6 @@
 export const getCashIssueInfo  = async (tradeSeq) => {
     try {
 
-
         console.log('tradeSeq******************', tradeSeq);
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCashIssueInfo?tradeSeq=${tradeSeq}`, {
             method: 'GET',

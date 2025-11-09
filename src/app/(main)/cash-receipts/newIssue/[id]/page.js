@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import IssuePage from "@/app/(main)/cash-receipts/issue/[id]/IssuePage";
-import { getCashIssueInfo } from "@/app/(main)/cash-receipts/issue/[id]/api";
+import IssuePage from "@/app/(main)/cash-receipts/newIssue/[id]/IssuePage";
+import { getCashIssueInfo } from "@/app/(main)/cash-receipts/newIssue/[id]/api";
 
 export default async function RegisterPage({ params }) {
   const cookieStore = await cookies();

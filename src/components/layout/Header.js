@@ -598,6 +598,11 @@ export default function Header({ session }) {
                   발행 리스트
                 </Link>
               </li>
+              <li className="select__option">
+                <Link href="/cash-receipts/newIssue" className="select__option-link">
+                  건별 발행행
+                </Link>
+              </li>
             </ul>
           </div>
           {/* 전자세금계산서 드롭다운 */}
@@ -621,6 +626,11 @@ export default function Header({ session }) {
               <li className="select__option">
                 <Link href="/electronic-tax-invoice/list" className="select__option-link">
                   발행 리스트
+                </Link>
+              </li>
+              <li className="select__option">
+                <Link href="/electronic-tax-invoice/newIssue" className="select__option-link">
+                  건별 발행행
                 </Link>
               </li>
             </ul>

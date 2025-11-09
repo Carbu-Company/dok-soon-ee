@@ -1406,18 +1406,10 @@ export default function CashReceiptList(props) {
 
       <div className="table-wrap">
         <h2 className="table-wrap__title">
-          발행 리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span>
+          <div></div><span>Total {pagination?.totalCount || carList?.length || 0}건</span>
         </h2>
         <div className="table-wrap__head table-wrap__title">
-          <button
-            type="button"
-            className="btn btn--red btn--padding--r30"
-            onClick={() => {
-              router.push('/cash-receipts/register');
-            }}
-          >
-            <span className="ico ico--add"></span>건별 발행 등록
-          </button>
+          <div>발행 리스트</div>
           <div className="input-group">
             {/* 정렬 항목 */}
             <div className="select select--dark w160">
