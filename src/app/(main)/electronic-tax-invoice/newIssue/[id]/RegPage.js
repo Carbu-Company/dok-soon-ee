@@ -7,45 +7,91 @@ import CustSearchModal from "@/components/modal/CustSearchModal";
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 import { getAcqTax } from '@/app/(main)/common/script.js'
+import { getMgtKey } from "@/app/(main)/api/search";
+import { issueTaxInvoice } from "@/app/(main)/api/popbill";
+
+
+/**
+ * 전자세금계산서 발행 페이지
+ * @param {Object} session - 세션 정보
+ * @param {Object} taxIssueInfo - 세금계산서 발행 정보
+ * @returns {JSX.Element} - 전자세금계산서 발행 페이지
+ */
+
 export default function ElectronicTaxInvoiceNewIssuePage({
   session, 
-  dealerList = [], 
-  carKndList = [], 
-  evdcCdList = [], 
-  parkingLocationList = [], 
-  sellTpList = [],
-  carPurInfo = [],
-  searchAction
+  taxIssueInfo = []
 }) {
+
+
+  /**
+   * 파라미터 초기화
+   */
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [carPurDetail, setCarPurDetail] = useState(carPurInfo);
+  /**
+   * 품목 리스트 상태 관리
+   */
+  const [itemList, setItemList] = useState(taxIssueInfo?.ITEM_LIST ?? []);
 
-  const [custNo, setCustNo] = useState('');
-  const [brno, setBrno] = useState('');
-  const [subBrno, setSubBrno] = useState('');
-  const [corpNm, setCorpNm] = useState('');
-  const [custNm, setCustNm] = useState('');
-  const [addr, setAddr] = useState('');
-  const [bizType, setBizType] = useState('');
-  const [bizItem, setBizItem] = useState('');
-  const [email, setEmail] = useState('');
-  const [writeDt, setWriteDt] = useState('');
-  const [memo, setMemo] = useState('');
-  const [totalAmount, setTotalAmount] = useState(0);
-  const [supplyPrice, setSupplyPrice] = useState(0);
-  const [vatAmount, setVatAmount] = useState(0);
-  const [itemList, setItemList] = useState([]);
+  /**
+   * 기본 정보 및 발행정보 상태 관리
+   */
+  const [custNo, setCustNo] = useState(taxIssueInfo?.CUST_NO ?? '');
+  const [brno, setBrno] = useState(taxIssueInfo?.BRNO ?? '');
+  const [subBrno, setSubBrno] = useState(taxIssueInfo?.SUB_BRNO ?? '');
+  const [corpNm, setCorpNm] = useState(taxIssueInfo?.CORP_NM ?? '');
+  const [custNm, setCustNm] = useState(taxIssueInfo?.CUST_NM ?? '');
+  const [addr, setAddr] = useState(taxIssueInfo?.ADDR ?? '');
+  const [bizType, setBizType] = useState(taxIssueInfo?.BIZ_TYPE ?? '');
+  const [bizItem, setBizItem] = useState(taxIssueInfo?.BIZ_ITEM ?? '');
+  const [email, setEmail] = useState(taxIssueInfo?.EMAIL ?? '');
+  const todayString = (() => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  })();
+  const [writeDt, setWriteDt] = useState(taxIssueInfo?.WRITE_DT ?? todayString);
+  const [memo, setMemo] = useState(taxIssueInfo?.MEMO ?? '');
+  const [totalAmount, setTotalAmount] = useState(taxIssueInfo?.TOTAL_AMOUNT ?? 0);
+  const [supplyPrice, setSupplyPrice] = useState(taxIssueInfo?.SUPPLY_PRICE ?? 0);
+  const [vatAmount, setVatAmount] = useState(taxIssueInfo?.VAT_AMOUNT ?? 0);
+
   const [taxIssueType, setTaxIssueType] = useState('001');
   const [isTaxIssueTypeOpen, setIsTaxIssueTypeOpen] = useState(false);
 
+  /**
+   * 고객 선택 모달 관리
+   */
   const [isModalOpen, setIsModalOpen] = useState(false);  
   const [isCustModalOpen, setIsCustModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
+  // 팝빌 연동 사용자 및 폼 데이터 상태 관리
+  const [user, setUser] = useState(session);
+  const [formData, setFormData] = useState({
+    brno: brno,
+    corpNm: corpNm,
+    custNm: custNm,
+    addr: addr,
+    bizType: bizType,
+    bizItem: bizItem,
+    email: email,
+    writeDt: writeDt,
+    memo: memo,
+    taxIssueType: taxIssueType,
+    taxIssueTypeOpen: isTaxIssueTypeOpen,
+    itemList: [],
+    totalAmount: totalAmount,
+    supplyPrice: supplyPrice,
+    vatAmount: vatAmount,
+    taxMgmtkey: '',
+  });
 
-  // 매수고객 정보 상태 관리
+  // 세금계산서 발행 대상 정보 상태 관리
   const [buyerCustomers, setBuyerCustomers] = useState([
     {
       id: 1,
@@ -111,45 +157,87 @@ export default function ElectronicTaxInvoiceNewIssuePage({
     setLoading(true);
     setError(null);
 
+    // 등록번호
+    if(!brno) {
+      alert('등록번호를 입력해주세요.');
+      return;
+    }
 
+    // 상호명
+    if(!corpNm) {
+      alert('상호명을 입력해주세요.');
+      return;
+    }
+
+    // 성명
+    if(!custNm) {
+      alert('성명을 입력해주세요.');
+      return;
+    }
+
+    // 품목 리스트 체크 
+    if(itemList.length === 0) {
+      alert('품목을 추가해주세요.');
+      return;
+    }
+
+    // 합계금액, 공급가액, 부가세 가 0이면 처리 안되게
+    if(totalAmount === 0 || supplyPrice === 0 || vatAmount === 0) {
+      alert('합계금액, 공급가액, 부가세 중 하나라도 0이면 발행 안됩니다.');
+      return;
+    }
+
+    /**
+     * 전자세금계산 팝빌 연동 성공시
+     * 발행 정보 DB 적재 .
+     * (세금계산서 발행 키 값 생성)
+     */
+
+
+    // 1. 세금계산서 발행 키값 생성
+    const taxMgmtkey = await getMgtKey();
+    console.log('세금계산서 발행 키값:', taxMgmtkey);  
+    if(!taxMgmtkey) {
+      alert('세금계산서 발행 키값 생성에 실패했습니다.');
+      return;
+    }
+
+
+    // 2. 세금계산서 발행 (팝빌)
+    const result = await issueTaxInvoice(user, formData);
+
+    // 3. 발행 정보 DB 적재
+
+
+
+    /**
+     * 팝빌 발행 성공시
+     * 발행 정보 DB 적재
+     */
+
+
+    //
     const formValues = {    
-      carRegId: carPurDetail.CAR_REG_ID,                       // 매입차량 ID
-      carSaleDt,                                               // 판매일
-      saleRegDt: new Date().toISOString().split('T')[0],       // 등록일
-      agentId: session?.agentId,                               // 상사사 ID
-      dlrId: selectedSellDealer,                               // 딜러 ID
-      saleTpCd: selectedSellType,                              // 판매유형
-      buyerNm: buyerCustomers[0].customerName,                 // 매수자명
-      buyerTpCd: buyerCustomers[0].customerType,               // 매수자구분
-      buyerSsn: buyerCustomers[0].residentNumber,              // 매수자 주민번호
-      buyerBrno: buyerCustomers[0].businessNumber,             // 매수자 사업자번호
-      buyerPhon: buyerCustomers[0].phone,                      // 매수자 연락처
-      buyerZip: buyerCustomers[0].zipCode,                     // 매수자 우편번호
-      buyerAddr1: buyerCustomers[0].address,                   // 매수자 주소
-      buyerAddr2: buyerCustomers[0].addressDetail,             // 매수자 상세주소
-      saleAmt: sellAmt,                                        // 판매금액
-      saleSupPrc: sellSupPrc,                                  // 판매 공급가액
-      saleVat: sellVat,                                        // 판매 부가세
-      saleCarNo: outCarNo,                                     // 판매차량번호
-      agentSelCost,                                            // 상사매도비
-      perfInfeAmt,                                             // 성능보험료
-      txblIssuYn: 'N',                                         // 세금계산서발행여부
-      selcstInclusYn: 'N',                                     // 매도비포함여부
-      selEvdcCd: '',                                           // 매도증빙코드
-      selEvdcCont: '',                                         // 매도증빙내용
-      selEvdcDt: '',                                           // 매도증빙일자
-      adjFinYn: 'N',                                           // 정산완료여부
-      attachedFiles: attachedSellFiles,                        // 첨부파일
-      saleDesc: sellMemo,                                      // 판매설명
-      totFeeAmt: '0',                                          // 총수수료
-      realFeeAmt: '0',                                         // 실수수료
-      saleCrIssuYn: 'N',                                       // 매도확인서발행여부
-      modrId: session?.usrId,                                   // 수정자ID
-      buyerCustomers
+      brno: brno,
+      corpNm: corpNm,
+      custNm: custNm,
+      addr: addr,
+      bizType: bizType,
+      bizItem: bizItem,
+      email: email,
+      writeDt: writeDt,
+      memo: memo,
+      taxIssueType: taxIssueType,
+      taxIssueTypeOpen: isTaxIssueTypeOpen,
+      itemList: JSON.stringify(itemList),
+      totalAmount: totalAmount,
+      supplyPrice: supplyPrice,
+      vatAmount: vatAmount,
+      taxMgmtKey: taxMgmtkey,
     };
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarSel`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertCarTax`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,17 +246,17 @@ export default function ElectronicTaxInvoiceNewIssuePage({
       });
       const res = await response.json();
       
-      alert('매도차량 등록 되었습니다.'); // 테스트용 알림
+      alert('전자세금계산서 발행 되었습니다.'); // 테스트용 알림
       setLoading(false);
       if (res.success) {
-        router.push('/car-sell/list');
+        router.push('/electronic-tax-invoice/register');
         return { success: true, res, error: null };
       } else {
-        throw new Error(res.message || '매도차량 등록에 실패했습니다');
+        throw new Error(res.message || '전자세금계산서 발행에 실패했습니다');
       }
     } catch (error) {
       setError(error.message);
-      alert('매도차량 등록 중 오류가 발생했습니다.'); // 테스트용 알림
+      alert('전자세금계산서 발행 중 오류가 발생했습니다.'); // 테스트용 알림
       setLoading(false);
       return { success: false, res: [], error: error.message };
     }
@@ -222,14 +310,15 @@ export default function ElectronicTaxInvoiceNewIssuePage({
           <tbody>
             <tr>
               <th>
-                사업자등록번호 <span className="text-red">*</span>
+                등록번호 <span className="text-red">*</span>
               </th>
               <td>
-                <div className="input">
-                <input 
+              <div className="input-group">
+              <div className="input w400">
+                  <input 
                     type="text" 
                     className="input__field" 
-                    placeholder="사업자등록번호"
+                    placeholder="등록번호"
                     name="brno"
                     value={brno}
                     onChange={(e) => setBrno(e.target.value)}
@@ -243,11 +332,13 @@ export default function ElectronicTaxInvoiceNewIssuePage({
                       삭제
                     </button>
                   </div>
-                </div>
+                  </div>
+                  <button className="btn btn--dark" type="button">확인</button>
+                  </div>
               </td>
 
               <th>
-                종사업장번호 <span className="text-red">*</span>
+                종사업장번호 
               </th>
               <td>
                 <div className="input">
@@ -321,7 +412,7 @@ export default function ElectronicTaxInvoiceNewIssuePage({
                 </div>
               </td>
               <th>
-                주소 <span className="text-red">*</span>
+                주소 
               </th>
               <td colSpan="3">
                 <div className="input">
@@ -445,29 +536,23 @@ export default function ElectronicTaxInvoiceNewIssuePage({
                 작성일자 <span className="text-red">*</span>
               </th>
               <td>
-                <div className="input">
-                <input 
-                    type="text" 
-                    className="input__field" 
-                    placeholder="작성일자"
-                    name="writeDt"
-                    value={writeDt}
-                    onChange={(e) => setWriteDt(e.target.value)}
-                    onFocus={(e) => e.target.select()}
-                  />
-                  <div className="input__utils">
-                    <button
-                      type="button"
-                      className="jsInputClear input__clear ico ico--input-delete"
-                    >
-                      삭제
-                    </button>
+              <div className="input-group">
+                  <div className="input w200">
+                  <input 
+                        type="date" 
+                        className="input__field" 
+                        placeholder="작성일자" 
+                        autoComplete="off"
+                        name='writeDt'
+                        onChange={(e) => setWriteDt(e.target.value)}
+                        value={writeDt || ''} 
+                      />
                   </div>
                 </div>
               </td>
 
               <th>
-                비고 <span className="text-red">*</span>
+                비고 
               </th>
               <td>
                 <div className="input">
@@ -491,73 +576,60 @@ export default function ElectronicTaxInvoiceNewIssuePage({
                 </div>
               </td>
               <th>
-                구분 <span className="text-red">*</span>
+                구분
               </th>
               <td>
-                <div className="select">
-                  <input 
-                    className="select__input" 
-                    type="hidden" 
-                    name="taxIssueType" 
-                    value={taxIssueType || '001'} 
-                  />
-                  <button 
-                    className="select__toggle" 
-                    type="button"
-                    onClick={() => setIsTaxIssueTypeOpen(!isTaxIssueTypeOpen)}
-                  >
-                    <span className="select__text">
-                      {taxIssueType === '001' ? '청구' : '영수'}
-                    </span>
-                    <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
-                  </button>
-
-                  <ul className={`select__menu ${isTaxIssueTypeOpen ? 'active' : ''}`}>
-                    <li 
-                      className={`select__option ${taxIssueType === '001' ? 'select__option--selected' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTaxIssueType('001');
-                      }}
-                    >
-                      청구
-                    </li>
-                    <li 
-                      className={`select__option ${taxIssueType === '002' ? 'select__option--selected' : ''}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setTaxIssueType('002');
-                      }}
-                    >
-                      영수
-                    </li>
-                  </ul>
+                <div className="form-option-wrap">
+                  <div className="form-option">
+                    <label className="form-option__label">
+                      <input 
+                        type="radio" 
+                        name="taxIssueType" 
+                        value="001"
+                        checked={taxIssueType === "001"}
+                        onChange={(e) => setTaxIssueType(e.target.value)}
+                      />
+                      <span className="form-option__title">청구</span>
+                    </label>
+                  </div>
+                  <div className="form-option">
+                    <label className="form-option__label">
+                      <input 
+                        type="radio" 
+                        name="taxIssueType" 
+                        value="002"
+                        checked={taxIssueType === "002"}
+                        onChange={(e) => setTaxIssueType(e.target.value)}
+                      />
+                      <span className="form-option__title">영수</span>
+                    </label>
+                  </div>
                 </div>
               </td>
             </tr>
             <tr>
               <th>
-                합계금액 <span className="text-red">*</span>
+                합계금액 
               </th>
               <td>
-                <div className="input">
-                  <span className="input__field">{totalAmount.toLocaleString()}원</span>
+                <div className="input" style={{ textAlign: 'right' }}>
+                  {totalAmount.toLocaleString()}
                 </div>
               </td>
               <th>
-                공급가액액 <span className="text-red">*</span>
+                공급가액
               </th>
               <td>
-                <div className="input">
-                  <span className="input__field">{supplyPrice.toLocaleString()}원</span>
+                <div className="input" style={{ textAlign: 'right' }}>
+                  {supplyPrice.toLocaleString()}
                 </div>
               </td>
               <th>
-                부가세 <span className="text-red">*</span>
+                부가세 
               </th>
               <td>
-                <div className="input">
-                  <span className="input__field">{vatAmount.toLocaleString()}원</span>
+                <div className="input" style={{ textAlign: 'right' }}>
+                  {vatAmount.toLocaleString()}
                 </div>
               </td>
             </tr>
@@ -582,10 +654,10 @@ export default function ElectronicTaxInvoiceNewIssuePage({
           <colgroup>
             <col style={{ width: "80px" }} />
             <col style={{ width: "80px" }} />
-            <col style={{ width: "250px" }} />
-            <col style={{ width: "250px" }} />
-            <col style={{ width: "150px" }} />
-            <col style={{ width: "150px" }} />
+            <col style={{ width: "200px" }} />
+            <col style={{ width: "200px" }} />
+            <col style={{ width: "100px" }} />
+            <col style={{ width: "120px" }} />
             <col style={{ width: "150px" }} />
             <col style={{ width: "150px" }} />
             <col style={{ width: "auto" }} />

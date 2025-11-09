@@ -19,9 +19,15 @@ export default async function RegisterPage({ params }) {
 
   // 현금영수증 발행 위한 데이터 조회.
 
-  const { id } = params;
+  let id = null;
+  let cashIssueInfo = null;
 
-  const cashIssueInfo = await getCashIssueInfo(id);
+  if (params && params.id) {
+    id = params.id;
+    if (id !== "0") {
+      cashIssueInfo = await getCashIssueInfo(id);
+    }
+  }
   return <IssuePage session={session}
                     cashIssueInfo={cashIssueInfo}
          />;

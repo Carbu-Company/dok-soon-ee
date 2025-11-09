@@ -592,7 +592,7 @@ export default function CashReceiptRegisterPage({
                       onClick={e => e.stopPropagation()}
                     >
                       <Link
-                        href={`/cash-receipts/issue/${item.TRADE_SEQ}`}
+                        href={`/cash-receipts/newIssue/${item.TRADE_SEQ}`}
                         onClick={e => e.stopPropagation()}
                       >
                         발행하기

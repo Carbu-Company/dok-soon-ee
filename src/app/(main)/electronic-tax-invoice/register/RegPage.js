@@ -1507,7 +1507,13 @@ export default function ElectronicTaxInvoicePage(props) {
                   <td>{item.CUST_BRNO}</td>
                   <td>{item.CAR_DT}</td>
                   <td><button className="btn btn--primary">제외하기</button></td>
-                  <td><button className="btn btn--primary">발행하기</button></td>
+                  <td>
+                    <button className="btn btn--primary" onClick={e => e.stopPropagation()}>
+                      <Link href={`/electronic-tax-invoice/newIssue/${item.TRADE_SEQ}`}>
+                        발행하기
+                      </Link>
+                    </button>
+                  </td>
                 </tr>
               );
             })}

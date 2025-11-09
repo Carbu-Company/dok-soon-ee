@@ -599,8 +599,8 @@ export default function Header({ session }) {
                 </Link>
               </li>
               <li className="select__option">
-                <Link href="/cash-receipts/newIssue" className="select__option-link">
-                  건별 발행행
+                <Link href="/cash-receipts/newIssue/0" className="select__option-link">
+                  건별 발행
                 </Link>
               </li>
             </ul>
@@ -629,8 +629,8 @@ export default function Header({ session }) {
                 </Link>
               </li>
               <li className="select__option">
-                <Link href="/electronic-tax-invoice/newIssue" className="select__option-link">
-                  건별 발행행
+                <Link href="/electronic-tax-invoice/newIssue/0" className="select__option-link">
+                  건별 발행
                 </Link>
               </li>
             </ul>

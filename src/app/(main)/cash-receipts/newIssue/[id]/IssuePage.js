@@ -25,17 +25,17 @@ export default function IssuePage({
   // 식별번호
   const [rcgnNo, setRcgnNo] = useState(cashIssueInfo?.RCGN_NO ?? '');
 
-  const [tradeAmt, setTradeAmt] = useState(cashIssueInfo.TRADE_ITEM_AMT);
-  const [tradeSupPrc, setTradeSupPrc] = useState(cashIssueInfo.TRADE_ITEM_SUP_PRC);
-  const [tradeVat, setTradeVat] = useState(cashIssueInfo.TRADE_ITEM_VAT);
-  const [tradeDt, setTradeDt] = useState(cashIssueInfo.TRADE_DT);
-  const [tradeMemo, setTradeMemo] = useState(cashIssueInfo.TRADE_MEMO);
+  const [tradeAmt, setTradeAmt] = useState(cashIssueInfo?.TRADE_ITEM_AMT ?? '');
+  const [tradeSupPrc, setTradeSupPrc] = useState(cashIssueInfo?.TRADE_ITEM_SUP_PRC ?? '');
+  const [tradeVat, setTradeVat] = useState(cashIssueInfo?.TRADE_ITEM_VAT ?? '');
+  const [tradeDt, setTradeDt] = useState(cashIssueInfo?.TRADE_DT ?? '');
+  const [tradeMemo, setTradeMemo] = useState(cashIssueInfo?.TRADE_MEMO ?? '');
 
   // 주문자명
-  const [ownrNm, setOwnrNm] = useState(cashIssueInfo.TRADE_TGT_NM);
+  const [ownrNm, setOwnrNm] = useState(cashIssueInfo?.TRADE_TGT_NM ?? '');
 
   // 연락처
-  const [ownrPhon, setOwnrPhon] = useState(cashIssueInfo.TRADE_TGT_PHON);
+  const [ownrPhon, setOwnrPhon] = useState(cashIssueInfo?.TRADE_TGT_PHON ?? '');
 
   // 자진발급 여부
   const [vltIssuYn, setVltIssuYn] = useState('N');
