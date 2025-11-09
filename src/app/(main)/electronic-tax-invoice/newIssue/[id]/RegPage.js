@@ -24,6 +24,9 @@ export default function ElectronicTaxInvoiceNewIssuePage({
 }) {
 
 
+  console.log('taxIssueInfo******************', taxIssueInfo);
+
+
   /**
    * 파라미터 초기화
    */
@@ -33,15 +36,14 @@ export default function ElectronicTaxInvoiceNewIssuePage({
   /**
    * 품목 리스트 상태 관리
    */
-  const [itemList, setItemList] = useState(taxIssueInfo?.ITEM_LIST ?? []);
-
+  const [itemList, setItemList] = useState(taxIssueInfo?.data?.itemList ? JSON.parse(taxIssueInfo.data.itemList) : []);
   /**
    * 기본 정보 및 발행정보 상태 관리
    */
   const [custNo, setCustNo] = useState(taxIssueInfo?.CUST_NO ?? '');
-  const [brno, setBrno] = useState(taxIssueInfo?.BRNO ?? '');
-  const [subBrno, setSubBrno] = useState(taxIssueInfo?.SUB_BRNO ?? '');
-  const [corpNm, setCorpNm] = useState(taxIssueInfo?.CORP_NM ?? '');
+  const [brno, setBrno] = useState(taxIssueInfo?.BUYR_BRNO ?? '');
+  const [subBrno, setSubBrno] = useState(taxIssueInfo?.BUYR_DOCNO ?? '');
+  const [corpNm, setCorpNm] = useState(taxIssueInfo?.SPLR_MTL_NM ?? '');
   const [custNm, setCustNm] = useState(taxIssueInfo?.CUST_NM ?? '');
   const [addr, setAddr] = useState(taxIssueInfo?.ADDR ?? '');
   const [bizType, setBizType] = useState(taxIssueInfo?.BIZ_TYPE ?? '');

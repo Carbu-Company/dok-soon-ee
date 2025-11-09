@@ -36,6 +36,6 @@ export default async function RegisterPage({ params }) {
   console.log('taxIssueInfo******************', taxIssueInfo);
 
   return <RegPage session={session}
-                  taxIssueInfo={taxIssueInfo}
+                  taxIssueInfo={taxIssueInfo.data}
   />;
 }
