@@ -40,22 +40,27 @@ export default function SalesRegisterPage({
   parkingLocationList = [], 
   sellTpList = [],
   carPurInfo = [],
+  agentTradeItemInfo = [],
   searchAction
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [carPurDetail, setCarPurDetail] = useState(carPurInfo);
+  const [agentTradeItemDetail, setAgentTradeItemDetail] = useState(agentTradeItemInfo);
+
+  /**
+   * carPurDetail 값은 항상 채워져 있다.  page.js에서 가져온다. 차량 선택시에도  carPurDetail 값이 채워 진다.
+   */
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
   const [isCustModalOpen, setIsCustModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  console.log(sellTpList);
-
-  // URL 파라미터에서 carRegId를 확인하여 차량 정보 로드
-  useEffect(() => {
+  // URL 파라미터에서 carRegId를 확인하여 차량 정보 로드  (제시차량에서 판매처리시 사용)   --- page.js에서 이미 가져오지 않았나 ?
+/*
+    useEffect(() => {
     const carRegId = searchParams.get('carRegId');
     
     if (carRegId && searchAction) {
@@ -79,8 +84,10 @@ export default function SalesRegisterPage({
       loadCarInfo();
     }
   }, [searchParams, searchAction]);
-
+*/
   // 페이지 로드 시 모달 자동 열기 (차량 정보가 없을 때만)
+
+
   useEffect(() => {
     console.log('=== RegPage useEffect 실행 ===');
     console.log('session:', session);
@@ -113,16 +120,42 @@ export default function SalesRegisterPage({
     const result = await searchAction(car.CAR_REG_ID);
     console.log('서버 액션 응답:', result);
 
-    if (result && result.success) {
+    if (result) {
+
+      /**
+       * 매입차량 기본정보
+       */
       const responseData = result.data?.purInfo || [];
 
       setCarPurDetail(responseData);
+
+      /**
+       * 상사 매입비 정보, 성능보험료 정보
+       */
+
+      const agentTradeItemData = result.data?.agentTradeItemInfo || [];
+      setAgentTradeItemDetail(agentTradeItemData);
+
+      /**
+       * CarPurDetail 값이 채워지면 ... 매입딜러 -> 판매딜러, 매입금액 -> 판매가격 정보를 셋팅해준다. 
+       */
+
+      setSelectedSellDealer(responseData.DLR_ID);
+      setSellAmt(responseData.PUR_AMT);
+      setSellSupPrc(responseData.PUR_SUP_PRC);
+      setSellVat(responseData.PUR_VAT);
     }
     setSelectedCar(car);
     setIsModalOpen(false);
   };
 
+  /**
+   * 차량 선택 안하는 경우 (취소 버튼 클릭시) - 모달 닫고 car-sell/list 로 이동
+   */
+
   const handleModalClose = () => {
+    // car-sell/list 로 이동
+    window.location.href = '/car-sell/list';
     setIsModalOpen(false);
   };
 
@@ -239,13 +272,18 @@ export default function SalesRegisterPage({
   const [isSellTypeSelectOpen, setIsSellTypeSelectOpen] = useState(false);
 
   // 판매일 선택 상태 관리
-  const [carSaleDt, setCarSaleDt] = useState('');
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  const todayStr = `${yyyy}-${mm}-${dd}`;
+  const [carSaleDt, setCarSaleDt] = useState(todayStr);
 
   // 상사매도비 선택 상태 관리
-  const [agentSelCost, setAgentSelCost] = useState('0');
+  const [agentSelCost, setAgentSelCost] = useState(agentTradeItemDetail.selCost || '0');
 
   // 성능보험료 선택 상태 관리
-  const [perfInfeAmt, setPerfInfeAmt] = useState('0');
+  const [perfInfeAmt, setPerfInfeAmt] = useState(agentTradeItemDetail.perfInfeAmt || '0');
 
   // 차량번호(출고) 선택 상태 관리
   const [outCarNo, setOutCarNo] = useState('');

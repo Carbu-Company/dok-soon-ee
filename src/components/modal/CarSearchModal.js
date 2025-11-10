@@ -177,9 +177,12 @@ export default function CarSearchModal({ open, onClose, onCarSelect, agentId }) 
         onCarSelect(selectedCar);
       }
     }
-    if (onClose) {
-      onClose();
+    else 
+    {
+      alert('차량을 선택해주세요.');
+      return;
     }
+    
   };
 
   if (!open) return null;

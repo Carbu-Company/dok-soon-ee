@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import RegPage from "@/app/(main)/car-sell/register/RegPage";
-import { getSuggestOne } from "./api";
+import { getCarPurInfo, getAgentTradeItemInfo } from "./api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
 export default async function RegisterPage({ searchParams }) {
@@ -22,18 +22,22 @@ export default async function RegisterPage({ searchParams }) {
   const resolvedSearchParams = await searchParams;
 
   // Server Action 정의
-  async function getCarPurInfo(carRegId) {
+  async function searchCarPurInfo(carRegId) {
     "use server";
     
     try {
-      const purInfo = await getSuggestOne(carRegId);
+      const purInfo = await getCarPurInfo(carRegId);
 
-      console.log('서버 액션 결과*******************:getSuggestOne', purInfo);
+      const agentTradeItemInfo = await getAgentTradeItemInfo(session.agentId);
+
+
+      console.log('agentTradeItemInfo:********************', agentTradeItemInfo);
 
       return {
         success: purInfo.success,
         data: {
-          purInfo: purInfo
+          purInfo: purInfo,
+          agentTradeItemInfo: agentTradeItemInfo
         },
         error: purInfo.error
       };
@@ -46,13 +50,20 @@ export default async function RegisterPage({ searchParams }) {
 
   // URL 파라미터에서 carRegId를 확인하여 차량 정보 조회
   let carPurInfo = null;
+  let agentTradeItemInfo = null;
   if (resolvedSearchParams?.carRegId) {
     console.log('URL에서 carRegId 발견:', resolvedSearchParams.carRegId);
-    carPurInfo = await getSuggestOne(resolvedSearchParams.carRegId).catch(error => {
+    carPurInfo = await getCarPurInfo(resolvedSearchParams.carRegId).catch(error => {
       console.error('차량 정보 조회 실패:', error);
       return null; // 에러 발생 시 null 반환
     });
-    console.log('조회된 차량 정보:', carPurInfo);
+
+    agentTradeItemInfo = await getAgentTradeItemInfo(session.agentId).catch(error => {
+      console.error('상사 매입비 정보 조회 실패:', error);
+      return null; // 에러 발생 시 null 반환
+    });
+
+    console.log('agentTradeItemInfo:********************', agentTradeItemInfo);
   }
 
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
@@ -71,6 +82,7 @@ export default async function RegisterPage({ searchParams }) {
                   parkingLocationList={parkingLocationList.data}
                   sellTpList={sellTpList.data}
                   carPurInfo={carPurInfo}
-                  searchAction={getCarPurInfo}
+                  agentTradeItemInfo={agentTradeItemInfo}
+                  searchAction={searchCarPurInfo}
   />;
 }

@@ -54,8 +54,6 @@ async function searchCarPurListAndSummary(searchParamsWithPage) {
       getCarPurSummary(searchParamsWithPage)
     ]);
 
-    console.log('서버 액션 결과*******************:searchCarPurListAndSummary');
-
     return {
       success: listResult.success && summaryResult.success,
       data: {
@@ -131,8 +129,6 @@ export default async function CarPurList() {
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const carPurSummary = await searchCarPurSummary({ ...defaultParams, ...searchParams });
-
-  console.log('carPurSummary*******************:', carPurSummary);
 
   return <ListPage session={session}
                    carList={carPurList}
