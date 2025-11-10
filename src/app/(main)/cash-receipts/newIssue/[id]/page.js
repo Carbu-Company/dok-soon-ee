@@ -14,19 +14,26 @@ export default async function RegisterPage({ params }) {
   usrNm: '김규식',
   iat: 1756640299,
   exp: 1757245099
+  agentBrno : 상사 사업자번호
+  empBrno : 사원 사업자번호
   } 
   */  
 
   // 현금영수증 발행 위한 데이터 조회.
 
-  let id = null;
   let cashIssueInfo = null;
 
-  if (params && params.id) {
-    id = params.id;
+  if (params) {
+    const { id } = await params;
+
+    /**
+     * 건별 발행이 아니면 현금영수증 발행을 위한 정보 조회
+     * - 건별발행시에는 파라메터 값을 0으로 처리한다.
+     */
     if (id !== "0") {
       cashIssueInfo = await getCashIssueInfo(id);
     }
+
   }
   return <IssuePage session={session}
                     cashIssueInfo={cashIssueInfo}

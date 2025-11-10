@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import CustSearchModal from "@/components/modal/CustSearchModal";
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
@@ -18,21 +18,21 @@ import { issueTaxInvoice } from "@/app/(main)/api/popbill";
  * @returns {JSX.Element} - 전자세금계산서 발행 페이지
  */
 
-export default function ElectronicTaxInvoiceNewIssuePage({
+export default function IssuePage({
   session, 
-  taxIssueInfo = []
+  taxIssueInfo = null
 }) {
 
-
   console.log('taxIssueInfo******************', taxIssueInfo);
-
 
   /**
    * 파라미터 초기화
    */
   const router = useRouter();
-  const searchParams = useSearchParams();
 
+  const [loading, setLoading] = useState(false); 
+  const [error, setError] = useState(null);
+  
   /**
    * 품목 리스트 상태 관리
    */

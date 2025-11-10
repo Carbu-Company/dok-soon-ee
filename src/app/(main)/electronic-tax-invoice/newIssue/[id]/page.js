@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import RegPage from "@/app/(main)/electronic-tax-invoice/newIssue/[id]/RegPage";
+import IssuePage from "@/app/(main)/electronic-tax-invoice/newIssue/[id]/IssuePage";
 import { getCarTaxIssueInfo, getTaxIssueInfo } from "./api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
@@ -23,6 +23,11 @@ export default async function RegisterPage({ params }) {
   if (params) {
     
     const { id } = await params;
+
+    /**
+     * 건별 발행이 아니면 전자세금계산서 발행을 위한 정보 조회
+     * - 건별발행시에는 파라메터 값을 0으로 처리한다.
+     */
     if (id !== "0") {
       // id가 16자리 숫자면 getCarTaxIssueInfo, 아니면 getTaxIssueInfo 호출
       if (typeof id === "string" && id.length === 16 && /^\d+$/.test(id)) {
@@ -33,9 +38,7 @@ export default async function RegisterPage({ params }) {
     }
   }
 
-  console.log('taxIssueInfo******************', taxIssueInfo);
-
-  return <RegPage session={session}
-                  taxIssueInfo={taxIssueInfo.data}
+  return <IssuePage session={session}
+                  taxIssueInfo={taxIssueInfo?.data}
   />;
 }

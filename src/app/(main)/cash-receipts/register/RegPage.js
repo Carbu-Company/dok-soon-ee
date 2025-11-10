@@ -532,8 +532,8 @@ export default function CashReceiptRegisterPage({
             <col style={{ width: "120px" }} />
             <col style={{ width: "130px" }} />
             <col style={{ width: "auto" }} />
-            <col style={{ width: "150px" }} />
             <col style={{ width: "120px" }} />
+            <col style={{ width: "150px" }} />
             <col style={{ width: "100px" }} />
             <col style={{ width: "100px" }} />
           </colgroup>
@@ -583,7 +583,11 @@ export default function CashReceiptRegisterPage({
                   <td>{item.CUST_NM}</td>
                   <td>{item.CUST_PHON}</td>
                   <td>{item.TRADE_TP_NM}</td>
-                  <td>{item.RCGN_NO}</td>
+                  <td>
+                    {item.RCGN_NO && item.RCGN_NO.length === 13
+                      ? item.RCGN_NO.slice(0, 7) + "******"
+                      : item.RCGN_NO}
+                  </td>
                   <td><button className="btn btn--primary">제외하기</button></td>
                   <td>
                     <button

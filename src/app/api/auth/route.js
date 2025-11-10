@@ -26,9 +26,12 @@ export async function POST(req) {
     request.input("loginId", sql.VarChar(200), loginId);
 
     const query = `
-      SELECT USR_ID, AGENT_ID, LOGIN_ID, LOGIN_PASSWD, USR_NM, USR_GRADE_CD
-      FROM dbo.CJB_USR
-      WHERE LOGIN_ID = @loginId
+      SELECT A.USR_ID, A.AGENT_ID, A.LOGIN_ID, A.LOGIN_PASSWD, A.USR_NM, A.USR_GRADE_CD, A.EMP_BRNO, B.BRNO AS AGENT_BRNO
+      FROM dbo.CJB_USR A
+	     , dbo.CJB_AGENT B
+      WHERE A.LOGIN_ID = @loginId
+	    AND A.AGENT_ID = B.AGENT_ID
+      AND A.USR_GRADE_CD = '9'   -- 사무장 
     `;
 
     const result = await request.query(query);
@@ -77,6 +80,8 @@ export async function POST(req) {
       usrId: user.USR_ID,
       agentId: user.AGENT_ID,
       usrNm: user.USR_NM,
+      agentBrno: user.AGENT_BRNO,
+      empBrno: user.EMP_BRNO,
     });
     const maxAge = 60 * 60 * 24 * 7; // 7 days
 

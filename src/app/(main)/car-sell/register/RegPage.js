@@ -127,23 +127,26 @@ export default function SalesRegisterPage({
        */
       const responseData = result.data?.purInfo || [];
 
+      // 제시 정보 셋팅팅
       setCarPurDetail(responseData);
+
+      // 판매 딜러, 판매금액, 판매 공급가액, 판매 부가세 셋팅
+      setSelectedSellDealer(responseData.DLR_ID);
+      setSellAmt(responseData.PUR_AMT);
+      setSellSupPrc(responseData.PUR_SUP_PRC);
+      setSellVat(responseData.PUR_VAT);
 
       /**
        * 상사 매입비 정보, 성능보험료 정보
        */
 
+      // 상사 매입비 정보, 성능보험료 정보 셋팅
       const agentTradeItemData = result.data?.agentTradeItemInfo || [];
       setAgentTradeItemDetail(agentTradeItemData);
 
-      /**
-       * CarPurDetail 값이 채워지면 ... 매입딜러 -> 판매딜러, 매입금액 -> 판매가격 정보를 셋팅해준다. 
-       */
-
-      setSelectedSellDealer(responseData.DLR_ID);
-      setSellAmt(responseData.PUR_AMT);
-      setSellSupPrc(responseData.PUR_SUP_PRC);
-      setSellVat(responseData.PUR_VAT);
+      // 상사 매입비 정보, 성능보험료 정보 셋팅
+      setAgentSelCost(agentTradeItemData.selCost);
+      setPerfInfeAmt(agentTradeItemData.perfInfeAmt);
     }
     setSelectedCar(car);
     setIsModalOpen(false);
@@ -280,10 +283,10 @@ export default function SalesRegisterPage({
   const [carSaleDt, setCarSaleDt] = useState(todayStr);
 
   // 상사매도비 선택 상태 관리
-  const [agentSelCost, setAgentSelCost] = useState(agentTradeItemDetail.selCost || '0');
+  const [agentSelCost, setAgentSelCost] = useState(agentTradeItemDetail?.selCost || '0');
 
   // 성능보험료 선택 상태 관리
-  const [perfInfeAmt, setPerfInfeAmt] = useState(agentTradeItemDetail.perfInfeAmt || '0');
+  const [perfInfeAmt, setPerfInfeAmt] = useState(agentTradeItemDetail?.perfInfeAmt || '0');
 
   // 차량번호(출고) 선택 상태 관리
   const [outCarNo, setOutCarNo] = useState('');

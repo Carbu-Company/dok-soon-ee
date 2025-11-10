@@ -11,7 +11,7 @@ export const putReceiptRegisterIssue = async (userData, formData) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            CorpNum: userData.usrId,
+            CorpNum: userData.agentBrno,
             Cashbill: {
               mgtKey: mgtKey,
               tradeType: "승인거래",
@@ -23,7 +23,7 @@ export const putReceiptRegisterIssue = async (userData, formData) => {
               tax: formData.tradeVat,
               serviceFee: "0",
               franchiseCorpNum: userData.EMPID,
-              identityNum: formData.rcgnNo,
+              identityNum: formData.ownrPhon,
             },
             memo: "즉시 발행 테스트",
             UserID: userData.usrId,

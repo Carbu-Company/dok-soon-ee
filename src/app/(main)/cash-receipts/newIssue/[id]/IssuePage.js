@@ -17,7 +17,6 @@ export default function IssuePage({
   // props 값 가져오기
   const [loading, setLoading] = useState(false); 
   const [error, setError] = useState(null);
-
   
     // 거래유형 코드
   const [tradeSctCd, setTradeSctCd] = useState('0');
@@ -65,7 +64,7 @@ export default function IssuePage({
     }
 
     const formValues = {
-      agentId: session?.agentId,                                // 상사사 ID
+      agentId: session?.agentId,                                 // 상사ID
       tradeSctCd,                                                // 거래유형
       rcgnNo,                                                    // 식별번호      
       vltIssuYn,                                                 // 자진발급 여부
@@ -83,40 +82,35 @@ export default function IssuePage({
     const result = await putReceiptRegisterIssue(session, formValues);
     console.log("발행 결과:", result);
     if (result.success) {
-      alert('현금영수증 발행 등록 되었습니다.'); // 테스트용 알림
-      setLoading(false);
-      router.push('/cash-receipts/register');
-      return { success: true, res: result, error: null };
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertCarCash`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formValues)
+        });
+        const res = await response.json();
+        
+        alert('현금영수증 발행 등록 되었습니다.'); // 테스트용 알림
+        setLoading(false);
+        if (res.success) {
+          router.push('/cash-receipts/register');
+          return { success: true, res, error: null };
+        } else {
+          throw new Error(res.message || '현금영수증 발행 등록에 실패했습니다');
+        }
+      } catch (error) {
+        setError(error.message);
+        alert('현금영수증 발행 등록 중 오류가 발생했습니다.'); // 테스트용 알림
+        setLoading(false);
+        return { success: false, res: [], error: error.message };
+      }
+
     } else {
       throw new Error(result.message || '현금영수증 발행 등록에 실패했습니다');
     }
-
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/insertCarCash`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formValues)
-      });
-      const res = await response.json();
-      
-      alert('현금영수증 발행 등록 되었습니다.'); // 테스트용 알림
-      setLoading(false);
-      if (res.success) {
-        router.push('/cash-receipts/register');
-        return { success: true, res, error: null };
-      } else {
-        throw new Error(res.message || '현금영수증 발행 등록에 실패했습니다');
-      }
-    } catch (error) {
-      setError(error.message);
-      alert('현금영수증 발행 등록 중 오류가 발생했습니다.'); // 테스트용 알림
-      setLoading(false);
-      return { success: false, res: [], error: error.message };
-    }
-
   };
 
   const handleReceiptRegisterIssue = async () => {
@@ -195,13 +189,12 @@ export default function IssuePage({
                       className="input__field" 
                       placeholder="식별번호" 
                       name="rcgnNo"
-                      value={rcgnNo}
+                      value={rcgnNo && rcgnNo.length === 13 ? rcgnNo.slice(0, 7) + "******" : rcgnNo}
                       onChange={(e) => setRcgnNo(e.target.value)}
                       onFocus={(e) => e.target.select()}
+                      readOnly={true}
                     />
-                    <div className="input__utils">
-                      <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
-                    </div>
+
                   </div>
                   <span className="input-help">휴대폰/주민등록/카드번호</span>
                 </div>
