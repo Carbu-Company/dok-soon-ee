@@ -35,6 +35,7 @@ const TAX_RECEIPT_STATUS = {
 export default function SalesRegisterPage({
   session, 
   dealerList = [], 
+  saleDealerList = [],
   carKndList = [], 
   evdcCdList = [], 
   parkingLocationList = [], 
@@ -46,9 +47,15 @@ export default function SalesRegisterPage({
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  /**
+   * 매입(제시)정보 
+   */
   const [carPurDetail, setCarPurDetail] = useState(carPurInfo);
-  const [agentTradeItemDetail, setAgentTradeItemDetail] = useState(agentTradeItemInfo);
 
+  /**
+   * 상사 매입비 정보, 성능보험료 정보
+   */
+  const [agentTradeItemDetail, setAgentTradeItemDetail] = useState(agentTradeItemInfo);
 
   const [purDlrId, setPurDlrId] = useState(carPurDetail?.DLR_ID || '');
   useEffect(() => {
@@ -274,8 +281,19 @@ export default function SalesRegisterPage({
   useEffect(() => {
     if (selectedSellDealer && selectedSellDealer !== purDlrId) {
       setIsAlsonDivVisible(true);
+      /** 
+       * 타상사딜러 아닌 경우 알선딜러명 셋팅
+       */
+      if (selectedSellDealer !== '000000000') {
+        setAlsonDlrNm(saleDealerList.find(dealer => dealer.USR_ID === selectedSellDealer)?.USR_NM || '');
+      } else {
+        setAlsonDlrNm('');
+      }      
+      setAlsonDlrId(saleDealerList.find(dealer => dealer.USR_ID === selectedSellDealer)?.USR_ID || '');
     } else {
       setIsAlsonDivVisible(false);
+      setAlsonDlrNm('');
+      setAlsonDlrId('');
     }
   }, [selectedSellDealer, purDlrId]);
 
@@ -548,6 +566,7 @@ export default function SalesRegisterPage({
   
   // ===== 드롭다운 열림/닫힘 상태 =====
 
+  const [alsonDlrNm, setAlsonDlrNm] = useState('');
   const [alsonDlrId, setAlsonDlrId] = useState('');
   const [alsonSelCost, setAlsonSelCost] = useState('');
   const [alsonFeeAmt, setAlsonFeeAmt] = useState('');
@@ -1042,7 +1061,7 @@ export default function SalesRegisterPage({
                     >
                       선택
                     </li>
-                    {dealerList.map((dealer, index) => (
+                    {saleDealerList.map((dealer, index) => (
                       <li
                         key={index}
                         className={`select__option ${selectedSellDealer === dealer.USR_ID ? "select__option--selected" : ""}`}
@@ -1337,17 +1356,17 @@ export default function SalesRegisterPage({
           <tbody>
             <tr>
               <th>
-                알선딜러 <span className="text-red">*</span>
+                알선딜러명 <span className="text-red">*</span>
               </th>
               <td>
                 <div className="input">
                   <input
                     type="text"
                     className="input__field"
-                    placeholder="알선딜러 ID"
-                    name="alsonDlrId"
-                    value={alsonDlrId || ""}
-                    onChange={e => setAlsonDlrId(e.target.value)}
+                    placeholder="알선딜러명"
+                    name="alsonDlrNm"
+                    value={alsonDlrNm || ""}
+                    onChange={e => setAlsonDlrNm(e.target.value)}
                   />
                   <div className="input__utils">
                     <button
@@ -1381,6 +1400,7 @@ export default function SalesRegisterPage({
                     placeholder="금액"
                     value={alsonSelCost || '0'}
                     onChange={e => setAlsonSelCost(e.target.value.replace(/[^\d]/g, ''))}
+                    onFocus={e => e.target.select()}
                   />
                   <div className="input__utils">
                     <button
@@ -1415,6 +1435,7 @@ export default function SalesRegisterPage({
                     placeholder="금액"
                     value={alsonFeeAmt || '0'}
                     onChange={e => setAlsonFeeAmt(e.target.value.replace(/[^\d]/g, ''))}
+                    onFocus={e => e.target.select()}
                   />
                   <div className="input__utils">
                     <button
@@ -1437,6 +1458,7 @@ export default function SalesRegisterPage({
                     placeholder="주민등록번호"
                     value={alsonSsn || ''}
                     onChange={e => setAlsonSsn(e.target.value)}
+                    onFocus={e => e.target.select()}
                   />
                   <div className="input__utils">
                     <button

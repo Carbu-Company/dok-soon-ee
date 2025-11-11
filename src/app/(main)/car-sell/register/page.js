@@ -71,12 +71,26 @@ export default async function RegisterPage({ searchParams }) {
   const carKndList = await getCDList('92');   // 차량 종류 코드 목록
 
   const dealerList = await getDealerList(session.agentId);
+
+  /**
+   * 판매딜러에는 타상사딜러 항목 추가
+   */
+  const saleDealerList = dealerList.data.map(dealer => ({
+    USR_ID: dealer.USR_ID,
+    USR_NM: dealer.USR_NM
+  }));
+  saleDealerList.push({
+    USR_ID: '000000000',
+    USR_NM: '타상사딜러'
+  });
+
   const sellTpList = await getCDList('03');   // 판매유형 목록
 
   //console.log(sellTpList.data);
 
   return <RegPage session={session}
                   dealerList={dealerList.data}
+                  saleDealerList={saleDealerList}
                   carKndList={carKndList.data}
                   evdcCdList={evdcCDList.data}
                   parkingLocationList={parkingLocationList.data}
