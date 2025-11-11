@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import CarSearchModal from "@/components/modal/CarSearchModal";
 
-export default function BrokerageSalesCreatePage({ session = null, dealerList = [], evdcCdList = [], tradeItemCDList = [], carKndList = [], carPurDetail = [] }) {
+export default function RegPage({ session = null, dealerList = [], evdcCdList = [], tradeItemCDList = [], carKndList = [], carPurDetail = [] }) {
 
   const router = useRouter();
 

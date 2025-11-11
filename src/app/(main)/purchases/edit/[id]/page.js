@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import EditPage from "@/app/(main)/purchases/edit/[id]/EditPage";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
-import { getSuggestOne } from "@/app/(main)/purchases/edit/[id]/api";
+import { getCarPurInfo } from "@/app/(main)/purchases/edit/[id]/api";
 
 export default async function EditorPage({ params }) {
   const cookieStore = await cookies();
@@ -23,9 +23,12 @@ export default async function EditorPage({ params }) {
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
   const parkingLocationList = await getCDList('91');   // 주차위치 코드 목록
   const carKndList = await getCDList('92');   // 차량 종류 코드 목록
+  const cstTypeCdList = await getCDList('29');   // 비용 발급 코드 목록
 
   const { id } = await params;
-  const carPurDetail = await getSuggestOne(id);
+  const carPurDetail = await getCarPurInfo(id);
+
+  console.log('carPurDetail*****************', carPurDetail);
 
   // 차량 등록 번호
   /** 
@@ -47,6 +50,7 @@ export default async function EditorPage({ params }) {
                    carKndList={carKndList.data}
                    evdcCdList={evdcCDList.data}
                    parkingLocationList={parkingLocationList.data}
+                   cstTypeCdList={cstTypeCdList.data}
                    carPurDetail={carPurDetail}
    />;
 }

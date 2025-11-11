@@ -1,4 +1,4 @@
-  export const getSuggestOne = async (carRegId) => {
+  export const getCarPurInfo = async (carRegId) => {
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarPurInfo?carRegId=${carRegId}`, {
             method: 'GET',

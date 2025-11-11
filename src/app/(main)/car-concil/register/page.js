@@ -14,6 +14,8 @@ export default async function RegisterPage() {
   usrNm: '김규식',
   iat: 1756640299,
   exp: 1757245099
+  agentBrno : 상사 사업자번호
+  empBrno : 사원 사업자번호
   } 
   */  
 

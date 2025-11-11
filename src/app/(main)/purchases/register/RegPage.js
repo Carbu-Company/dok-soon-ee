@@ -1,11 +1,35 @@
 "use client";
 import Image from 'next/image'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber, handleImageUpload } from '@/lib/util.js'
 import { getAcqTax } from '@/app/(main)/common/script.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 import CarSearchModal from "@/components/modal/CarSearchModal"
+
+// ===== 상수 정의 =====
+const OWNER_TYPE = {
+  INDIVIDUAL: '001', // 개인
+  CORPORATION: '002' // 법인
+};
+
+const PRESENTATION_TYPE = {
+  COMPANY_PURCHASE: '0', // 상사매입
+  CUSTOMER_CONSIGNMENT: '1' // 고객위탁
+};
+
+const EMAIL_DOMAINS = [
+  'naver.com',
+  'gmail.com',
+  'daum.net', 
+  'nate.com',
+];
+
+const TAX_RECEIPT_STATUS = {
+  RECEIVED: 'Y',      // 수취
+  NOT_RECEIVED: 'N',  // 미수취
+  NOT_APPLICABLE: 'E' // 해당없음
+};
 
 export default function RegPage({ 
   session = null, 
@@ -16,6 +40,17 @@ export default function RegPage({
   carPurDetail = [], 
   cstTypeCdList = [], 
   purCst = '0' }) {
+
+  const router = useRouter();
+
+      // 발행일 선택 상태 관리
+  function getTodayStr() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
 
   // 매입딜러 선택 상태 관리 (콤보 박스)
   const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
@@ -64,11 +99,12 @@ export default function RegPage({
       setPurVat(0);
     }
   }, [purAmt]);
+
   // 상사매입비 
   const [agentPurCst, setAgentPurCst] = useState(purCst || '0');
 
   // 매입일 선택 상태 관리
-  const [carPurDt, setCarPurDt] = useState('');
+  const [carPurDt, setCarPurDt] = useState(getTodayStr());
 
   // jQuery datepicker와 React state 연동을 위한 전역 콜백 등록
   useEffect(() => {
@@ -89,12 +125,12 @@ export default function RegPage({
   const [gainTax, setGainTax] = useState('0');
 
   // 상사매입비 입금일 선택 상태 관리
-  const [brokerageDate, setBrokerageDate] = useState('');
+  const [brokerageDate, setBrokerageDate] = useState(getTodayStr());
 
   // 이전일 선택 상태 관리
   const [carRegDt, setCarRegDt] = useState('');
 
-  // 발행일 선택 상태 관리
+  // 발행일 선택 상태 관리 (오늘일자로 초기화)
   const [txblIssuDt, setTxblIssuDt] = useState('');
 
   // 차량명 
@@ -190,14 +226,18 @@ export default function RegPage({
     }
   }, [prsnSctCd, purAmt, carKndCd]);
 
-  const router = useRouter();
-
   // 차량 선택 핸들러
   const handleCarSelect = (car) => {
     console.log('선택된 차량:', car);
     setSelectedCar(car);
     setIsModalOpen(false);
   };
+
+  const handleEmailDomainSelect = useCallback((domain) => {
+    setEmailDomain(domain);
+    setIsEmailDomainOpen(false);
+  }, []);
+
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -423,7 +463,8 @@ export default function RegPage({
       parkKeyNo,                                                 // Key번호
       fctCndcYn,                                                 // 사실 확인서 여부
       txblRcvYn,                                                 // 매입수취여부
-      ctshNo                                                     // 계약서번호
+      ctshNo,                                                    // 계약서번호
+      carRegDt,                                                  // 이전일
     };
     
     try {
@@ -643,7 +684,7 @@ export default function RegPage({
                         className={`select__option ${!cstTypeCd ? 'select__option--selected' : ''}`}
                         data-value="000"
                         onClick={() => {
-                          setCstTypeCd('');
+                          setCstTypeCd('000');
                           setIsCstTypeCdSelectOpen(false);
                         }}
                       >해당없음</li>
@@ -1137,32 +1178,21 @@ export default function RegPage({
                     <ul className={`select__menu ${isEmailDomainOpen ? 'active' : ''}`}>
                       <li 
                         className={`select__option ${!emailDomain ? 'select__option--selected' : ''}`}
-                        onClick={() => {
-                          setEmailDomain('');
-                          setIsEmailDomainOpen(false);
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEmailDomainSelect('');
                         }}
                       >직접입력</li>
-                      <li 
-                        className={`select__option ${emailDomain === 'gmail.com' ? 'select__option--selected' : ''}`}
-                        onClick={() => {
-                          setEmailDomain('gmail.com');
-                          setIsEmailDomainOpen(false);
-                        }}
-                      >gmail.com</li>
-                      <li 
-                        className={`select__option ${emailDomain === 'daum.net' ? 'select__option--selected' : ''}`}
-                        onClick={() => {
-                          setEmailDomain('daum.net');
-                          setIsEmailDomainOpen(false);
-                        }}
-                      >daum.net</li>
-                      <li 
-                        className={`select__option ${emailDomain === 'nate.com' ? 'select__option--selected' : ''}`}
-                        onClick={() => {
-                          setEmailDomain('nate.com');
-                          setIsEmailDomainOpen(false);
-                        }}
-                      >nate.com</li>
+                      {EMAIL_DOMAINS.map((domain) => (
+                        <li 
+                          key={domain}
+                          className={`select__option ${emailDomain === domain ? 'select__option--selected' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEmailDomainSelect(domain);
+                          }}
+                        >{domain}</li>
+                      ))}
                     </ul>
                   </div>
                 </div>

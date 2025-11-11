@@ -1,7 +1,7 @@
 "use client";
 import Image from 'next/image'
 import { useState, useEffect, useCallback } from 'react';
-import { updatePurchase } from "@/app/(main)/purchases/edit/[id]/api";
+import { useRouter } from 'next/navigation';
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '../../../../../lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 import { getAcqTax } from '@/app/(main)/common/script.js'
@@ -18,9 +18,10 @@ const PRESENTATION_TYPE = {
 };
 
 const EMAIL_DOMAINS = [
+  'naver.com',
   'gmail.com',
   'daum.net', 
-  'nate.com'
+  'nate.com',
 ];
 
 const TAX_RECEIPT_STATUS = {
@@ -36,10 +37,12 @@ export default function EditPage({
   carKndList = [], 
   evdcCdList = [], 
   parkingLocationList = [], 
-  carPurDetail = [] 
+  carPurDetail = [] ,  
+  cstTypeCdList = [], 
 }) {
-  console.log('carPurDetail**********', carPurDetail);
-  
+
+  const router = useRouter();
+
   // ===== 드롭다운 열림/닫힘 상태 =====
   const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
   const [isCarKndSelectOpen, setIsCarKndSelectOpen] = useState(false);
@@ -133,12 +136,17 @@ export default function EditPage({
   const [parkKeyNo, setParkKeyNo] = useState(carPurDetail.PARK_KEY_NO || '');
   const [attachedFiles, setAttachedFiles] = useState([]);
 
+  // 비용 발급 코드 선택 상태 관리 (콤보 박스)
+  const [isCstTypeCdSelectOpen, setIsCstTypeCdSelectOpen] = useState(false);
+  const [cstTypeCd, setCstTypeCd] = useState(carPurDetail.AGENT_PUR_CST_ISSU_CD || '');
+    
   // ===== UI 상태 =====
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // ===== 계산 로직 (useEffect) =====
   // 제시구분과 차량 종류 변경시 상사매입비 설정
+  /*
   useEffect(() => {
     if (prsnSctCd === PRESENTATION_TYPE.COMPANY_PURCHASE) {
       // 상사매입이면...
@@ -153,6 +161,7 @@ export default function EditPage({
       setAgentPurCst('0');
     }
   }, [prsnSctCd, carKndCd]);
+  */
 
   // 매입금액과 차량 종류 변경시 취득세 계산 (상사매입일 때만)
   useEffect(() => {
@@ -232,7 +241,8 @@ export default function EditPage({
     console.log('purVat', purVat);    // 부가세    
     console.log('carPurDt', carPurDt);    // 매입일
     console.log('agentPurCst', agentPurCst);    // 상사매입비
-    console.log('brokerageDate', brokerageDate);    // 상사매입비 입금일
+    console.log('brokerageDate', brokerageDate);    // 상사매입비 입금일    
+    console.log('cstTypeCd', cstTypeCd);    // 비용 발급 코드
     console.log('carRegDt', carRegDt);    // 이전일
     console.log('txblIssuDt', txblIssuDt);    // 발행일
     console.log('carNo', carNo);    // 차량번호(매입후)
@@ -277,12 +287,6 @@ export default function EditPage({
     // 상사매입비
     if(!agentPurCst) {
       alert('상사매입비를 입력해주세요.');
-      return;
-    }
-
-    // 취득세
-    if(!gainTax) {
-      alert('취득세를 선택해주세요.');
       return;
     }
 
@@ -353,6 +357,7 @@ export default function EditPage({
       carPurDt,                                                  // 매입일   
       agentPurCst,                                               // 상사매입비
       brokerageDate,                                             // 상사매입비 입금일
+      cstTypeCd,                                                 // 비용 발급 코드
       gainTax,                                                   // 취득세
       carNm,                                                     // 차량명
       carNo,                                                     // 차량번호(매입후)
@@ -372,7 +377,10 @@ export default function EditPage({
       purDesc,                                                   // 매입설명
       ownrAddr1,                                                 // 주소
       ownrAddr2,                                                 // 상세주소
-      attachedFiles,                                             // 관련 서류 첨부
+      attachedFiles: attachedFiles.map(file => ({
+        name: file.name,
+        url: file.url
+      })), // 관련 서류 첨부 (파일명과 URL)
       usrId: session?.usrId,                                     // 사용자 ID
       dealerId,                                                  // 딜러 코드
       parkingCd,                                                 // 주차위치 코드
@@ -384,11 +392,8 @@ export default function EditPage({
       carRegDt,                                                  // 이전일
     };
 
-
-    console.log('formValues', formValues);
-
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updatePurchase`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarPur`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -396,10 +401,15 @@ export default function EditPage({
         body: JSON.stringify(formValues)
       });
       const res = await response.json();
-      
-      alert('매입차량 수정 완료되었습니다.'); // 테스트용 알림
+
+      alert('매입차량 수정 되었습니다.'); // 테스트용 알림
       setLoading(false);
-      return { success: true, res, error: null };
+      if (res.success) {
+        router.back();
+        return { success: true, res, error: null };
+      } else {
+        throw new Error(res.message || '매입차량 수정에 실패했습니다');
+      }
     } catch (error) {
       setError(error.message);
       alert('매입차량 수정 중 오류가 발생했습니다.'); // 테스트용 알림
@@ -574,6 +584,47 @@ export default function EditPage({
                       onChange={(e) => setBrokerageDate(e.target.value)}
                       value={brokerageDate || ''} 
                     />
+                  </div>
+
+                  <div className="select w120">
+                    <input 
+                      className="select__input" 
+                      type="hidden" 
+                      name="carKndCd" 
+                      value={cstTypeCd || ''} 
+                    />
+                    <button 
+                      className="select__toggle" 
+                      type="button"
+                      onClick={() => setIsCstTypeCdSelectOpen(!isCstTypeCdSelectOpen)}
+                    >
+                      <span className="select__text">
+                        {cstTypeCd ? cstTypeCdList.find(c => c.CD === cstTypeCd)?.CD_NM || '해당없음' : '해당없음'}
+                      </span>
+                      <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
+                    </button>
+                    <ul className="select__menu" style={{ display: isCstTypeCdSelectOpen ? 'block' : 'none' }}>
+                      <li 
+                        key="default-cstType"
+                        className={`select__option ${!cstTypeCd ? 'select__option--selected' : ''}`}
+                        data-value="000"
+                        onClick={() => {
+                          setCstTypeCd('000');
+                          setIsCstTypeCdSelectOpen(false);
+                        }}
+                      >해당없음</li>
+                      {cstTypeCdList && cstTypeCdList.map((cstType) => (
+                        <li 
+                          key={`cstType-${cstType.CD}`}
+                          className={`select__option ${cstTypeCd === cstType.CD ? 'select__option--selected' : ''}`}
+                          data-value={`${cstType.CD}`}
+                          onClick={() => {
+                            setCstTypeCd(`${cstType.CD}`);
+                            setIsCstTypeCdSelectOpen(false);
+                          }}
+                        >{cstType.CD_NM}</li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </td>

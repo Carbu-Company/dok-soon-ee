@@ -12,7 +12,7 @@ import { getAcqTax } from '@/app/(main)/common/script.js'
 // ===== 상수 정의 =====
 const OWNER_TYPE = {
   INDIVIDUAL: '001', // 개인
-  CORPORATION: '002' // 법인
+  CORPORATION: '002' // 사업자 (법인)
 };
 
 const PRESENTATION_TYPE = {
@@ -48,6 +48,14 @@ export default function SalesRegisterPage({
 
   const [carPurDetail, setCarPurDetail] = useState(carPurInfo);
   const [agentTradeItemDetail, setAgentTradeItemDetail] = useState(agentTradeItemInfo);
+
+
+  const [purDlrId, setPurDlrId] = useState(carPurDetail?.DLR_ID || '');
+  useEffect(() => {
+    if (carPurDetail) {
+      setPurDlrId(carPurDetail.DLR_ID);
+    }
+  }, [carPurDetail]);
 
   /**
    * carPurDetail 값은 항상 채워져 있다.  page.js에서 가져온다. 차량 선택시에도  carPurDetail 값이 채워 진다.
@@ -137,6 +145,11 @@ export default function SalesRegisterPage({
       setSellVat(responseData.PUR_VAT);
 
       /**
+       * 매입 딜러 셋팅
+       */
+      setPurDlrId(responseData.DLR_ID);
+
+      /**
        * 상사 매입비 정보, 성능보험료 정보
        */
 
@@ -177,6 +190,7 @@ export default function SalesRegisterPage({
       const updatedCustomers = buyerCustomers.map(cust => ({
         ...cust,
         customerName: customer.CUST_NM || '',
+        customerType: customer.CUST_TYPE || '',
         residentNumber: customer.CUST_NO || '',
         phone: customer.CUST_PHON || '',
         address: customer.CUST_ADDR || '',
@@ -199,9 +213,11 @@ export default function SalesRegisterPage({
     const newCustomer = {
       id: Date.now(), // 고유 ID 생성
       customerName: '',
+      customerType: OWNER_TYPE.INDIVIDUAL,
       residentNumber: '',
       businessNumber: '',
       phone: '',
+      zip: '',
       address: '',
       memo: '',
       shareRate: ''
@@ -237,6 +253,34 @@ export default function SalesRegisterPage({
   const [sellAmt, setSellAmt] = useState('0');
   const [sellSupPrc, setSellSupPrc] = useState('0');
   const [sellVat, setSellVat] = useState('0');
+
+  /**
+   * 초기 셋팅
+   * 딜러,  판매금액, 판매 공급가액, 판매 부가세 셋팅
+   */
+  useEffect(() => {
+    if (carPurDetail) {
+      setSelectedSellDealer(carPurDetail.DLR_ID);
+      setSellAmt(carPurDetail.PUR_AMT);
+      setSellSupPrc(carPurDetail.PUR_SUP_PRC);
+      setSellVat(carPurDetail.PUR_VAT);
+    }
+  }, [carPurDetail]);
+
+
+  /**
+   * selectedSellDealer, purDlrId 비교해서 다르면 알선 처리 
+   */
+  useEffect(() => {
+    if (selectedSellDealer && selectedSellDealer !== purDlrId) {
+      setIsAlsonDivVisible(true);
+    } else {
+      setIsAlsonDivVisible(false);
+    }
+  }, [selectedSellDealer, purDlrId]);
+
+
+  const [isAlsonDivVisible, setIsAlsonDivVisible] = useState(false);
 
   // 매입금액이 변경될 때 공급가액과 부가세 계산
   useEffect(() => {
@@ -330,6 +374,92 @@ export default function SalesRegisterPage({
   const handleSellSubmit = async () => {
     console.log('handleSellSubmit');
 
+    // 필수 입력 항목 체크 
+    if(!selectedSellDealer) {
+      alert('딜러를 선택해주세요.');
+      return;
+    }
+    if(!sellAmt || sellAmt === '0') {
+      alert('판매금액을 입력해주세요.');
+      return;
+    }
+    if(!carSaleDt) {
+      alert('판매일을 선택해주세요.');
+      return;
+    }
+    if(!agentSelCost) {
+      alert('상사매도비를 입력해주세요.');
+      return;
+    }
+    if(!perfInfeAmt) {
+      alert('성능보험료를 입력해주세요.');
+      return;
+    }
+    if(!outCarNo) {
+      alert('차량번호(출고)를 입력해주세요.');
+      return;
+    }
+    if(!buyerCustomers[0].customerName) {
+      alert('매수자명을 입력해주세요.');
+      return;
+    }
+    if(!buyerCustomers[0].customerType) {
+      alert('매수자구분을 선택해주세요.');
+      return;
+    }
+    if(!buyerCustomers[0].residentNumber && !buyerCustomers[0].businessNumber) {
+      alert('매수자 주민번호나 사업자번호 중 하나를 입력해주세요.');
+      return;
+    }
+    if(!buyerCustomers[0].phone) {
+      alert('매수자 연락처를 입력해주세요.');
+      return;
+    }
+    if(!buyerCustomers[0].zip) {
+      alert('매수자 우편번호를 입력해주세요.');
+      return;
+    }
+    if(!buyerCustomers[0].address) {  
+      alert('매수자 주소를 입력해주세요.');
+      return;
+    }
+    if(!buyerCustomers[0].addressDetail) {
+      alert('매수자 상세주소를 입력해주세요.');
+      return;
+    }
+
+    // 알선 항목 체크
+    if(isAlsonDivVisible) {
+      if(!alsonDlrId) {
+        alert('알선딜러를 선택해주세요.');
+        return;
+      }
+      if(!alsonSelCost) {
+        alert('판매금액를 입력해주세요.');
+        return;
+      }
+      if(!alsonFeeAmt) {
+        alert('알선수수료를 입력해주세요.');
+        return;
+      }
+      if(!alsonSsn) {
+        alert('알선주민번호를 입력해주세요.');
+        return;
+      }
+      if(!alsonPhon) {
+        alert('알선연락처를 입력해주세요.');
+        return;
+      }
+      if(!alsonAgentNm) {
+        alert('알선소속상사명을 입력해주세요.');
+        return;
+      }
+      if(!alsonAcntNo) {
+        alert('알선입금계좌를 입력해주세요.');
+        return;
+      }
+    }
+
     setLoading(true);
     setError(null);
 
@@ -346,7 +476,7 @@ export default function SalesRegisterPage({
       buyerSsn: buyerCustomers[0].residentNumber,              // 매수자 주민번호
       buyerBrno: buyerCustomers[0].businessNumber,             // 매수자 사업자번호
       buyerPhon: buyerCustomers[0].phone,                      // 매수자 연락처
-      buyerZip: buyerCustomers[0].zipCode,                     // 매수자 우편번호
+      buyerZip: buyerCustomers[0].zip,                     // 매수자 우편번호
       buyerAddr1: buyerCustomers[0].address,                   // 매수자 주소
       buyerAddr2: buyerCustomers[0].addressDetail,             // 매수자 상세주소
       saleAmt: sellAmt,                                        // 판매금액
@@ -369,6 +499,17 @@ export default function SalesRegisterPage({
       modrId: session?.usrId,                                   // 수정자ID
       buyerCustomers
     };
+
+    // 알선 항목 formValues 추가
+    if(isAlsonDivVisible) {
+      formValues.alsonDlrId = alsonDlrId;
+      formValues.alsonSelCost = alsonSelCost;
+      formValues.alsonFeeAmt = alsonFeeAmt;
+      formValues.alsonSsn = alsonSsn;
+      formValues.alsonPhon = alsonPhon;
+      formValues.alsonAgentNm = alsonAgentNm;
+      formValues.alsonAcntNo = alsonAcntNo;
+    }
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarSel`, {
@@ -405,6 +546,17 @@ export default function SalesRegisterPage({
   /////////////////////////////////////////////////////////////////////////////
 
   
+  // ===== 드롭다운 열림/닫힘 상태 =====
+
+  const [alsonDlrId, setAlsonDlrId] = useState('');
+  const [alsonSelCost, setAlsonSelCost] = useState('');
+  const [alsonFeeAmt, setAlsonFeeAmt] = useState('');
+  const [alsonSsn, setAlsonSsn] = useState('');
+  const [alsonPhon, setAlsonPhon] = useState('');
+  const [alsonAgentNm, setAlsonAgentNm] = useState('');
+  const [alsonAcntNo, setAlsonAcntNo] = useState('');
+
+
   // ===== 드롭다운 열림/닫힘 상태 =====
   const [isDealerSelectOpen, setIsDealerSelectOpen] = useState(false);
   const [isCarKndSelectOpen, setIsCarKndSelectOpen] = useState(false);
@@ -1171,7 +1323,7 @@ export default function SalesRegisterPage({
       </div>
 
       {/* 알선 경우만 s */}
-      <div className="table-wrap" id="alson_div" style={{ display: "none" }}>
+      <div className="table-wrap" id="alson_div" style={{ display: isAlsonDivVisible ? 'block' : 'none' }}>
         <h2 className="table-wrap__title">알선</h2>
         <table className="table table--lg">
           <colgroup>
@@ -1189,7 +1341,14 @@ export default function SalesRegisterPage({
               </th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
+                  <input
+                    type="text"
+                    className="input__field"
+                    placeholder="알선딜러 ID"
+                    name="alsonDlrId"
+                    value={alsonDlrId || ""}
+                    onChange={e => setAlsonDlrId(e.target.value)}
+                  />
                   <div className="input__utils">
                     <button
                       type="button"
@@ -1216,11 +1375,18 @@ export default function SalesRegisterPage({
               </th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="금액" defaultValue="0" />
+                  <input
+                    type="text"
+                    className="input__field"
+                    placeholder="금액"
+                    value={alsonSelCost || '0'}
+                    onChange={e => setAlsonSelCost(e.target.value.replace(/[^\d]/g, ''))}
+                  />
                   <div className="input__utils">
                     <button
                       type="button"
                       className="jsInputClear input__clear ico ico--input-delete"
+                      onClick={() => setAlsonSelCost('')}
                     >
                       삭제
                     </button>
@@ -1243,7 +1409,13 @@ export default function SalesRegisterPage({
               </th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="금액" defaultValue="0" />
+                  <input
+                    type="text"
+                    className="input__field"
+                    placeholder="금액"
+                    value={alsonFeeAmt || '0'}
+                    onChange={e => setAlsonFeeAmt(e.target.value.replace(/[^\d]/g, ''))}
+                  />
                   <div className="input__utils">
                     <button
                       type="button"
@@ -1259,7 +1431,13 @@ export default function SalesRegisterPage({
               <th>주민등록번호</th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
+                  <input
+                    type="text"
+                    className="input__field"
+                    placeholder="주민등록번호"
+                    value={alsonSsn || ''}
+                    onChange={e => setAlsonSsn(e.target.value)}
+                  />
                   <div className="input__utils">
                     <button
                       type="button"
@@ -1273,7 +1451,11 @@ export default function SalesRegisterPage({
               <th>연락처</th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
+                  <input type="text" className="input__field"
+                    placeholder="연락처"
+                    value={alsonPhon || ''}
+                    onChange={e => setAlsonPhon(e.target.value)}
+                  />
                   <div className="input__utils">
                     <button
                       type="button"
@@ -1287,7 +1469,11 @@ export default function SalesRegisterPage({
               <th>소속상사명</th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
+                  <input type="text" className="input__field"
+                    placeholder="소속상사명"
+                    value={alsonAgentNm || ''}
+                    onChange={e => setAlsonAgentNm(e.target.value)}
+                  />
                   <div className="input__utils">
                     <button
                       type="button"
@@ -1303,7 +1489,11 @@ export default function SalesRegisterPage({
               <th>입금계좌</th>
               <td>
                 <div className="input">
-                  <input type="text" className="input__field" placeholder="" />
+                  <input type="text" className="input__field"
+                    placeholder="입금계좌"
+                    value={alsonAcntNo || ''}
+                    onChange={e => setAlsonAcntNo(e.target.value)}
+                  />
                   <div className="input__utils">
                     <button
                       type="button"
@@ -1339,18 +1529,20 @@ export default function SalesRegisterPage({
         </div>
         <table className="table table--xl" id="myTable">
           <colgroup>
-            <col style={{ width: "240px" }} />
-            <col style={{ width: "220px" }} />
             <col style={{ width: "200px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "180px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "250px" }} />
             <col style={{ width: "200px" }} />
-            <col style={{ width: "300px" }} />
-            <col style={{ width: "200px" }} />
-            <col style={{ width: "200px" }} />
+            <col style={{ width: "120px" }} />
             <col style={{ width: "64px" }} />
           </colgroup>
           <thead>
             <tr>
               <th>고객명</th>
+              <th>고객구분</th>
               <th>주민(법인)등록번호</th>
               <th>사업자등록번호</th>
               <th>연락처</th>
@@ -1361,7 +1553,7 @@ export default function SalesRegisterPage({
             </tr>
           </thead>
           <tbody>
-            {buyerCustomers.map((customer, index) => (
+            {buyerCustomers.map((customer) => (
               <tr key={customer.id}>
                 <td>
                   <div className="input-with-search">
@@ -1384,6 +1576,36 @@ export default function SalesRegisterPage({
                       </div>
                     </div>
                     <button className="btn btn--dark" type="button" onClick={handleCustSearchClick}>검색</button>
+                  </div>
+                </td>
+                <td>
+                  <div className="form-option-wrap">
+                    <div className="form-option">
+                      <label className="form-option__label">
+                        <input 
+                          type="radio" 
+                          id={`customerType_${customer.id}_individual`}
+                          name="customerType" 
+                          value="individual"
+                          checked={customer.customerType ? customer.customerType === "individual" : true}
+                          onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'customerType', e.target.value)}
+                        />
+                        <span className="form-option__title">개인</span>
+                      </label>
+                    </div>
+                    <div className="form-option">
+                      <label className="form-option__label">
+                        <input 
+                          type="radio" 
+                          id={`customerType_${customer.id}_business`}
+                          name="customerType" 
+                          value="business"
+                          checked={customer.customerType === "business"}
+                          onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'customerType', e.target.value)}
+                        />
+                        <span className="form-option__title">사업자</span>
+                      </label>
+                    </div>
                   </div>
                 </td>
                 <td>
