@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { openPostcodeSearch } from '@/components/modal/AddressModal'
 
 export default function DealerManagement({ dealerList, loading, onDealerListChange }) {
   // 행별 수정 모드 상태 관리
@@ -19,6 +20,13 @@ export default function DealerManagement({ dealerList, loading, onDealerListChan
     }
     setEditingRows(prev => new Set([...prev, index]))
   }
+
+  // 주소 검색 함수
+  const handleAddressSearch = () => {
+    openPostcodeSearch((data) => {
+      handleFieldChange('address', data.address);
+    });
+  };
 
   // 특정 행 수정 모드 취소
   const handleRowEditCancel = (index) => {
@@ -195,19 +203,23 @@ export default function DealerManagement({ dealerList, loading, onDealerListChan
       
       <table className="table dealer-table">
         <colgroup>
+          <col style={{ width: "40px" }} />
           <col style={{ width: "80px" }} />
           <col style={{ width: "90px" }} />
           <col style={{ width: "110px" }} />
           <col style={{ width: "90px" }} />
-          <col style={{ width: "200px" }} />
+          <col style={{ width: "90px" }} />
+          <col style={{ width: "400px" }} />
           <col style={{ width: "60px" }} />
         </colgroup>
         <thead>
           <tr>
+            <th>번호</th>
             <th>딜러명</th>
             <th>연락처</th>
             <th>이메일</th>
-            <th>입사일</th>
+            <th>등록일</th>
+            <th>종료일</th>
             <th>주소</th>
             <th>관리</th>
           </tr>
@@ -217,12 +229,15 @@ export default function DealerManagement({ dealerList, loading, onDealerListChan
             dealerList.map((dealer, index) => (
               <tr key={index}>
                 <td>
+                  {index + 1}
+                </td>
+                <td>
                   <div className="input">
                     <input 
                       type="text" 
                       className={`input__field ${getFieldClassName(index)}`}
                       placeholder="딜러명" 
-                      value={dealer.EMPKNAME || ''}
+                      value={dealer.USR_NM || ''}
                       onChange={(e) => handleFieldChange(index, 'EMPKNAME', e.target.value)}
                       readOnly={!isRowEditing(index)}
                     />
@@ -243,7 +258,7 @@ export default function DealerManagement({ dealerList, loading, onDealerListChan
                       type="text" 
                       className={`input__field ${getFieldClassName(index)}`}
                       placeholder="- 없이 입력" 
-                      value={dealer.EMPTELNO1 || ''}
+                      value={dealer.USR_PHON || ''}
                       onChange={(e) => handleFieldChange(index, 'EMPTELNO1', e.target.value)}
                       readOnly={!isRowEditing(index)}
                     />
@@ -264,7 +279,7 @@ export default function DealerManagement({ dealerList, loading, onDealerListChan
                       type="email" 
                       className={`input__field ${getFieldClassName(index)}`}
                       placeholder="이메일 주소" 
-                      value={dealer.EMPEMAIL || ''}
+                      value={dealer.USR_EMAIL || ''}
                       onChange={(e) => handleFieldChange(index, 'EMPEMAIL', e.target.value)}
                       readOnly={!isRowEditing(index)}
                     />
@@ -284,7 +299,7 @@ export default function DealerManagement({ dealerList, loading, onDealerListChan
                     <input 
                       type="date" 
                       className={`input__field ${getFieldClassName(index)}`}
-                      value={dealer.EMPSDATE || ''}
+                      value={dealer.USR_STRT_DT || ''}
                       onChange={(e) => handleFieldChange(index, 'EMPSDATE', e.target.value)}
                       readOnly={!isRowEditing(index)}
                     />
@@ -302,21 +317,89 @@ export default function DealerManagement({ dealerList, loading, onDealerListChan
                 <td>
                   <div className="input">
                     <input 
-                      type="text" 
+                      type="date" 
                       className={`input__field ${getFieldClassName(index)}`}
-                      placeholder="주소를 입력하세요" 
-                      value={dealer.ADDR1 || ''}
-                      onChange={(e) => handleFieldChange(index, 'ADDR1', e.target.value)}
+                      value={dealer.USR_END_DT || ''}
+                      onChange={(e) => handleFieldChange(index, 'EMPEDATE', e.target.value)}
                       readOnly={!isRowEditing(index)}
                     />
                     <div className="input__utils">
                       <button 
                         type="button" 
                         className="jsInputClear input__clear ico ico--input-delete"
-                        onClick={() => handleFieldChange(index, 'ADDR1', '')}
+                        onClick={() => handleFieldChange(index, 'EMPEDATE', '')}
                       >
                         삭제
                       </button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="input-group">
+                    <div className="input w100">
+                      <input 
+                        type="text" 
+                        className={`input__field ${getFieldClassName('zip')}`}
+                        placeholder="" 
+                        value={dealer.ZIP || ''}
+                        onChange={(e) => handleFieldChange('zip', e.target.value)}
+                        readOnly={!isRowEditing(index)}
+                      />
+                      <div className="input__utils">
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => handleFieldChange('zip', '')}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                    <button 
+                      className="btn btn--dark" 
+                      type="button" 
+                      onClick={handleAddressSearch}
+                      disabled={!isRowEditing(index)}
+                    >
+                      주소 검색
+                    </button>
+                    <div className="input w400">
+                      <input 
+                        type="text" 
+                        className={`input__field ${getFieldClassName('address')}`}
+                        placeholder="검색 버튼을 눌러주세요" 
+                        value={dealer.ADDR1 || ''}
+                        onChange={(e) => handleFieldChange(index, 'address', e.target.value)}
+                        readOnly={!isRowEditing(index)}
+                      />
+                      <div className="input__utils">
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => handleFieldChange(index, 'address', '')}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                    <div className="input w400">
+                      <input 
+                        type="text" 
+                        className={`input__field ${getFieldClassName('detailAddress')}`}
+                        placeholder="상세 주소" 
+                        value={dealer.ADDR2 || ''}
+                        onChange={(e) => handleFieldChange(index, 'detailAddress', e.target.value)}
+                        readOnly={!isRowEditing(index)}
+                      />
+                      <div className="input__utils">
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => handleFieldChange(index, 'detailAddress', '')}
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </td>

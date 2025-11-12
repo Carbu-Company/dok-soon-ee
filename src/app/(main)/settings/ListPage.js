@@ -2,8 +2,8 @@
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { 
-  getAgentInfo, 
-  getDealerList,    // getUsrList 
+  getAgentInfo,         // 공통 모듈에서 
+  getDealerList,        // getUsrList 
   getPurchaseCost,
   getSellCostSummary,
   getCompanyExpense,
@@ -17,9 +17,8 @@ import Certificate from '@/components/settings/Certificate'
 import Account from '@/components/settings/Account'
 
 export default function SettingsPage(props) {
-    const agentId = props.session.agentId;
-    console.log('SettingsPage - agentId:', agentId);
-    console.log('SettingsPage - props.session:', props.session);
+  const agentId = props.session.agentId;
+
   // 탭 상태 관리
   const [activeTab, setActiveTab] = useState('company-info')
   
@@ -35,6 +34,8 @@ export default function SettingsPage(props) {
     phone: '',
     email: '',
     emailDomain: 'gmail.com',
+    presidentName: '',
+    presidentPhone: '',
     mobile: '',
     address: '',
     detailAddress: ''
@@ -54,44 +55,38 @@ export default function SettingsPage(props) {
   // 계좌 목록 상태
   const [accountList, setAccountList] = useState([])
   
-  // 이메일 도메인 옵션
-  const emailDomains = [
-    { value: 'gmail.com', label: 'gmail.com' },
-    { value: 'naver.com', label: 'naver.com' },
-    { value: 'daum.net', label: 'daum.net' },
-    { value: 'nate.com', label: 'nate.com' }
-  ]
-  
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     loadAgentInfo()
     loadDealerList()
-    loadPurchaseCost()
-    loadSellCostSummary()
-    loadExpenseList()
-    loadIncomeList()
-    loadAccountList()
+    //loadPurchaseCost()
+    //loadSellCostSummary()
+    //loadExpenseList()
+    //loadIncomeList()
+    //loadAccountList()
   }, [])
   
   // 상사 정보 로드
   const loadAgentInfo = async () => {
-    console.log('loadAgentInfo*******************:', agentId);
     try {
       setLoading(true)
       const result = await getAgentInfo(agentId)
-      console.log('getAgentInfo result*******************:', result);
       if (result.success && result.data && result.data.length > 0) {
         const agentData = result.data[0];
 
-        console.log('agentData*******************:', agentData);
+        console.log('agentData*************', agentData);
+
         setAgentInfo({
-          companyName: agentData.AGENT_NM || '',
+          companyName: agentData.COMNAME || '',
           businessNumber: agentData.BRNO || '',
-          loginId: agentData.LOGIN_ID || '',
-          password: agentData.LOGIN_PASSWORD || '',
           phone: agentData.PHON || '',
+          fax: agentData.FAX || '',
           email: agentData.EMAIL || '',
-          emailDomain: agentData.EMAIL_DOMAIN || ''
+          zip: agentData.ZIP || '',
+          address: agentData.ADDR1 || '',
+          detailAddress: agentData.ADDR2 || '',
+          presidentName: agentData.PRES_NM || '',
+          presidentPhone: agentData.PRES_PHON || ''
         })
       }
     } catch (error) {
@@ -179,7 +174,7 @@ export default function SettingsPage(props) {
   
   // 상사 정보 업데이트
   const handleCompanyInfoChange = (field, value) => {
-    setCompanyInfo(prev => ({
+    setAgentInfo(prev => ({
       ...prev,
       [field]: value
     }))
@@ -340,8 +335,7 @@ export default function SettingsPage(props) {
           {/* 상사 정보 관리 탭 */}
           {activeTab === 'company-info' && (
             <CompanyInfo 
-            companyInfo={agentInfo}
-              emailDomains={emailDomains}
+              companyInfo={agentInfo}
               onCompanyInfoChange={handleCompanyInfoChange}
               loading={loading}
             />

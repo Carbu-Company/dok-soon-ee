@@ -204,6 +204,8 @@ export default function RegPage({
   useEffect(() => {
     if (prsnSctCd === '0') {
 
+      console.log('carKndCd*************', carKndCd);
+
       // 상사매입이면...
       if (carKndCd !== '') {
         const carKndCdValue = carKndCd.split('|')[0];
@@ -211,17 +213,17 @@ export default function RegPage({
         setGainTax(taxAmount);
 
         const carKndValue = carKndCd.split('|')[1];
-        setAgentPurCst(purCst);
+        //setAgentPurCst(purCst);
       }
       else {
-        setAgentPurCst(purCst);
+        //setAgentPurCst(purCst);
         setGainTax('0');
       }
     }
     else {
 
       // 고객위탁이면...
-      setAgentPurCst('0');
+      //setAgentPurCst('0');
       setGainTax('0');
     }
   }, [prsnSctCd, purAmt, carKndCd]);
