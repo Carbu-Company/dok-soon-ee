@@ -399,7 +399,7 @@ export default function InventoryFinanceInterestList( props ) {
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">재고금융 리스트(이자납입)</h2>
+        <h2 className="container__title">재고금융 이자납입 리스트</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">재고금융 : 이자납입 = 1 : N</p>
@@ -1090,6 +1090,7 @@ export default function InventoryFinanceInterestList( props ) {
           리스트<span>Total {pagination?.totalCount || carList?.length || 0}건</span>
         </h2>
         <div className="table-wrap__head table-wrap__title">
+          {/* 재고금융 등록 버튼 
           <button
             type="button"
             className="btn btn--red btn--padding--r30"
@@ -1101,6 +1102,8 @@ export default function InventoryFinanceInterestList( props ) {
           >
             <span className="ico ico--add"></span>재고금융 등록
           </button>
+          */}
+          <div></div>
           <div className="input-group">
             {/* 딜러명 */}
             <div className="select select--dark w160">

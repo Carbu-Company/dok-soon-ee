@@ -408,7 +408,7 @@ export default function InventoryFinanceList(props) {
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">재고금융 리스트</h2>
+        <h2 className="container__title">재고금융 차량별 리스트</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">상사별 환경설정-캐피탈이용내역 불러오기, 신규/추가/연장</p>

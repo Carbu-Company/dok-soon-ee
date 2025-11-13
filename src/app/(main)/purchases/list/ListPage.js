@@ -487,7 +487,7 @@ export default function ListPage(props) {
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">매입차량 리스트</h2>
+        <h2 className="container__title">제시차량 리스트</h2>
         <div className="guidebox">
           <p className="guidebox__title">이용안내</p>
           <p className="guidebox__desc">

@@ -408,7 +408,7 @@ export default function ElectronicTaxInvoicePage(props) {
     return (
       <main className="container container--page">
         <div className="container__head">
-          <h2 className="container__title">전자세금계산서 관리</h2>
+          <h2 className="container__title">세금계산서 결과 리스트</h2>
   
           <div className="guidebox">
             <p className="guidebox__title">매도처리 후 매출증빙과 연계 필요(1:1)</p>

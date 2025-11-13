@@ -517,7 +517,7 @@ export default function Header({ session }) {
         <nav className="header__gnb">
           {/* 제시(매입)차량: 기존엔 /purchases/list였으나 마크업에선 m1.jsp */}
           <Link href="/purchases/list" className="header__gnb-menu">
-            제시(매입)차량
+            제시차량
           </Link>
 
           {/* 상품화비용관리 드롭다운 */}
@@ -535,12 +535,12 @@ export default function Header({ session }) {
             <ul className="select__menu">
               <li className="select__option select__option--selected">
                 <Link href="/car-goods/list" className="select__option-link">
-                  차량별 리스트
+                  상품화비용 차량별
                 </Link>
               </li>
               <li className="select__option">
                 <Link href="/car-goods/cost" className="select__option-link">
-                  상품화비용 리스트
+                  상품화비용 개별
                 </Link>
               </li>
             </ul>
@@ -561,19 +561,19 @@ export default function Header({ session }) {
             <ul className="select__menu">
               <li className="select__option select__option--selected">
                 <Link href="/inventory-finance/inventory-list" className="select__option-link">
-                  재고금융 리스트
+                  재고금융 차량별
                 </Link>
               </li>
               <li className="select__option">
                 <Link href="/inventory-finance/interest-list" className="select__option-link">
-                  이자납입 리스트
+                  재고금융 이자납입
                 </Link>
               </li>
             </ul>
           </div>
 
           <Link href="/car-sell/list" className="header__gnb-menu">
-            매도(판매)/정산
+            판매차량
           </Link>
           {/* 현금영수증 드롭다운 */}
           <div className="select">
@@ -590,17 +590,17 @@ export default function Header({ session }) {
             <ul className="select__menu">
               <li className="select__option select__option--selected">
                 <Link href="/cash-receipts/register" className="select__option-link">
-                  현금영수증 발행
+                  현금영수증 발행대기
                 </Link>
               </li>
               <li className="select__option">
                 <Link href="/cash-receipts/list" className="select__option-link">
-                  발행 리스트
+                  현금영수증 결과
                 </Link>
               </li>
               <li className="select__option">
                 <Link href="/cash-receipts/newIssue/0" className="select__option-link">
-                  건별 발행
+                  현금영수증 건별발행
                 </Link>
               </li>
             </ul>
@@ -620,17 +620,17 @@ export default function Header({ session }) {
             <ul className="select__menu">
               <li className="select__option select__option--selected">
                 <Link href="/electronic-tax-invoice/register" className="select__option-link">
-                  전자세금계산서 발행
+                  세금계산서 발행대기
                 </Link>
               </li>
               <li className="select__option">
                 <Link href="/electronic-tax-invoice/list" className="select__option-link">
-                  발행 리스트
+                  세금계산서 결과
                 </Link>
               </li>
               <li className="select__option">
                 <Link href="/electronic-tax-invoice/newIssue/0" className="select__option-link">
-                  건별 발행
+                  세금계산서 건별발행
                 </Link>
               </li>
             </ul>

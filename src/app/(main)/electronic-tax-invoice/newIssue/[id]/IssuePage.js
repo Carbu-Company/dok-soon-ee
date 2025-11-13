@@ -268,7 +268,7 @@ export default function IssuePage({
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">전자세금계산서 발행</h2>
+        <h2 className="container__title">세금계산서 건별발행</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">

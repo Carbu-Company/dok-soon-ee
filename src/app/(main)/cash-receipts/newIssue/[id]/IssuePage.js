@@ -128,7 +128,7 @@ export default function IssuePage({
   return (
       <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">현금영수증 발행 등록</h2>
+        <h2 className="container__title">현금영수증 건별발행</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">도움말</p>
