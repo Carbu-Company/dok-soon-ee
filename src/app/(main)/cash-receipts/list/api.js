@@ -1,7 +1,3 @@
-
-
-
-
 export const getCarCashList = async (params) => {
   try {
     const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarCashList`, {
