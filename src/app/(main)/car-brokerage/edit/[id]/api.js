@@ -1,6 +1,6 @@
-export const getCarConcilDetail  = async (brkSeq) => {
+export const getCarBrkTradeInfo  = async (brkTradeSeq) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarConcilDetail?brkSeq=${brkSeq}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarBrkTradeInfo?brkTradeSeq=${brkTradeSeq}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -20,9 +20,9 @@ export const getCarConcilDetail  = async (brkSeq) => {
     }
 };
 
-export const updateCarConcil = async (data) => {
+export const updateCarBrkTrade = async (data) => {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarConcil`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarBrkTrade`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

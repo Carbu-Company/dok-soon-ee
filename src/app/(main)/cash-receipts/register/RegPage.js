@@ -279,7 +279,7 @@ export default function CashReceiptRegisterPage({
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">현금영수증 발행</h2>
+        <h2 className="container__title">현금영수증 발행대기 리스트</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">

@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { updateCarConcil } from "@/app/(main)/car-concil/edit/[id]/api";
+import { updateCarBrkTrade } from "@/app/(main)/car-brokerage/edit/[id]/api";
 
 export default function EditPage({ 
   session = null, 
@@ -11,30 +11,16 @@ export default function EditPage({
   carKndList = [], 
   evdcCdList = [], 
   tradeItemCDList = [], 
-  carConcilDetail = [] 
+  carBrkTradeInfo = [] 
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
 /*
-  console.log('carConcilDetail**********', carConcilDetail);
+  console.log('carBrkTradeInfo**********', carBrkTradeInfo);
   
-  console.log('carConcilDetail.BRK_DLR_ID', carConcilDetail.BRK_DLR_ID);
-  console.log('carConcilDetail.TRADE_ITEM_CD', carConcilDetail.BRK_TRADE_ITEM_CD);
-  console.log('carConcilDetail.BRK_SALE_DT', carConcilDetail.BRK_SALE_DT);
-  console.log('carConcilDetail.BRK_AMT', carConcilDetail.BRK_AMT);
-  console.log('carConcilDetail.BRK_SUP_PRC', carConcilDetail.BRK_SUP_PRC);
-  console.log('carConcilDetail.BRK_VAT', carConcilDetail.BRK_VAT);  
-  console.log('carConcilDetail.DEDT_AMT', carConcilDetail.DEDT_AMT);
-  console.log('carConcilDetail.PAY_AMT', carConcilDetail.PAY_AMT);
-  console.log('carConcilDetail.BRK_EVDC_CD', carConcilDetail.BRK_EVDC_CD);
-  console.log('carConcilDetail.CAR_KND_CD', carConcilDetail.CAR_KND_CD);
-  console.log('carConcilDetail.CAR_NM', carConcilDetail.CAR_NM);
-  console.log('carConcilDetail.CAR_NO', carConcilDetail.CAR_NO);
-  console.log('carConcilDetail.OWNR_NM', carConcilDetail.OWNR_NM);
-  console.log('carConcilDetail.OWNR_PHON', carConcilDetail.OWNR_PHON);
-  console.log('carConcilDetail.BRK_MEMO', carConcilDetail.BRK_MEMO);
+  console.log('carBrkTradeInfo.BRK_TRADE_SEQ', carBrkTradeInfo.BRK_TRADE_SEQ);
   */
 
 
@@ -45,44 +31,142 @@ export default function EditPage({
   const [isTradeItemCdOpen, setIsTradeItemCdOpen] = useState(false);
   const [isTradeItemCdSelectOpen, setIsTradeItemCdSelectOpen] = useState(false);
 
-  const [dealerId, setDealerId] = useState(carConcilDetail.BRK_DLR_ID || '');
-  const [tradeItemCd, setTradeItemCd] = useState(carConcilDetail.BRK_TRADE_ITEM_CD || '');
-  const [brkSaleDt, setBrkSaleDt] = useState(carConcilDetail.BRK_SALE_DT || '');
-  const [brkAmt, setBrkAmt] = useState(carConcilDetail.BRK_AMT || '');
-  const [brkSupPrc, setBrkSupPrc] = useState(carConcilDetail.BRK_SUP_PRC || '');
-  const [brkVat, setBrkVat] = useState(carConcilDetail.BRK_VAT || '');
-  const [brkDedtAmt, setBrkDedtAmt] = useState(carConcilDetail.DEDT_AMT || '');
-  const [brkTaxAmt, setBrkTaxAmt] = useState(carConcilDetail.TAX_AMT || '');
-  const [brkPayAmt, setBrkPayAmt] = useState(carConcilDetail.PAY_AMT || '');
-  const [evdcCd, setEvdcCd] = useState(carConcilDetail.BRK_EVDC_CD || '');
-  const [carKndCd, setCarKndCd] = useState(carConcilDetail.CAR_KND_CD || '');
-  const [carNm, setCarNm] = useState(carConcilDetail.CAR_NM || '');
-  const [carNo, setCarNo] = useState(carConcilDetail.CAR_NO || '');
-  const [ownrNm, setOwnrNm] = useState(carConcilDetail.OWNR_NM || '');
-  const [ownrPhon, setOwnrPhon] = useState(carConcilDetail.OWNR_PHON || '');
-  const [brkDesc, setBrkDesc] = useState(carConcilDetail.BRK_MEMO || '');
+  const [brkTradeSeq, setBrkTradeSeq] = useState(carBrkTradeInfo.BRK_TRADE_SEQ || '');
+  const [dealerId, setDealerId] = useState(carBrkTradeInfo.SALE_DLR_ID || '');
+  const [tradeItemCd, _setTradeItemCd] = useState(carBrkTradeInfo.TRADE_ITEM_CD || '');
+  // tradeItemNm은 아래에 있음
+
+  // tradeItemCd를 변경할 때 tradeItemNm도 같이 설정하는 setter
+  const setTradeItemCd = (cd) => {
+    _setTradeItemCd(cd);
+    if (cd && tradeItemCDList && tradeItemCDList.length > 0) {
+      const matched = tradeItemCDList.find(item => item.CD === cd);
+      setTradeItemNm(matched ? matched.CD_NM : '');
+    } else {
+      setTradeItemNm('');
+    }
+  };
+  const [tradeItemNm, setTradeItemNm] = useState('');
+
+
+  const [brkSaleDt, setBrkSaleDt] = useState(carBrkTradeInfo.BRK_SALE_DT || '');
+  const [brkAmt, setBrkAmt] = useState(carBrkTradeInfo.TRADE_AMT || '');
+  const [brkSupPrc, setBrkSupPrc] = useState(carBrkTradeInfo.TRADE_SUP_PRC || '');
+  const [brkVat, setBrkVat] = useState(carBrkTradeInfo.TRADE_VAT || '');
+  const [dedtAmt, setDedtAmt] = useState(carBrkTradeInfo.DEDT_AMT || '');
+  const [taxSumAmt, setTaxSumAmt] = useState(carBrkTradeInfo.TAX_AMT || '');
+  const [wttx, setWttx] = useState(carBrkTradeInfo.WTTX || '');
+  const [dlrPayAmt, setDlrPayAmt] = useState(carBrkTradeInfo.DLR_PAY_AMT || '');
+  const [evdcCd, setEvdcCd] = useState(carBrkTradeInfo.SALE_EVDC_CD || '');
+  const [carKndCd, setCarKndCd] = useState(carBrkTradeInfo.CAR_KND_CD || '');
+  const [carNm, setCarNm] = useState(carBrkTradeInfo.CAR_NM || '');
+  const [carNo, setCarNo] = useState(carBrkTradeInfo.CAR_NO || '');
+  const [custNm, setCustNm] = useState(carBrkTradeInfo.CUST_NM || '');
+  const [custPhon, setCustPhon] = useState(carBrkTradeInfo.CUST_PHON || '');
+  const [brkMemo, setBrkMemo] = useState(carBrkTradeInfo.BRK_MEMO || '');
 
   // 알선금액이 변경될 때 공급가액과 부가세 계산
+  /**
+   * 200,000 금액 
+   * 10,000 공제비용
+   * 딜러 지급액 : 177,027
+   * 세액계 : 22,973
+   */
   useEffect(() => {
-    // 문자열에서 숫자로 변환 (brkAmt가 null, undefined, 또는 숫자인 경우 처리)
-    const amountStr = String(brkAmt || '');
-    const amount = Number(amountStr.replace(/[^0-9]/g, ''));
     
-    if (!isNaN(amount) && amount > 0) {
-      // 공급가액 = 매입금액 / 1.1 (소수점 버림)
-      const supplyPrice = Math.floor(amount / 1.1);
-      // 부가세 = 매입금액 - 공급가액
-      const vat = amount - supplyPrice;
-      
-      setBrkSupPrc(supplyPrice);
-      setBrkVat(vat);
-    } else {
-      setBrkSupPrc(0);
-      setBrkVat(0);
-    }
-  }, [brkAmt]);
-  const handleSubmit = async () => {
 
+    /**
+     * 공제비용이 알선금액보다 클 수 없다.
+     */
+    if (
+      !isNaN(Number(brkAmt)) && 
+      !isNaN(Number(dedtAmt)) && 
+      Number(dedtAmt) > Number(brkAmt)
+    ) {
+      alert('공제비용이 알선금액보다 클 수 없습니다. 공제비용을 초기화합니다.');
+      setDedtAmt('0');
+      return;
+    }
+
+    // brkAmt(알선금액), brkDedtAmt(공제비용)이 변경될 때 정산 계산
+    const {
+      SettAmtVat,   // 예수부가세 
+      SettAmtVat_RST, // 예수부가세 제외 금액   (공급가)
+      SettAmt33,    // 원천징수(3.3%)
+      taxSum,       // 세금(합계)액   = 예수부가세 + 원천징수(3.3%)
+      dealerPayAmt    // 딜러 지급액
+    } = calculateSettlement(brkAmt, dedtAmt);
+
+    console.log('SettAmtVat', SettAmtVat);
+    console.log('SettAmt33', SettAmt33);
+    console.log('taxSum', taxSum);
+    console.log('dealerPayAmt', dealerPayAmt);
+
+    /**
+     * 필요한 데이터는 
+     * 
+     * 1. 예수부가세
+     * 2. 원천징수(3.3%)
+     * 3. 세금(합계)액   = 예수부가세 + 원천징수(3.3%)
+     * 4. 지급액
+     */
+    setBrkVat(SettAmtVat); // 예수부가세
+    //공급가액 = 알선금액 - 공제비용 - 세금(합계)액
+    setBrkSupPrc(SettAmtVat_RST); // 공급가액
+    setTaxSumAmt(taxSum);    // 세금(합계)액
+    setWttx(SettAmt33); // 원천징수세(3.3%)
+    setDlrPayAmt(dealerPayAmt); // 지급액
+  }, [brkAmt, dedtAmt]);
+
+
+  // 정산 관련 계산 함수 (Cal_Settle)
+  // 원본 JS 로직을 React state 기반으로 변환
+  const calculateSettlement = (costRealAmt, settCost) => {
+    // costRealAmt, settCost는 숫자 또는 string이어도 좋다.
+    // 콤마 등 들어있을 수 있으니 전처리
+    const clearComma = (value) => String(value ?? '').replace(/,/g, '');
+    const rtnZero = (v) => (v === '' || v == null || isNaN(Number(v)) ? '0' : v);
+
+    const cost_realamt_int = parseInt(rtnZero(clearComma(costRealAmt)), 10);    // 총 금액
+    const settcost_int = parseInt(rtnZero(clearComma(settCost)), 10);           // 공제금액(상품화 비용)
+
+    console.log('cost_realamt_int', cost_realamt_int);
+    console.log('settcost_int', settcost_int);
+
+    const settamtbasic_int = cost_realamt_int - settcost_int;                   // 정산금액(기본)
+    const settamtvat_int = Math.round((settamtbasic_int / 1.1) * 0.1);          // 예수부가세(VAT)
+    const settamtvat_rst = settamtbasic_int - settamtvat_int;                   // 예수부가세 제외 금액   (공급가)
+
+    console.log('settamtbasic_int', settamtbasic_int);
+    console.log('settamtvat_int', settamtvat_int);
+    console.log('settamtvat_rst', settamtvat_rst);
+
+    const settamt33_int = parseInt(Math.round(settamtvat_rst * 0.033), 10);      // 원천징수금액
+
+    const taxsum = settamtvat_int + settamt33_int;                              // 세금계
+    const settamt_send_int = cost_realamt_int - taxsum;                         // 지급액
+
+    // 콤마로 표시
+    const addComma = (value) => value?.toLocaleString() ?? '0';
+
+    return {
+      //SETTAMTBASIC: addComma(settamtbasic_int),         // 정산기준금액
+      SettAmtVat: settamtvat_int,             // 예수부가세
+      SettAmtVat_RST: settamtvat_rst,         // 예수부가세 제외 금액   (공급가)
+      //SettAmtSodeuk: addComma(settamtvat_rst),          // 예수부가세 제외(=sodeuk, 소득/수익)
+      SettAmt33: settamt33_int,               // 원천징수(3.3%)
+      //SettAmt: addComma(settamt33_rst),                 // 최종 정산금액
+      taxSum: taxsum,                         // 세금계(VAT+3.3%)
+      dealerPayAmt: settamt_send_int,         // 지급액(총금액-세금계)
+      // 원본 jQuery 연동하는 HTML 삽입부/innerHTML 제외 (React에선 직접 안 씀)
+    };
+  };
+
+  /**
+   * 알선매출 수정
+   * 
+   */
+  const handleSubmit = async () => {
     setLoading(true);
     setError(null);
 
@@ -92,15 +176,15 @@ export default function EditPage({
       return;
     }
 
-    // 차량 유형
-    if(!carKndCd) {
-      alert('차량 유형을 선택해주세요.');
-      return;
-    }
-
     // 거래항목 
     if(!tradeItemCd) {
       alert('거래항목을 선택해주세요.');
+      return;
+    }
+    
+    // 알선판매일
+    if(!brkSaleDt) {
+      alert('알선판매일을 선택해주세요.');
       return;
     }
 
@@ -110,88 +194,36 @@ export default function EditPage({
       return;
     }
 
-    // 공제비용
-    if(!brkDedtAmt || brkDedtAmt === '0') {
-      alert('공제비용을 입력해주세요.');
-      return;
-    }
+    alert('매출증빙: ' + evdcCd + ', 알선금액: ' + brkAmt + ', 공제비용: ' + dedtAmt + ', 딜러지급액: ' + dlrPayAmt);
     
-    // 딜러지급액
-    if(!brkPayAmt || brkPayAmt === '0') {
-      alert('딜러지급액을 입력해주세요.');
-      return;
-    }
-
-    // 알선판매일
-    if(!brkSaleDt) {
-      alert('알선판매일을 선택해주세요.');
-      return;
-    }
-
-    // 차량 유형
-    if(!carKndCd) {
-      alert('차량 유형을 선택해주세요.');
-      return;
-    }
-
-    // 증빙종류
-    if(!evdcCd) {
-      alert('증빙종류를 선택해주세요.');
-      return;
-    }
-
-    // 차량명
-    if(!carNm) {
-      alert('차량명을 입력해주세요.');
-      return;
-    }
-    
-    // 차량번호
-    if(!carNo) {
-      alert('차량번호를 입력해주세요.');
-      return;
-    }
-    
-    // 고객명/상사명
-    if(!ownrNm) {
-      alert('고객명/상사명을 입력해주세요.');
-      return;
-    }
-    
-    
-    // 연락처
-    if(!ownrPhon) {
-      alert('연락처를 입력해주세요.');
-      return;
-    }
-
     const formValues = {
-      brkSeq: carConcilDetail.BRK_SEQ,                            // 알선매출 일련번호
-      agentId: session?.agentId,                                // 상사사 ID
-      dealerId,                                                  // 판매딜러 ID
-      tradeItemCd,                                               // 거래항목 코드
-      brkSaleDt,                                                 // 알선판매일  
-      brkAmt,                                                    // 알선금액
-      brkSupPrc,                                                 // 공급가액
-      brkVat,                                                    // 부가세
-      brkDedtAmt,                                                // 공제비용
-      brkTaxAmt,                                                 // 부가세
-      brkPayAmt,                                                 // 딜러지급액
-      evdcCd,                                                    // 증빙종류 코드
-      carKndCd,                                                  // 차량 유형 코드
-      carNm,                                                     // 차량명
-      carNo,                                                     // 차량번호
-      ownrNm,                                                    // 고객명/상사명
-      ownrPhon,                                                  // 연락처
-      brkDesc,                                                   // 특이사항
-      usrId: session?.usrId,                                     // 사용자 ID
-      carRegId: carConcilDetail.CAR_REG_ID,                      // 차량 등록 ID
+      brkTradeSeq: brkTradeSeq,                 // BRK_TRADE_SEQ: 알선매출 순번
+      saleDlrId: dealerId,                       // SALE_DLR_ID: 판매딜러 ID
+      tradeItemCd : tradeItemCd,                 // TRADE_ITEM_CD: 거래항목 코드
+      tradeItemNm : tradeItemNm,                 // TRADE_ITEM_NM: 거래항목명
+      brkSaleDt : brkSaleDt,                     // BRK_SALE_DT: 알선판매일  
+      tradeAmt: brkAmt,                          // TRADE_AMT: 알선금액
+      tradeSupPrc: brkSupPrc,                    // TRADE_SUP_PRC: 공급가액
+      tradeVat: brkVat,                          // TRADE_VAT: 부가세
+      dedtAmt: dedtAmt,                       // DEDT_AMT: 공제비용 
+      taxSumAmt: taxSumAmt,                      // TAX_SUM: 세금(합계)액
+      wttx: wttx,                                  // WTTX: 원천징수세(3.3%)
+      dlrPayAmt: dlrPayAmt,                      // DLR_PAY_AMT: 딜러지급액
+      saleEvdcCd: evdcCd,                        // SALE_EVDC_CD: 증빙종류 코드
+      carNm : carNm,                             // CAR_NM: 차량명
+      carKndCd : carKndCd,                       // CAR_KND_CD: 차량 유형 코드
+      carNo : carNo,                             // CAR_NO: 차량번호
+      brkAgentNm : custNm,                       // BRK_AGENT_NM: 고객상사명(상사명)
+      custNm : custNm,                           // CUST_NM: 고객명/상사명
+      custPhon : custPhon,                       // CUST_PHON: 연락처  
+      brkMemo : brkMemo,                         // BRK_MEMO: 특이사항
+      usrId: session?.usrId                      // REGR_ID: 등록자 ID
       };
 
     console.log('formValues', formValues);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarConcil`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateCarBrkTrade`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -200,17 +232,17 @@ export default function EditPage({
       });
       const res = await response.json();
       
-      alert('알선매출 등록 되었습니다.'); // 테스트용 알림
+      alert('알선매출 수정 되었습니다.'); // 테스트용 알림
       setLoading(false);
       if (res.success) {
-        router.push('/car-concil/list');
+        router.push('/car-brokerage/list');
         return { success: true, res, error: null };
       } else {
-        throw new Error(res.message || '알선매출 등록에 실패했습니다');
+        throw new Error(res.message || '알선매출 수정에 실패했습니다');
       }
     } catch (error) {
       setError(error.message);
-      alert('알선매출 등록 중 오류가 발생했습니다.'); // 테스트용 알림
+      alert('알선매출 수정 중 오류가 발생했습니다.'); // 테스트용 알림
       setLoading(false);
       return { success: false, res: [], error: error.message };
     }
@@ -220,7 +252,7 @@ export default function EditPage({
   return (
     <main className="container container--page">
       <div className="container__head">
-        <h2 className="container__title">알선매출 등록</h2>
+        <h2 className="container__title">알선매출 수정</h2>
 
         <div className="guidebox">
           <p className="guidebox__title">매출등록, 세금계산서 발행 연동, 즉시발행 필요</p>
@@ -242,7 +274,7 @@ export default function EditPage({
           </colgroup>
           <tbody>
             <tr>
-              <th>판매딜러</th>
+              <th>판매딜러 <span className="text-red">*</span></th>
               <td>
               <div className="select">
                   <input 
@@ -287,7 +319,7 @@ export default function EditPage({
                 </div>
               </td>
 
-              <th>거래항목</th>
+              <th>거래항목 <span className="text-red">*</span></th>
               <td>
                 <div className="select">
                   <input
@@ -313,7 +345,8 @@ export default function EditPage({
                     <li 
                       className={`select__option ${!tradeItemCd ? 'select__option--selected' : ''}`}
                       onClick={() => {
-                        setTradeItemCd('');
+                        _setTradeItemCd('');
+                        setTradeItemNm('');
                         setIsTradeItemCdSelectOpen(false);
                       }}
                     >
@@ -324,7 +357,8 @@ export default function EditPage({
                         key={item.CD}
                         className={`select__option ${tradeItemCd === item.CD ? 'select__option--selected' : ''}`}
                         onClick={() => {
-                          setTradeItemCd(item.CD);
+                          _setTradeItemCd(item.CD);
+                          setTradeItemNm(item.CD_NM);
                           setIsTradeItemCdSelectOpen(false);
                         }}
                       >
@@ -335,7 +369,7 @@ export default function EditPage({
                 </div>
               </td>
 
-              <th>알선판매일</th>
+              <th>알선판매일 <span className="text-red">*</span></th>
               <td>
                 <div className="input-group">
                   <div className="input w200">
@@ -354,7 +388,7 @@ export default function EditPage({
               </td>
             </tr>
             <tr>
-              <th>알선 금액</th>
+              <th>알선 금액 <span className="text-red">*</span></th>
               <td>
                 <div className="input-group input-group--sm">
                   <div className="input w160">
@@ -396,9 +430,9 @@ export default function EditPage({
                     type="text" 
                     className="input__field" 
                     placeholder="금액" 
-                    name="brkDedtAmt"
-                    value={brkDedtAmt ? Number(brkDedtAmt).toLocaleString() : '0'}
-                    onChange={(e) => setBrkDedtAmt(e.target.value.replace(/[^\d]/g, ''))}
+                    name="dedtAmt"
+                    value={dedtAmt ? Number(dedtAmt).toLocaleString() : '0'}
+                    onChange={(e) => setDedtAmt(e.target.value.replace(/[^\d]/g, ''))}
                     onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
@@ -428,9 +462,9 @@ export default function EditPage({
                     type="text" 
                     className="input__field" 
                     placeholder="금액" 
-                    name="brkPayAmt"
-                    value={brkPayAmt ? Number(brkPayAmt).toLocaleString() : '0'}
-                    onChange={(e) => setBrkPayAmt(e.target.value.replace(/[^\d]/g, ''))}
+                    name="dlrPayAmt"
+                    value={dlrPayAmt ? Number(dlrPayAmt).toLocaleString() : '0'}
+                    onChange={(e) => setDlrPayAmt(e.target.value.replace(/[^\d]/g, ''))}
                     onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
@@ -445,7 +479,7 @@ export default function EditPage({
               </td>
             </tr>
             <tr>
-              <th>매출증빙</th>
+              <th>매출증빙 <span className="text-red">*</span></th>
               <td>
                 <div className="form-option-wrap">
                   <div className="form-option">
@@ -565,14 +599,14 @@ export default function EditPage({
                       type="text" 
                       className="input__field" 
                       placeholder=""
-                      value={ownrNm || ''}
-                      onChange={(e) => setOwnrNm(e.target.value)}
+                      value={custNm || ''}
+                      onChange={(e) => setCustNm(e.target.value)}
                     />
                     <div className="input__utils">
                       <button
                         type="button"
                         className="jsInputClear input__clear ico ico--input-delete"
-                        onClick={() => setOwnrNm('')}
+                        onClick={() => setCustNm('')}
                       >
                         삭제
                       </button>
@@ -591,14 +625,14 @@ export default function EditPage({
                     type="text" 
                     className="input__field" 
                     placeholder="'-' 없이 입력"
-                    value={ownrPhon || ''}
-                    onChange={(e) => setOwnrPhon(e.target.value)}
+                    value={custPhon || ''}
+                    onChange={(e) => setCustPhon(e.target.value)}
                   />
                   <div className="input__utils">
                     <button
                       type="button"
                       className="jsInputClear input__clear ico ico--input-delete"
-                      onClick={() => setOwnrPhon('')}
+                      onClick={() => setCustPhon('')}
                     >
                       삭제
                     </button>
@@ -612,14 +646,14 @@ export default function EditPage({
                     type="text" 
                     className="input__field" 
                     placeholder=""
-                    value={brkDesc || ''}
-                    onChange={(e) => setBrkDesc(e.target.value)}
+                    value={brkMemo || ''}
+                    onChange={(e) => setBrkMemo(e.target.value)}
                   />
                   <div className="input__utils">
                     <button
                       type="button"
                       className="jsInputClear input__clear ico ico--input-delete"
-                      onClick={() => setBrkDesc('')}
+                      onClick={() => setBrkMemo('')}
                     >
                       삭제
                     </button>
@@ -636,7 +670,9 @@ export default function EditPage({
           className="btn btn--light"
           type="button"
           onClick={() => {
-            window.location.href = "m7.jsp";
+            if (typeof window !== "undefined") {
+              window.history.back();
+            }
           }}
         >
           취소

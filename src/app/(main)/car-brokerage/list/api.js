@@ -1,6 +1,6 @@
-export const getCarConcilList = async (params) => {
+export const getCarBrkTradeList = async (params) => {
   try {
-    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarConcilList`, {
+    const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarBrkTradeList`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -9,14 +9,14 @@ export const getCarConcilList = async (params) => {
     }).then(res => res.json());
     return { success: true, data, error: null };
   } catch (error) {
-    console.error("getCarConcilList Error:", error); 
+    console.error("getCarBrkTradeList Error:", error); 
     return { success: false, data: [], error: error.message };
   }
 };
 
-export const getCarConcilSummary = async (params) => {
+export const getCarBrkTradeSummary = async (params) => {
 try {
-  const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarConcilSummary`, {
+  const data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/getCarBrkTradeSummary`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ try {
   }).then(res => res.json());
   return { success: true, data, error: null };
 } catch (error) {
-  console.error("getCarConcilSummary Error:", error);  
+  console.error("getCarBrkTradeSummary Error:", error);  
   return { success: false, data: [], error: error.message };
 }
 };

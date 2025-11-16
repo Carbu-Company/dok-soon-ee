@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import EditPage from "@/app/(main)/car-concil/edit/[id]/EditPage";
+import EditPage from "@/app/(main)/car-brokerage/edit/[id]/EditPage";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
-import { getCarConcilDetail } from "@/app/(main)/car-concil/edit/[id]/api";
+import { getCarBrkTradeInfo } from "@/app/(main)/car-brokerage/edit/[id]/api";
 
 export default async function EditorPage({ params }) {
   const cookieStore = await cookies();
@@ -27,31 +27,16 @@ export default async function EditorPage({ params }) {
   const { id } = await params;
 
   console.log('id', id);
-  const carConcilDetail = await getCarConcilDetail(id);
+  const carBrkTradeInfo = await getCarBrkTradeInfo(id);
 
 
-  //console.log('carConcilDetail', carConcilDetail);
-
-  // 차량 등록 번호
-  /** 
-  const carConcilDetail = {
-    data: {
-      id: id,
-      offerType: '상사매입',
-      modelName: '그랜저(승용)',
-      carNo: '123가1234 (123허1234)',
-      dealerName: '홍길동',
-      purchaseDate: '2025-08-01',
-      purchaseAmount: 100000000 
-    }
-  }
-  */
+  console.log('carBrkTradeInfo********', carBrkTradeInfo);
 
   return <EditPage session={session}
                    dealerList={dealerList.data}
                    carKndList={carKndList.data}
                    evdcCdList={evdcCDList.data}
                    tradeItemCDList={tradeItemCDList.data}
-                   carConcilDetail={carConcilDetail}
+                   carBrkTradeInfo={carBrkTradeInfo}
    />;
 }

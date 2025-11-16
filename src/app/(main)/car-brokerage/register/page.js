@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import RegPage from "@/app/(main)/car-concil/register/RegPage";
+import RegPage from "@/app/(main)/car-brokerage/register/RegPage";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
 export default async function RegisterPage() {

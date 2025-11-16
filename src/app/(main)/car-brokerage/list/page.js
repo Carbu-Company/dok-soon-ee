@@ -1,17 +1,17 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
-import ListPage from "@/app/(main)/car-concil/list/ListPage";
-import { getCarConcilList, getCarConcilSummary } from "./api";
+import ListPage from "@/app/(main)/car-brokerage/list/ListPage";
+import { getCarBrkTradeList, getCarBrkTradeSummary } from "./api";
 import { getDealerList, getCDList } from "@/app/(main)/common/api";
 
 // Server Action 정의
-async function searchCarConcilList(searchParamsWithPage) {
+async function searchCarBrkTradeList(searchParamsWithPage) {
   "use server";
   try {
-    const result = await getCarConcilList(searchParamsWithPage);
+    const result = await getCarBrkTradeList(searchParamsWithPage);
 
     console.log('서버 액션 결과*******************:', { 
-      carConcilListLength: result?.data?.carlist?.length, 
+      carBrkTradeListLength: result?.data?.carlist?.length, 
       totalCount: result?.data?.pagination?.totalCount,
       page: searchParamsWithPage.page,
       pageSize: searchParamsWithPage.pageSize 
@@ -26,11 +26,11 @@ async function searchCarConcilList(searchParamsWithPage) {
 
 
 // Server Action 정의
-async function searchCarConcilSummary(searchParamsWithPage) {
+async function searchCarBrkTradeSummary(searchParamsWithPage) {
   "use server";
   
   try {
-    const result = await getCarConcilSummary(searchParamsWithPage);
+    const result = await getCarBrkTradeSummary(searchParamsWithPage);
 
     return result;
   } catch (error) {
@@ -41,13 +41,13 @@ async function searchCarConcilSummary(searchParamsWithPage) {
 
 
 // Server Action 정의
-async function searchCarConcilListAndSummary(searchParamsWithPage) {
+async function searchCarBrkTradeListAndSummary(searchParamsWithPage) {
   "use server";
   
   try {
     const [listResult, summaryResult] = await Promise.all([
-      getCarConcilList(searchParamsWithPage),
-      getCarConcilSummary(searchParamsWithPage)
+      getCarBrkTradeList(searchParamsWithPage),
+      getCarBrkTradeSummary(searchParamsWithPage)
     ]);
 
     return {
@@ -64,7 +64,7 @@ async function searchCarConcilListAndSummary(searchParamsWithPage) {
   }
 }
 
-export default async function CarConcilList() {
+export default async function CarBrkTradeList() {
   /* 쿠키에서 세션 정보 가져오기
   {
   usrId: '005110001',
@@ -101,16 +101,19 @@ export default async function CarConcilList() {
     ordAscDesc: 'desc'
   };
 
-  const carConcilList = await searchCarConcilList({ ...defaultParams, ...searchParams });
+  const carBrkTradeList = await searchCarBrkTradeList({ ...defaultParams, ...searchParams });
   const dealerList = await getDealerList(session.agentId);
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
-  const carConcilSummary = await searchCarConcilSummary({ ...defaultParams, ...searchParams });
+  const carBrkTradeSummary = await searchCarBrkTradeSummary({ ...defaultParams, ...searchParams });
+
+
+  console.log('carBrkTradeList*******************:', carBrkTradeList);
 
   return <ListPage session={session}
-                   carList={carConcilList}
+                   carList={carBrkTradeList}
                    dealerList={dealerList.data}
                    evdcCdList={evdcCDList.data}
-                   searchAction={searchCarConcilListAndSummary}
-                   carSummary={carConcilSummary}
+                   searchAction={searchCarBrkTradeListAndSummary}
+                   carSummary={carBrkTradeSummary}
    />;
 }

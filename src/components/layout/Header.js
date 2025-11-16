@@ -635,7 +635,7 @@ export default function Header({ session }) {
               </li>
             </ul>
           </div>
-          <Link href="/car-concil/list" className="header__gnb-menu">
+          <Link href="/car-brokerage/list" className="header__gnb-menu">
             타상사알선판매
           </Link>
           <a href="/bank-account/list" className="header__gnb-menu">

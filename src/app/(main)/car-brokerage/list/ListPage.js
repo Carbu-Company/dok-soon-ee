@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
+import BrokerageRemoveModal from "@/components/modal/BrokerageRemoveModal";
 import SimpleTableDownloadButton from "@/components/utils/SimpleTableDownloadButton";
 import Image from "next/image";
 
@@ -25,13 +26,13 @@ export default function OtherDealerMediationSalesPage(props) {
   const initialPagination = props.carList?.data?.pagination || {};
   
   // Summary 데이터
-  const initialCarConcilSummary = props.carSummary?.data || [];
+  const initialCarBrkTradeSummary = props.carSummary?.data || [];
 
   const [carList, setCarList] = useState(initialCarListData);
   const [pagination, setPagination] = useState(initialPagination);
   const [totalPages, setTotalPages] = useState(initialPagination.totalPages || 1);
 
-  const [carConcilSummary, setCarConcilSummary] = useState(initialCarConcilSummary);
+  const [carBrkTradeSummary, setCarBrkTradeSummary] = useState(initialCarBrkTradeSummary);
 
   const [dealerList, setDealerList] = useState(props.dealerList || []);
   const [saleItemList, setSaleItemList] = useState(props.saleItemList || []);
@@ -59,10 +60,9 @@ export default function OtherDealerMediationSalesPage(props) {
   const [startDt, setStartDt] = useState("");
   const [endDt, setEndDt] = useState("");
 
-  // 매입취소/삭제 모달 관련 state
-  const [isGoodsFeeCarRemoveModalOpen, setIsGoodsFeeCarRemoveModalOpen] = useState(false);
-  const [selectedCarForRemove, setSelectedCarForRemove] = useState(null);
-  const [selectedCarTypeForRemove, setSelectedCarTypeForRemove] = useState(null);
+  // 알선 삭제 모달 관련 state
+  const [isBrokerageRemoveModalOpen, setIsBrokerageRemoveModalOpen] = useState(false);
+  const [selectedBrokerageForRemove, setSelectedBrokerageForRemove] = useState(null);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 페이지네이션 영역
@@ -255,7 +255,7 @@ export default function OtherDealerMediationSalesPage(props) {
 
           setCarList(responseData);
           setPagination(paginationInfo);
-          setCarConcilSummary(summaryData);
+          setCarBrkTradeSummary(summaryData);
 
           // 서버에서 제공하는 페이지네이션 정보 사용
           setTotalPages(paginationInfo.totalPages || 1);
@@ -280,6 +280,27 @@ export default function OtherDealerMediationSalesPage(props) {
     setSearchBtn(2);
     handleSearch(1);
   };
+
+  
+  // 알선 삭제 모달 관련 핸들러
+  const handleBrokerageRemoveModalOpen = (brokerage) => {
+    setSelectedBrokerageForRemove(brokerage);
+    setIsBrokerageRemoveModalOpen(true);
+  };
+
+  const handleBrokerageRemoveModalClose = () => {
+    setIsBrokerageRemoveModalOpen(false);
+    setSelectedBrokerageForRemove(null);
+  };
+
+    const handleBrokerageRemoveConfirm = async () => {
+      // TODO: 실제 알선 삭제 API 호출 구현
+    console.log("알선 삭제 확인:", selectedBrokerageForRemove);
+    // API 호출 후 성공하면 모달 닫기 및 목록 새로고침
+    handleBrokerageRemoveModalClose();
+    // handleSearch(currentPage); // 목록 새로고침
+  };
+
 
   /**
    * 페이지 처리
@@ -373,6 +394,9 @@ export default function OtherDealerMediationSalesPage(props) {
           <p className="guidebox__title">세금계산서 직접 발행 필요</p>
           <p className="guidebox__title">
             삭제 시 체크! (계산서 발행건 처리) 계산서 취소 발행 여부 확인 필요.
+          </p>
+          <p className="guidebox__title"> 
+            타상사 차량을 알선 판매 후 알선수수료, 알선수익금에 대해 차주상사에서 정산하지 않고 알선상사에서 직접 정산(원천징수)을 해야 하는 경우 이용바랍니다.
           </p>
         </div>
       </div>
@@ -1029,7 +1053,7 @@ export default function OtherDealerMediationSalesPage(props) {
             type="button"
             className="btn btn--red btn--padding--r30"
             onClick={() => {
-              router.push("/car-concil/register");
+              router.push("/car-brokerage/register");
             }}
           >
             <span className="ico ico--add"></span>알선매출 등록
@@ -1142,7 +1166,6 @@ export default function OtherDealerMediationSalesPage(props) {
             <col style={{ width: "auto" }} />
             {/*품목명*/}
             <col style={{ width: "100px" }} />
-            <col style={{ width: "100px" }} />
           </colgroup>
           <thead>
             <tr>
@@ -1167,21 +1190,20 @@ export default function OtherDealerMediationSalesPage(props) {
               <th>발행일</th>
               <th>상사/고객명</th>
               <th>바로가기</th>
-              <th>보기</th>
             </tr>
           </thead>
           <tbody>
             {carList && carList.length > 0 ? (
               carList.map((car, index) => (
-            <tr key={`${car.CAR_REG_ID}-${index}`}>
-              <td>{car.CAR_NO} / {car.DLR_NM} / {car.CAR_NM}</td>
+            <tr key={`${car.BRK_TRADE_SEQ}-${index}`}>
+              <td>{car.CAR_NO} / {car.SALE_DLR_NM} / {car.CAR_NM}</td>
               <td>{car.BRK_SALE_DT}</td>
-              <td>{car.BRK_TRADE_ITEM_NM}</td>
-              <td>{car.BRK_AMT.toLocaleString()}</td>
+              <td>{car.TRADE_ITEM_NM}</td>
+              <td>{car.TRADE_AMT.toLocaleString()}</td>
               <td>{car.DEDT_AMT.toLocaleString()}</td>
-              <td>{car.TAX_AMT.toLocaleString()}</td>
-              <td>{car.PAY_AMT.toLocaleString()}</td>
-              <td>{car.BRK_EVDC_NM}</td>
+              <td>{car.TAX_SUM_AMT.toLocaleString()}</td>
+              <td>{car.DLR_PAY_AMT.toLocaleString()}</td>
+              <td>{car.SALE_EVDC_NM}</td>
               <td>
                 <button
                   type="button"
@@ -1193,7 +1215,7 @@ export default function OtherDealerMediationSalesPage(props) {
                   발행등록
                 </button>
               </td>
-              <td>{car.OWNER_NM}</td>
+              <td>{car.CUST_NM}</td>
               <td>
                 <div className="input-group input-group--sm input-group--center">
                   <div className="select select--utils">
@@ -1202,39 +1224,38 @@ export default function OtherDealerMediationSalesPage(props) {
                     </button>
                     <ul className="select__menu">
                       <li className="select__option">
-                        <Link href={`/car-concil/edit/${car.BRK_SEQ}`}>알선매출 수정</Link>
+                        <Link href={`/car-brokerage/edit/${car.BRK_TRADE_SEQ}`}>알선매출 수정</Link>
                       </li>
                       <li className="select__option">
-                        <a
-                          href="#"
+                        <button
+                          type="button"
                           onClick={e => {
                             e.preventDefault();
-                            if (typeof window !== "undefined" && window.openModal) {
-                              window.openModal("1");
-                            }
+                            e.stopPropagation();
+                            handleBrokerageRemoveModalOpen(car);
+                          }}
+                          style={{
+                            border: "none",
+                            background: "none",
+                            padding: 0,
+                            color: "inherit",
+                            cursor: "pointer",
+                            width: "100%",
+                            textAlign: "left",
                           }}
                         >
                           알선매출 삭제
-                        </a>
+                        </button>
                       </li>
                     </ul>
                   </div>
                 </div>
               </td>
-              <td>
-                <button
-                  type="button"
-                  className="btn btn--light btn--sm"
-                  onClick={() => router.push(`/detail/purchases/${car.CAR_REG_ID}`)}
-                >
-                  상세보기
-                </button>
-              </td>
             </tr>
           ))
           ) : (
             <tr>
-              <td colSpan="12" className="text-center py-8 text-gray-500">
+              <td colSpan="11" className="text-center py-8 text-gray-500">
                 데이터가 존재하지 않습니다.
               </td>
             </tr>
@@ -1260,45 +1281,49 @@ export default function OtherDealerMediationSalesPage(props) {
               <th>공급가액</th>
               <th>세액</th>
               <th>공제금액</th>
-              <th>예수부가세</th>
-              <th>원천세</th>
               <th>지급액</th>
             </tr>
           </thead>
           <tbody>
-              {carConcilSummary?.map((item, index) => (
+              {carBrkTradeSummary?.map((item, index) => (
                 index < 2 && (
                   <tr key={index}>
                     <td>{item.BRK_TRADE_ITEM_NM || '-'}</td>
                     <td>{item.CNT?.toLocaleString() || 0}</td>
-                    <td>{item.BRK_AMT?.toLocaleString() || 0}</td>
-                    <td>{item.BRK_SUP_PRC?.toLocaleString() || 0}</td>
-                    <td>{item.BRK_VAT?.toLocaleString() || 0}</td>
+                    <td>{item.TRADE_AMT?.toLocaleString() || 0}</td>
+                    <td>{item.TRADE_SUP_PRC?.toLocaleString() || 0}</td>
+                    <td>{item.TRADE_VAT?.toLocaleString() || 0}</td>
                     <td>{item.DEDT_AMT?.toLocaleString() || 0}</td>
-                    <td>{item.TAX_AMT?.toLocaleString() || 0}</td>
-                    <td>{item.PAY_AMT?.toLocaleString() || 0}</td>
+                    <td>{item.DLR_PAY_AMT?.toLocaleString() || 0}</td>
                   </tr>
                 )
               ))}
           </tbody>
           <tfoot>
-            {carConcilSummary?.map((item, index) => (
+            {carBrkTradeSummary?.map((item, index) => (
               index === 2 && (
                 <tr key={index}>
                   <td>{item.BRK_TRADE_ITEM_NM || '-'}</td>
                   <td>{item.CNT?.toLocaleString() || 0}</td>
-                  <td>{item.BRK_AMT?.toLocaleString() || 0}</td>
-                  <td>{item.BRK_SUP_PRC?.toLocaleString() || 0}</td>
-                  <td>{item.BRK_VAT?.toLocaleString() || 0}</td>
+                  <td>{item.TRADE_AMT?.toLocaleString() || 0}</td>
+                  <td>{item.TRADE_SUP_PRC?.toLocaleString() || 0}</td>
+                  <td>{item.TRADE_VAT?.toLocaleString() || 0}</td>
                   <td>{item.DEDT_AMT?.toLocaleString() || 0}</td>
-                  <td>{item.TAX_AMT?.toLocaleString() || 0}</td>
-                  <td>{item.PAY_AMT?.toLocaleString() || 0}</td>
+                  <td>{item.DLR_PAY_AMT?.toLocaleString() || 0}</td>
                 </tr>
               )
             ))}
           </tfoot>
         </table>
       </div>
+
+      {/* 매입취소/삭제 모달 */}
+      <BrokerageRemoveModal
+        brokerage={selectedBrokerageForRemove}
+        open={isBrokerageRemoveModalOpen}
+        onClose={handleBrokerageRemoveModalClose}
+        onConfirm={handleBrokerageRemoveConfirm}
+      />
     </main>
   );
 }
