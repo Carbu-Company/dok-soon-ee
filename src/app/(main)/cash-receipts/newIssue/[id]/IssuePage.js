@@ -192,7 +192,6 @@ export default function IssuePage({
                       value={rcgnNo && rcgnNo.length === 13 ? rcgnNo.slice(0, 7) + "******" : rcgnNo}
                       onChange={(e) => setRcgnNo(e.target.value)}
                       onFocus={(e) => e.target.select()}
-                      readOnly={true}
                     />
 
                   </div>
