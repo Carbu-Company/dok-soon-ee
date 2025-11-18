@@ -151,7 +151,7 @@ export default function RegPage({ session = null, dealerList = [], evdcCdList = 
     const settamt33_int = parseInt(Math.round(settamtvat_rst * 0.033), 10);      // 원천징수금액
 
     const taxsum = settamtvat_int + settamt33_int;                              // 세금계
-    const settamt_send_int = cost_realamt_int - taxsum;                         // 지급액
+    const settamt_send_int = cost_realamt_int - settcost_int -taxsum;                         // 지급액
 
     // 콤마로 표시
     const addComma = (value) => value?.toLocaleString() ?? '0';

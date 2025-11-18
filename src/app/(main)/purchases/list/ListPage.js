@@ -1822,12 +1822,12 @@ export default function ListPage(props) {
                   <td>{carSummary.PUR_AMT.toLocaleString()}</td>
                   <td>{carSummary.PUR_SUP_PRC.toLocaleString()}</td>
                   <td>{carSummary.PUR_VAT.toLocaleString()}</td>
-                  <td className={carSummary.CAR_LOAN_AMT < 0 ? "text-red" : ""}>
+                  <td className={carSummary.CAR_LOAN_AMT == 0 ? "text-blue" : "text-red"}>
                     {carSummary.CAR_LOAN_AMT.toLocaleString()}
                   </td>
                   <td>
                     <span className={carSummary.AGENT_PUR_CST < 0 ? "text-point" : ""}>
-                      {carSummary.AGENT_PUR_CST}
+                      {carSummary.AGENT_PUR_CST.toLocaleString()}
                     </span>
                   </td>
                 </tr>

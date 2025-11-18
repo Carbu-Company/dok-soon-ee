@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '../../../../../lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
-import { getAcqTax } from '@/app/(main)/common/script.js'
+import { getAcqTax, autoHypenTelNo, autoHypenBizNO, autoHypenSNO } from '@/app/(main)/common/script.js'
 
 // ===== 상수 정의 =====
 const OWNER_TYPE = {
@@ -119,7 +119,6 @@ export default function EditPage({
 
   // ===== 이메일 정보 상태 =====
   const [ownrEmail, setOwnrEmail] = useState(carPurDetail.OWNR_EMAIL || '');
-  const [emailDomain, setEmailDomain] = useState(carPurDetail.OWNR_EMAIL_DOMAIN || '');
 
   // ===== 주소 정보 상태 =====
   const [ownrZip, setOwnrZip] = useState(carPurDetail.OWNR_ZIP || '');
@@ -253,7 +252,6 @@ export default function EditPage({
     console.log('ownrSsn', ownrSsn);    // 주민(법인)등록번호
     console.log('ownrPhon', ownrPhon);    // 연락처
     console.log('ownrEmail', ownrEmail);    // e메일 주소
-    console.log('emailDomain', emailDomain);    // e메일 도메인
     console.log('ownrZip', ownrZip);    // 우편번호
     console.log('ownrAddr1', ownrAddr1);    // 주소1
     console.log('ownrAddr2', ownrAddr2);    // 주소2
@@ -330,10 +328,10 @@ export default function EditPage({
     if(ownrSsn) {
 
       // 주민번호 체크 
-      if(!isValidResidentNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.INDIVIDUAL) {
+      if(!isValidResidentNumber(ownrSsn.replace(/-/g, '')) && ownrTpCd === OWNER_TYPE.INDIVIDUAL) {
         alert('주민등록번호를 확인해주세요.');
         return;
-      } else if(!isValidCorporateNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.CORPORATION) {
+      } else if(!isValidCorporateNumber(ownrSsn.replace(/-/g, '')) && ownrTpCd === OWNER_TYPE.CORPORATION) {
         alert('법인등록번호를 확인해주세요.');
         return;
       }
@@ -342,7 +340,7 @@ export default function EditPage({
 
     // 사업자번호
     if(ownrBrno) {
-      if(!checkBizID(ownrBrno)) {
+      if(!checkBizID(ownrBrno.replace(/-/g, ''))) {
         alert('사업자등록번호를 확인해주세요.');
         return;
       }
@@ -372,7 +370,6 @@ export default function EditPage({
       prsnSctCd,                                                 // 제시 구분
       ownrPhon,                                                  // 연락처
       ownrEmail,                                                 // 이메일 아이디
-      emailDomain,                                               // 이메일 도메인
       txblIssuDt,                                                // 세금 납부일
       purDesc,                                                   // 매입설명
       ownrAddr1,                                                 // 주소
@@ -1047,7 +1044,10 @@ export default function EditPage({
                     placeholder="주민(법인)등록번호"
                     name="ownrSsn"
                     value={ownrSsn || ''}
-                    onChange={(e) => setOwnrSsn(e.target.value)}
+                    onChange={(e) => {
+                      autoHypenSNO(e.target);
+                      setOwnrSsn(e.target.value);
+                    }}
                     onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
@@ -1064,7 +1064,10 @@ export default function EditPage({
                     placeholder="- 없이 입력"
                     name="ownrPhon"
                     value={ownrPhon || ''}
-                    onChange={(e) => setOwnrPhon(e.target.value)}
+                    onChange={(e) => {
+                      let value = autoHypenTelNo(e.target.value);
+                      setOwnrPhon(value);
+                    }}
                     onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
@@ -1074,56 +1077,22 @@ export default function EditPage({
               </td>
               <th>e메일주소</th>
               <td>
-                <div className="input-group input-group--sm">
-                  <div className="input w160">
-                    <input 
-                      type="text" 
-                      className="input__field" 
-                      placeholder="e메일 주소"
-                      name="ownrEmail"
-                      value={ownrEmail || ''}
-                      onChange={(e) => setOwnrEmail(e.target.value)}
-                      onFocus={(e) => e.target.select()}
-                    />
-                    <div className="input__utils">
-                      <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
-                    </div>
-                  </div>
-                  <span className="input-group__dash">@</span>
-                  <div className="select w140">
-                    <input className="select__input" type="hidden" name="emailDomain" value={emailDomain || ''} />
-                    <button 
-                      className="select__toggle" 
-                      type="button"
-                      onClick={() => setIsEmailDomainOpen(!isEmailDomainOpen)}
-                    >
-                      <span className="select__text">{emailDomain || '직접입력'}</span>
-                      <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
-                    </button>
-                    <ul className={`select__menu ${isEmailDomainOpen ? 'active' : ''}`}>
-                      <li 
-                        className={`select__option ${!emailDomain ? 'select__option--selected' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEmailDomainSelect('');
-                        }}
-                      >직접입력</li>
-                      {EMAIL_DOMAINS.map((domain) => (
-                        <li 
-                          key={domain}
-                          className={`select__option ${emailDomain === domain ? 'select__option--selected' : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEmailDomainSelect(domain);
-                          }}
-                        >{domain}</li>
-                      ))}
-                    </ul>
+                <div className="input">
+                  <input 
+                    type="text" 
+                    className="input__field" 
+                    placeholder="e메일 주소"
+                    name="ownrEmail"
+                    value={ownrEmail || ''}
+                    onChange={(e) => setOwnrEmail(e.target.value)}
+                    onFocus={(e) => e.target.select()}
+                  />
+                  <div className="input__utils">
+                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                   </div>
                 </div>
               </td>
             </tr>
-
             <tr>
               <th>주소</th>
               <td colSpan={3}>
@@ -1173,7 +1142,10 @@ export default function EditPage({
                     placeholder="-없이 입력"
                     name="ownrBrno"
                     value={ownrBrno || ''}
-                    onChange={(e) => setOwnrBrno(e.target.value)}
+                    onChange={(e) => {
+                      autoHypenBizNO(e.target);
+                      setOwnrBrno(e.target.value);
+                    }}
                   />
                   <div className="input__utils">
                     <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>

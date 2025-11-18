@@ -8,7 +8,7 @@ import { checkBizID } from '../../lib/util.js'
 export default function ExperienceRegistrationModal({ open = true, onClose, onPrint }) {
 
 
-
+/*
   const [AgentNm, setAgentNm] = useState('테스트상사사');
   const [AgentRegNo, setAgentRegNo] = useState('8218701635');
   const [CeoNm, setCeoNm] = useState('테스트대표자');
@@ -18,13 +18,30 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
   const [UserPw, setUserPw] = useState('testuser'); 
   const [UsrNm, setUsrNm] = useState('테스트신청자');
   const [UsrTel, setUsrTel] = useState('01033500564');
-  const [MailDomain, setMailDomain] = useState('naver.com');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [sangsaCodeCheck, setSangsaCodeCheck] = useState(false);
   const [sangsaCodeCheckMsg, setSangsaCodeCheckMsg] = useState(null);
   const [sangsaCodeCheckCss, setSangsaCodeCheckCss] = useState(null);
   const [allinputCheck, setAllinputCheck] = useState(false);
+*/
+
+
+const [AgentNm, setAgentNm] = useState('');
+const [AgentRegNo, setAgentRegNo] = useState('');
+const [CeoNm, setCeoNm] = useState('');
+const [Email, setEmail] = useState('');
+const [CombAgentCd, setCombAgentCd] = useState('');
+const [UserId, setUserId] = useState('');
+const [UserPw, setUserPw] = useState(''); 
+const [UsrNm, setUsrNm] = useState('');
+const [UsrTel, setUsrTel] = useState('');
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState(null);
+const [sangsaCodeCheck, setSangsaCodeCheck] = useState(false);
+const [sangsaCodeCheckMsg, setSangsaCodeCheckMsg] = useState(null);
+const [sangsaCodeCheckCss, setSangsaCodeCheckCss] = useState(null);
+const [allinputCheck, setAllinputCheck] = useState(false);
 
 
 /*
@@ -37,7 +54,6 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
   const [UserPw, setUserPw] = useState('');
   const [UsrNm, setUsrNm] = useState('');
   const [UsrTel, setUsrTel] = useState('');
-  const [MailDomain, setMailDomain] = useState('naver.com');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [sangsaCodeCheck, setSangsaCodeCheck] = useState(false);
@@ -56,13 +72,17 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
       UserId.trim() !== '' &&
       UserPw.trim() !== '' &&
       UsrNm.trim() !== '' &&
-      UsrTel.trim() !== '' &&
-      MailDomain.trim() !== '';
+      UsrTel.trim() !== '' ;
     
     setAllinputCheck(allFieldsFilled);
-  }, [AgentNm, AgentRegNo, CeoNm, Email, CombAgentCd, UserId, UserPw, UsrNm, UsrTel, MailDomain]);
+  }, [AgentNm, AgentRegNo, CeoNm, Email, CombAgentCd, UserId, UserPw, UsrNm, UsrTel]);
 
   const handleSangsaCodeCheck = async () => {
+
+    if (!CombAgentCd || CombAgentCd.trim() === '') {
+      alert('조합상사코드를 입력해주세요.');
+      return;
+    }
 
     try {
       console.log(CombAgentCd);
@@ -76,13 +96,17 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
 
       console.log(data);
 
+      /** 
+       * 미등록 상사코드도 체험등록 신청 가능하게 처리
+       */
+
       if (data === 1) {
         setSangsaCodeCheck(true);
-        setSangsaCodeCheckMsg('등록 가능합니다. 신청을 계속 진행바랍니다.');
+        setSangsaCodeCheckMsg('확인 가능한 상사코드 입니다. 신청을 계속 진행바랍니다.');
         setSangsaCodeCheckCss('input-notice');
       } else {
-        setSangsaCodeCheck(false);
-        setSangsaCodeCheckMsg('등록 불가합니다. 고객센터로 문의바랍니다.');
+        setSangsaCodeCheck(true);
+        setSangsaCodeCheckMsg('확인 불가능한 상사코드 입니다. 신청을 계속 진행바랍니다.');
         setSangsaCodeCheckCss('input-error');
       }
 
@@ -115,8 +139,7 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
         UserId,
         UserPw,
         UsrNm,
-        UsrTel,
-        MailDomain
+        UsrTel
       };
 
       try {
@@ -213,37 +236,30 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
                   </td>
                   <th>e메일주소</th>
                   <td>
-                    <div className="input-group input-group--sm">
-                      <div className="input w187">
-                        <input type="text" className="input__field" placeholder="이메일 주소" name="Email" value={Email} onChange={(e) => e.target.value.length <= 20 ? setEmail(e.target.value) : null}/>
-                        <div className="input__utils">
-                          <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
-                        </div>
-                      </div>
-                      <span className="input-group__dash">@</span>
-                      {/* 커스텀 셀렉트 마크업 */}
-                      <div className="select">
-                        <input className="select__input" type="hidden" name="dealer" value={MailDomain} onChange={(e) => setMailDomain(e.target.value)}/>
-                        <button className="select__toggle" type="button">
-                          <span className="select__text">{MailDomain}</span>
-                          <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
-                        </button>
-                        <ul className="select__menu">
-                          <li className={`select__option ${MailDomain === 'gmail.com' ? 'select__option--selected' : ''}`} data-value="gmail.com">gmail.com</li>
-                          <li className={`select__option ${MailDomain === 'naver.com' ? 'select__option--selected' : ''}`} data-value="naver.com">naver.com</li>
-                          <li className={`select__option ${MailDomain === 'daum.net' ? 'select__option--selected' : ''}`} data-value="daum.net">daum.net</li>
-                          <li className={`select__option ${MailDomain === 'nate.com' ? 'select__option--selected' : ''}`} data-value="nate.com">nate.com</li>
-                        </ul>
+                    <div className="input">
+                      <input type="text" className="input__field" placeholder="xx@abc.com" name="Email" value={Email} onChange={(e) => e.target.value.length <= 20 ? setEmail(e.target.value) : null}/>
+                      <div className="input__utils">
+                        <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                       </div>
                     </div>
                   </td>
                 </tr>
                 <tr>
-                  <th>조합상사코드</th>
+                  <th>조합상사코드</th> 
                   <td colSpan={3}>
                     <div className="input-group">
                       <div className="input w246">
-                        <input type="text" className="input__field" placeholder="코드" name="CombAgentCd" value={CombAgentCd} onChange={(e) => e.target.value.length <= 6 ? setCombAgentCd(e.target.value) : null}/>
+                        <input
+                          type="text"
+                          className="input__field"
+                          placeholder="코드"
+                          name="CombAgentCd"
+                          value={CombAgentCd}
+                          onChange={(e) => {
+                            setCombAgentCd(e.target.value)
+                            setSangsaCodeCheck(false);
+                          }}
+                        />
                         <div className="input__utils">
                           <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                         </div>

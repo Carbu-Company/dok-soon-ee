@@ -54,21 +54,39 @@ export async function searchDealers(carAgent) {
     }
   }
   
-  export const getMgtKey = async (carAgent) => {
+  export const getCashMgmtKey = async (agentId) => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/getMgtKey?carAgent=${carAgent}`
+        `${process.env.NEXT_PUBLIC_API_URL}/api/getCashMgmtKey?agentId=${agentId}`
       );
-  
+
       if (!res.ok) {
-        throw new Error("MGTKEY를 불러오는데 실패했습니다");
+        throw new Error("CASHMGTKEY를 불러오는데 실패했습니다");
       }
   
       const data = await res.json();
       return data.MgtKey;
     } catch (error) {
-      console.error("MGTKEY 불러오기 오류:", error);
-      throw new Error(`MGTKEY 불러오기에 실패했습니다: ${error.message}`);
+      console.error("CASHMGTKEY 불러오기 오류:", error);
+      throw new Error(`CASHMGTKEY 불러오기에 실패했습니다: ${error.message}`);
+    }
+  };
+  
+  export const getTaxMgmtKey = async (agentId) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/getTaxMgmtKey?agentId=${agentId}`
+      );
+
+      if (!res.ok) {
+        throw new Error("TAXMGTKEY를 불러오는데 실패했습니다");
+      }
+  
+      const data = await res.json();
+      return data.MgtKey;
+    } catch (error) {
+      console.error("TAXMGTKEY 불러오기 오류:", error);
+      throw new Error(`TAXMGTKEY 불러오기에 실패했습니다: ${error.message}`);
     }
   };
   

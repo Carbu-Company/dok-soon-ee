@@ -68,9 +68,6 @@ export function isValidCorporateNumber(corporateNumber) {
     return numberArr[12] === checkDigit;
   }
 
-
-
-
 export function checkBizID(bizID) {
   // bizID는 숫자만 10자리로 해서 문자열로 넘김
   const checkID = [1, 3, 7, 1, 3, 7, 1, 3, 5, 1];

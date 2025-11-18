@@ -7,7 +7,7 @@ import CustSearchModal from "@/components/modal/CustSearchModal";
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
 import { getAcqTax } from '@/app/(main)/common/script.js'
-import { getMgtKey } from "@/app/(main)/api/search";
+import { getTaxMgmtKey } from "@/app/(main)/api/search";
 import { issueTaxInvoice } from "@/app/(main)/api/popbill";
 
 
@@ -197,7 +197,7 @@ export default function IssuePage({
 
 
     // 1. 세금계산서 발행 키값 생성
-    const taxMgmtkey = await getMgtKey();
+    const taxMgmtkey = await getTaxMgmtKey();
     console.log('세금계산서 발행 키값:', taxMgmtkey);  
     if(!taxMgmtkey) {
       alert('세금계산서 발행 키값 생성에 실패했습니다.');

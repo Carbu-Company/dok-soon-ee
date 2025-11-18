@@ -6,17 +6,17 @@ import {
   // 제시(매입)
   getCarPurInfo,
   // 재고금융
-  getCarLoanInfo,
+  //getCarLoanInfo,
   // 상품화비
-  getCarGoodsInfo,
+  //getCarGoodsInfo,
   // 매도
-  getCarSelInfo,
+  //getCarSelInfo,
   // 현금영수증
-  getCarCashInfo,
+  //getCarCashInfo,
   // 전자세금계산서
-  getCarTaxInfo,
+  //getCarTaxInfo,
   // 알선/정산
-  getCarConcilInfo,
+  //getCarConcilInfo,
 } from "@/app/(main)/api/carApi";
 
 export default function UnifiedDetailPage() {
@@ -62,12 +62,12 @@ export default function UnifiedDetailPage() {
         concilRes,
       ] = await Promise.all([
         getCarPurInfo(itemId).catch(() => null),
-        getCarLoanInfo(itemId).catch(() => null),
-        getCarGoodsInfo({ carRegId: itemId, carRegId: itemId }).catch(() => null),
-        getCarSelInfo({ carRegId: itemId, sell_car_regid: itemId }).catch(() => null),
-        getCarCashInfo({ costSeq: itemId, carRegId: itemId }).catch(() => null),
-        getCarTaxInfo({ eInvoiceSeq: itemId, carRegId: itemId }).catch(() => null),
-        getCarConcilInfo({ brkSeq: itemId, carRegId: itemId }).catch(() => null),
+        //getCarLoanInfo(itemId).catch(() => null),
+        //getCarGoodsInfo({ carRegId: itemId, carRegId: itemId }).catch(() => null),
+        //getCarSelInfo({ carRegId: itemId, sell_car_regid: itemId }).catch(() => null),
+        //getCarCashInfo({ costSeq: itemId, carRegId: itemId }).catch(() => null),
+        //getCarTaxInfo({ eInvoiceSeq: itemId, carRegId: itemId }).catch(() => null),
+        //getCarConcilInfo({ brkSeq: itemId, carRegId: itemId }).catch(() => null),
       ]);
 
       return {

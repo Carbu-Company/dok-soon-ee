@@ -7,7 +7,7 @@ import CarSearchModal from "@/components/modal/CarSearchModal";
 import CustSearchModal from "@/components/modal/CustSearchModal";
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
-import { getAcqTax } from '@/app/(main)/common/script.js'
+import { getAcqTax, autoHypenTelNo, autoHypenBizNO, autoHypenSNO } from '@/app/(main)/common/script.js'
 
 // ===== 상수 정의 =====
 const OWNER_TYPE = {
@@ -1323,7 +1323,11 @@ export default function SalesRegisterPage({
                       className="input__field" 
                       placeholder="주민(법인)등록번호"
                       value={customer.residentNumber}
-                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'residentNumber', e.target.value)}
+                      onChange={(e) => {
+                        autoHypenSNO(e.target);
+                        handleUpdateBuyerCustomer(customer.id, 'residentNumber', e.target.value);
+                      }}
+                      onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
                       <button
@@ -1343,7 +1347,11 @@ export default function SalesRegisterPage({
                       className="input__field" 
                       placeholder="사업자등록번호"
                       value={customer.businessNumber}
-                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'businessNumber', e.target.value)}
+                      onChange={(e) => {
+                        autoHypenBizNO(e.target);
+                        handleUpdateBuyerCustomer(customer.id, 'businessNumber', e.target.value);
+                      }}
+                      onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
                       <button
@@ -1363,7 +1371,11 @@ export default function SalesRegisterPage({
                       className="input__field" 
                       placeholder="연락처"
                       value={customer.phone}
-                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'phone', e.target.value)}
+                      onChange={(e) => {
+                        let value = autoHypenTelNo(e.target.value);
+                        handleUpdateBuyerCustomer(customer.id, 'phone', value);
+                      }}
+                      onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
                       <button
@@ -2110,7 +2122,10 @@ export default function SalesRegisterPage({
                     placeholder="- 없이 입력"
                     name="ownrPhon"
                     value={ownrPhon || ''}
-                    onChange={(e) => setOwnrPhon(e.target.value)}
+                    onChange={(e) => {
+                      let value = autoHypenTelNo(e.target.value);
+                      setOwnrPhon(value);
+                    }}
                     onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
@@ -2219,7 +2234,11 @@ export default function SalesRegisterPage({
                     placeholder="-없이 입력"
                     name="ownrBrno"
                     value={ownrBrno || ''}
-                    onChange={(e) => setOwnrBrno(e.target.value)}
+                    onChange={(e) => {
+                      autoHypenBizNO(e.target);
+                      setOwnrBrno(e.target.value);
+                    }}
+                    onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
                     <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>

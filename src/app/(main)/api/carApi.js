@@ -250,6 +250,14 @@ export const getMgtKey = async (params = {}) => {
   return apiGet("getMgtKey", { ...params });
 };
 
+export const getCashMgmtKey = async (params = {}) => {
+  return apiGet("getCashMgmtKey", { ...params });
+};
+
+export const getTaxMgmtKey = async (params = {}) => {
+  return apiGet("getTaxMgmtKey", { ...params });
+};
+
 export const getCDList = (grpCD) => apiGet("getCDList", { grpCD });
 export const getCustomerList = (params) => apiGet("getCustomerList", params);
 

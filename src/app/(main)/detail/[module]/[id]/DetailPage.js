@@ -171,11 +171,42 @@ export default function DetailPage({ title, data, dataSets, moduleType, onEdit, 
           <tbody>
             <tr>
               <th>매입금액</th>
-              <td>{v("PUR_AMT", "매입금액")}</td>
+              <td>
+                {(() => {
+                  const amt = v("PUR_AMT", "매입금액");
+                  const n = typeof amt === "number" ? amt : Number(String(amt).replace(/,/g, ""));
+                  return isNaN(n) ? amt : n.toLocaleString();
+                })()}
+              </td>
               <th>상사매입비</th>
-              <td>{`${v("AGENT_PUR_CST") || ""}${v("AGENT_PUR_CST_PAY_DT") ? ` (입금일 : ${v("AGENT_PUR_CST_PAY_DT")})` : ""}`}</td>
+              <td>
+                {(() => {
+                  const cost = v("AGENT_PUR_CST");
+                  const costStr = cost !== undefined && cost !== null && cost !== ""
+                    ? Number(String(cost).replace(/,/g, "")).toLocaleString()
+                    : "";
+                  const payDt = v("AGENT_PUR_CST_PAY_DT");
+                  return (
+                    <>
+                      {costStr}
+                      {payDt && (
+                        <>
+                          <br />
+                          (입금일 : {payDt})
+                        </>
+                      )}
+                    </>
+                  );
+                })()}
+              </td>
               <th>취득세</th>
-              <td>{v("GAIN_TAX")}</td>
+              <td>
+                {(() => {
+                  const tax = v("GAIN_TAX");
+                  const n = typeof tax === "number" ? tax : Number(String(tax).replace(/,/g, ""));
+                  return isNaN(n) ? tax : n.toLocaleString();
+                })()}
+              </td>
               <th>계약서번호</th>
               <td>{v("CTSH_NO")}</td>
             </tr>
@@ -183,7 +214,7 @@ export default function DetailPage({ title, data, dataSets, moduleType, onEdit, 
               <th>이전일</th>
               <td>{v("CAR_REG_DT")}</td>
               <th>매도자(전소유자)</th>
-              <td>{`${v("OWNR_TP_CD") === "0" ? "개인" : v("OWNR_TP_CD") === "1" ? "법인" : ""}${v("OWNR_NM") ? `-${v("OWNR_NM")}` : ""}`}</td>
+              <td>{`${v("OWNR_TP_CD") === "001" ? "개인" : v("OWNR_TP_CD") === "002" ? "법인" : ""}${v("OWNR_NM") ? `-${v("OWNR_NM")}` : ""}`}</td>
               <th>주민(법인)등록번호</th>
               <td>{v("OWNR_SSN")}</td>
               <th>사업자등록번호</th>

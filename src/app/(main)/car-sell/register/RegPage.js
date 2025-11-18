@@ -7,7 +7,7 @@ import CarSearchModal from "@/components/modal/CarSearchModal";
 import CustSearchModal from "@/components/modal/CustSearchModal";
 import { isValidResidentNumber, checkBizID, isValidCorporateNumber } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
-import { getAcqTax } from '@/app/(main)/common/script.js'
+import { getAcqTax, autoHypenTelNo, autoHypenBizNO, autoHypenSNO } from '@/app/(main)/common/script.js'
 
 // ===== 상수 정의 =====
 const OWNER_TYPE = {
@@ -197,11 +197,11 @@ export default function SalesRegisterPage({
       const updatedCustomers = buyerCustomers.map(cust => ({
         ...cust,
         customerName: customer.CUST_NM || '',
-        customerType: customer.CUST_TYPE || '',
         residentNumber: customer.CUST_NO || '',
         phone: customer.CUST_PHON || '',
+        zip: customer.CUST_ZIP || '',
         address: customer.CUST_ADDR || '',
-        zipCode: customer.CUST_ZIP || ''
+        addressDetail: customer.CUST_ADDR_DETAIL || '',
       }));
       setBuyerCustomers(updatedCustomers);
     }
@@ -220,12 +220,12 @@ export default function SalesRegisterPage({
     const newCustomer = {
       id: Date.now(), // 고유 ID 생성
       customerName: '',
-      customerType: OWNER_TYPE.INDIVIDUAL,
       residentNumber: '',
       businessNumber: '',
       phone: '',
       zip: '',
       address: '',
+      addressDetail: '',
       memo: '',
       shareRate: ''
     };
@@ -333,7 +333,7 @@ export default function SalesRegisterPage({
 
   
   // 판매유형 선택 상태 관리
-  const [selectedSellType, setSelectedSellType] = useState("");
+  const [selectedSellType, setSelectedSellType] = useState("001");      // 기본 : 소매
   const [isSellTypeSelectOpen, setIsSellTypeSelectOpen] = useState(false);
 
   // 판매일 선택 상태 관리
@@ -376,16 +376,22 @@ export default function SalesRegisterPage({
       phone: '',
       zip: '',
       address: '',
+      addressDetail: '',
       memo: '',
       shareRate: ''
     }
   ]);
 
   // 주소 검색 핸들러
-  const handleBuyerAddressSearch = useCallback(() => {
+  const handleBuyerAddressSearch = useCallback((customerId) => {
     openPostcodeSearch((addressData) => {
-      setBuyerCustomers(addressData.zonecode);
-      setBuyerCustomers(addressData.address);
+      setBuyerCustomers(prevCustomers => 
+        prevCustomers.map(customer => 
+          customer.id === customerId 
+            ? { ...customer, zip: addressData.zonecode, address: addressData.address, addressDetail: '' }
+            : customer
+        )
+      );
     });
   }, []);
 
@@ -418,21 +424,34 @@ export default function SalesRegisterPage({
       return;
     }
     if(!buyerCustomers[0].customerName) {
-      alert('매수자명을 입력해주세요.');
-      return;
-    }
-    if(!buyerCustomers[0].customerType) {
-      alert('매수자구분을 선택해주세요.');
+      alert('고객명(매수자명)을 입력해주세요.');
       return;
     }
     if(!buyerCustomers[0].residentNumber && !buyerCustomers[0].businessNumber) {
       alert('매수자 주민번호나 사업자번호 중 하나를 입력해주세요.');
       return;
     }
+
+    // 주민번호 체크
+    if(buyerCustomers[0].residentNumber) {
+      if(!isValidResidentNumber(buyerCustomers[0].residentNumber.replace(/-/g, ''))) {
+        alert('매수자 주민번호를 확인해주세요.');
+        return;
+      }
+    }
+    // 사업자번호 체크
+    if(buyerCustomers[0].businessNumber) {
+      if(!checkBizID(buyerCustomers[0].businessNumber.replace(/-/g, ''))) {
+        alert('매수자 사업자번호를 확인해주세요.');
+        return;
+      }
+    }
+
     if(!buyerCustomers[0].phone) {
       alert('매수자 연락처를 입력해주세요.');
       return;
     }
+
     if(!buyerCustomers[0].zip) {
       alert('매수자 우편번호를 입력해주세요.');
       return;
@@ -464,6 +483,11 @@ export default function SalesRegisterPage({
         alert('알선주민번호를 입력해주세요.');
         return;
       }
+      if(!isValidResidentNumber(alsonSsn.replace(/-/g, ''))) {
+        alert('알선주민번호를 확인해주세요.');
+        return;
+      }
+
       if(!alsonPhon) {
         alert('알선연락처를 입력해주세요.');
         return;
@@ -490,11 +514,10 @@ export default function SalesRegisterPage({
       dlrId: selectedSellDealer,                               // 딜러 ID
       saleTpCd: selectedSellType,                              // 판매유형
       buyerNm: buyerCustomers[0].customerName,                 // 매수자명
-      buyerTpCd: buyerCustomers[0].customerType,               // 매수자구분
       buyerSsn: buyerCustomers[0].residentNumber,              // 매수자 주민번호
       buyerBrno: buyerCustomers[0].businessNumber,             // 매수자 사업자번호
       buyerPhon: buyerCustomers[0].phone,                      // 매수자 연락처
-      buyerZip: buyerCustomers[0].zip,                     // 매수자 우편번호
+      buyerZip: buyerCustomers[0].zip,                         // 매수자 우편번호
       buyerAddr1: buyerCustomers[0].address,                   // 매수자 주소
       buyerAddr2: buyerCustomers[0].addressDetail,             // 매수자 상세주소
       saleAmt: sellAmt,                                        // 판매금액
@@ -862,10 +885,10 @@ export default function SalesRegisterPage({
     if(ownrSsn) {
 
       // 주민번호 체크 
-      if(!isValidResidentNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.INDIVIDUAL) {
+      if(!isValidResidentNumber(ownrSsn.replace(/-/g, '')) && ownrTpCd === OWNER_TYPE.INDIVIDUAL) {
         alert('주민등록번호를 확인해주세요.');
         return;
-      } else if(!isValidCorporateNumber(ownrSsn) && ownrTpCd === OWNER_TYPE.CORPORATION) {
+      } else if(!isValidCorporateNumber(ownrSsn.replace(/-/g, '')) && ownrTpCd === OWNER_TYPE.CORPORATION) {
         alert('법인등록번호를 확인해주세요.');
         return;
       }
@@ -874,7 +897,7 @@ export default function SalesRegisterPage({
 
     // 사업자번호
     if(ownrBrno) {
-      if(!checkBizID(ownrBrno)) {
+      if(!checkBizID(ownrBrno.replace(/-/g, ''))) {
         alert('사업자등록번호를 확인해주세요.');
         return;
       }
@@ -1127,7 +1150,7 @@ export default function SalesRegisterPage({
             </tr>
             <tr>
               <th>
-                상사매도비 <span className="text-red">*</span>
+                상사매도비 
                 <div className="tooltip">
                   <button className="jsTooltipBtn tooltip__btn btn btn--ico">
                     <span className="ico ico--help">보기</span>
@@ -1159,7 +1182,7 @@ export default function SalesRegisterPage({
                 </div>
               </td>
               <th>
-                성능보험료 <span className="text-red">*</span>
+                성능보험료 
                 <div className="tooltip">
                   <button className="jsTooltipBtn tooltip__btn btn btn--ico">
                     <span className="ico ico--help">보기</span>
@@ -1191,7 +1214,7 @@ export default function SalesRegisterPage({
                 </div>
               </td>
               <th>
-                차량번호(출고) <span className="text-red">*</span>
+                차량번호(출고) 
               </th>
               <td>
                 <div className="input">
@@ -1398,7 +1421,7 @@ export default function SalesRegisterPage({
                     type="text"
                     className="input__field"
                     placeholder="금액"
-                    value={alsonSelCost || '0'}
+                    value={alsonSelCost ? Number(alsonSelCost).toLocaleString() : '0'}
                     onChange={e => setAlsonSelCost(e.target.value.replace(/[^\d]/g, ''))}
                     onFocus={e => e.target.select()}
                   />
@@ -1433,7 +1456,7 @@ export default function SalesRegisterPage({
                     type="text"
                     className="input__field"
                     placeholder="금액"
-                    value={alsonFeeAmt || '0'}
+                    value={alsonFeeAmt ? Number(alsonFeeAmt).toLocaleString() : '0'}
                     onChange={e => setAlsonFeeAmt(e.target.value.replace(/[^\d]/g, ''))}
                     onFocus={e => e.target.select()}
                   />
@@ -1457,7 +1480,10 @@ export default function SalesRegisterPage({
                     className="input__field"
                     placeholder="주민등록번호"
                     value={alsonSsn || ''}
-                    onChange={e => setAlsonSsn(e.target.value)}
+                    onChange={(e) => {
+                      autoHypenSNO(e.target);
+                      setAlsonSsn(e.target.value);
+                    }}
                     onFocus={e => e.target.select()}
                   />
                   <div className="input__utils">
@@ -1474,9 +1500,14 @@ export default function SalesRegisterPage({
               <td>
                 <div className="input">
                   <input type="text" className="input__field"
-                    placeholder="연락처"
+                    placeholder="- 없이 입력"
+                    name="alsonPhon"
                     value={alsonPhon || ''}
-                    onChange={e => setAlsonPhon(e.target.value)}
+                    onChange={(e) => {
+                      let value = autoHypenTelNo(e.target.value);
+                      setAlsonPhon(value);
+                    }}
+                    onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
                     <button
@@ -1493,8 +1524,10 @@ export default function SalesRegisterPage({
                 <div className="input">
                   <input type="text" className="input__field"
                     placeholder="소속상사명"
+                    name="alsonAgentNm"
                     value={alsonAgentNm || ''}
                     onChange={e => setAlsonAgentNm(e.target.value)}
+                    onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
                     <button
@@ -1512,7 +1545,7 @@ export default function SalesRegisterPage({
               <td>
                 <div className="input">
                   <input type="text" className="input__field"
-                    placeholder="입금계좌"
+                    placeholder="입금계좌 - 없이 입력"
                     value={alsonAcntNo || ''}
                     onChange={e => setAlsonAcntNo(e.target.value)}
                   />
@@ -1552,7 +1585,6 @@ export default function SalesRegisterPage({
         <table className="table table--xl" id="myTable">
           <colgroup>
             <col style={{ width: "200px" }} />
-            <col style={{ width: "150px" }} />
             <col style={{ width: "180px" }} />
             <col style={{ width: "150px" }} />
             <col style={{ width: "150px" }} />
@@ -1564,7 +1596,6 @@ export default function SalesRegisterPage({
           <thead>
             <tr>
               <th>고객명</th>
-              <th>고객구분</th>
               <th>주민(법인)등록번호</th>
               <th>사업자등록번호</th>
               <th>연락처</th>
@@ -1601,43 +1632,17 @@ export default function SalesRegisterPage({
                   </div>
                 </td>
                 <td>
-                  <div className="form-option-wrap">
-                    <div className="form-option">
-                      <label className="form-option__label">
-                        <input 
-                          type="radio" 
-                          id={`customerType_${customer.id}_individual`}
-                          name="customerType" 
-                          value="individual"
-                          checked={customer.customerType ? customer.customerType === "individual" : true}
-                          onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'customerType', e.target.value)}
-                        />
-                        <span className="form-option__title">개인</span>
-                      </label>
-                    </div>
-                    <div className="form-option">
-                      <label className="form-option__label">
-                        <input 
-                          type="radio" 
-                          id={`customerType_${customer.id}_business`}
-                          name="customerType" 
-                          value="business"
-                          checked={customer.customerType === "business"}
-                          onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'customerType', e.target.value)}
-                        />
-                        <span className="form-option__title">사업자</span>
-                      </label>
-                    </div>
-                  </div>
-                </td>
-                <td>
                   <div className="input">
                     <input 
                       type="text" 
                       className="input__field" 
                       placeholder="주민(법인)등록번호"
                       value={customer.residentNumber}
-                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'residentNumber', e.target.value)}
+                      onChange={(e) => {
+                        autoHypenSNO(e.target);
+                        handleUpdateBuyerCustomer(customer.id, 'residentNumber', e.target.value);
+                      }}
+                      onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
                       <button
@@ -1657,7 +1662,11 @@ export default function SalesRegisterPage({
                       className="input__field" 
                       placeholder="사업자등록번호"
                       value={customer.businessNumber}
-                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'businessNumber', e.target.value)}
+                      onChange={(e) => {
+                        autoHypenBizNO(e.target);
+                        handleUpdateBuyerCustomer(customer.id, 'businessNumber', e.target.value);
+                      }}
+                      onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
                       <button
@@ -1677,7 +1686,11 @@ export default function SalesRegisterPage({
                       className="input__field" 
                       placeholder="연락처"
                       value={customer.phone}
-                      onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'phone', e.target.value)}
+                      onChange={(e) => {
+                        let value = autoHypenTelNo(e.target.value);
+                        handleUpdateBuyerCustomer(customer.id, 'phone', value);
+                      }}
+                      onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
                       <button
@@ -1698,11 +1711,12 @@ export default function SalesRegisterPage({
                         className="input__field" 
                         placeholder="우편번호"
                         value={customer.zip}
+                        readOnly
                         onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'zip', e.target.value)}
                       />
                     </div>
                     <div className="input-with-search">
-                      <div className="input">
+                      <div className="input w400">
                         <input 
                           type="text" 
                           className="input__field" 
@@ -1720,7 +1734,25 @@ export default function SalesRegisterPage({
                           </button>
                         </div>
                       </div>
-                      <button className="btn btn--dark" type="button" onClick={handleBuyerAddressSearch} style={{ width: "50px" }}>검색</button>
+                      <button className="btn btn--dark" type="button" onClick={() => handleBuyerAddressSearch(customer.id)} style={{ width: "50px" }}>검색</button>
+                      <div className="input w400">
+                        <input 
+                          type="text" 
+                          className="input__field" 
+                          placeholder="상세주소"
+                          value={customer.addressDetail}
+                          onChange={(e) => handleUpdateBuyerCustomer(customer.id, 'addressDetail', e.target.value)}
+                        />
+                        <div className="input__utils">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                            onClick={() => handleUpdateBuyerCustomer(customer.id, 'addressDetail', '')}
+                          >
+                            상세주소
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </td>
@@ -2407,7 +2439,10 @@ export default function SalesRegisterPage({
                     placeholder="주민(법인)등록번호"
                     name="ownrSsn"
                     value={ownrSsn || ''}
-                    onChange={(e) => setOwnrSsn(e.target.value)}
+                    onChange={(e) => {
+                      autoHypenSNO(e.target);
+                      setOwnrSsn(e.target.value);
+                    }}
                     onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
@@ -2424,7 +2459,10 @@ export default function SalesRegisterPage({
                     placeholder="- 없이 입력"
                     name="ownrPhon"
                     value={ownrPhon || ''}
-                    onChange={(e) => setOwnrPhon(e.target.value)}
+                    onChange={(e) => {
+                      let value = autoHypenTelNo(e.target.value);
+                      setOwnrPhon(value);
+                    }}
                     onFocus={(e) => e.target.select()}
                   />
                   <div className="input__utils">
@@ -2533,7 +2571,10 @@ export default function SalesRegisterPage({
                     placeholder="-없이 입력"
                     name="ownrBrno"
                     value={ownrBrno || ''}
-                    onChange={(e) => setOwnrBrno(e.target.value)}
+                    onChange={(e) => {
+                      autoHypenBizNO(e.target);
+                      setOwnrBrno(e.target.value);
+                    }}
                   />
                   <div className="input__utils">
                     <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>

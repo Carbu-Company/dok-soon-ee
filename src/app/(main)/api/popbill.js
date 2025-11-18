@@ -1,8 +1,13 @@
-import { getMgtKey } from "./search";
+import { getCashMgmtKey } from "./search";
 
 export const putReceiptRegisterIssue = async (userData, formData) => {
     try {
-      const mgtKey = await getMgtKey(userData.agentId);
+      
+      /**
+       * 현금영수증 발행 키값 조회
+       */
+      const mgtKey = await getCashMgmtKey(userData.agentId);
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/popbill/v1/cashbill/registIssue/`,
         {
@@ -11,7 +16,7 @@ export const putReceiptRegisterIssue = async (userData, formData) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            CorpNum: userData.agentBrno,
+            CorpNum: "5258103621", // "5258103621", //userData.agentBrno,
             Cashbill: {
               mgtKey: mgtKey,
               tradeType: "승인거래",
@@ -22,11 +27,11 @@ export const putReceiptRegisterIssue = async (userData, formData) => {
               supplyCost: formData.tradeSupPrc,
               tax: formData.tradeVat,
               serviceFee: "0",
-              franchiseCorpNum: userData.EMPID,
-              identityNum: formData.ownrPhon,
+              franchiseCorpNum: "5258103621",     // userData.agentBrno,
+              identityNum: formData.rcgnNo,       // 식별번호      
             },
             memo: "즉시 발행 테스트",
-            UserID: userData.usrId,
+            UserID: "aibzcokr",                // aibzcokr, ------------ userData.usrId,
             EmailSubject: "발행 안내메일",
           }),
         }

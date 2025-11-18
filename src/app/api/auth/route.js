@@ -26,7 +26,7 @@ export async function POST(req) {
     request.input("loginId", sql.VarChar(200), loginId);
 
     const query = `
-      SELECT A.USR_ID, A.AGENT_ID, A.LOGIN_ID, A.LOGIN_PASSWD, A.USR_NM, A.USR_GRADE_CD, A.EMP_BRNO, B.BRNO AS AGENT_BRNO
+      SELECT A.USR_ID, A.AGENT_ID, A.LOGIN_ID, A.LOGIN_PASSWD, A.USR_NM, A.USR_GRADE_CD, A.EMP_BRNO, B.BRNO AS AGENT_BRNO, A.SYS_ADMIN_YN 
       FROM dbo.CJB_USR A
 	     , dbo.CJB_AGENT B
       WHERE A.LOGIN_ID = @loginId
@@ -82,6 +82,7 @@ export async function POST(req) {
       usrNm: user.USR_NM,
       agentBrno: user.AGENT_BRNO,
       empBrno: user.EMP_BRNO,
+      sysAdminYn : user.SYS_ADMIN_YN,
     });
     const maxAge = 60 * 60 * 24 * 7; // 7 days
 
