@@ -1551,7 +1551,7 @@ export default function ProductCostList(props) {
               <th>부가세</th>
               <th>정산반영</th>
               <th>결제일</th>
-              <th>등록일일</th>
+              <th>등록일</th>
               <th>지출증빙</th>
 
               <th>바로가기</th>

@@ -572,7 +572,7 @@ export default function EditPage({
           className="btn btn--light"
           type="button"
           onClick={() => {
-            window.location.href = "m3.jsp";
+            router.back();
           }}
         >
           취소

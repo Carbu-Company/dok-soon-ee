@@ -5,11 +5,15 @@ import { useRouter } from 'next/navigation';
 import Image from "next/image";
 
 export default function EditPage(param) {
-  let { session, carPurInfo = [], expdCdList = [], evdcCdList = [], carGoodsInfo = [], updateGoodsFee = async (data)=>{} } = param;
+  let { session, carPurInfo = [], expdCdList = [], evdcCdList = [], carGoodsInfo = []
+    , insertGoodsFee = async (data)=>{}
+    , deleteAllGoodsFee = async (carRegId, usrId)=>{} } = param;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   // 상품화비용 행 상태 초기값(빈 배열로 시작)
   const [productCostRows, setProductCostRows] = useState([]);
+
+  const router = useRouter();
 
   // carGoodsInfo(또는 undefined/null)를 상품화비용 테이블로 초기화
   useEffect(() => {
@@ -154,12 +158,40 @@ export default function EditPage(param) {
       return;
     }
 
-    // 클릭 시 현재 테이블 상태 로그 출력
-    console.log('updateGoodsFeeHandler - productCostRows:', productCostRows);
-    console.log('updateGoodsFeeHandler - carRegId:', carPurInfo?.CAR_REG_ID || null);
+    /**
+     * 처리하기 전에 데이터 검증 
+     * 
+     */
+
+    for (const row of productCostRows) {
+      if (!row.productItem) {
+        alert('상품화항목을 선택해주세요.');
+        return;
+      }
+
+      if (!row.amount || row.amount === '0') {
+        alert('금액을 입력해주세요.');
+        return;
+      }
+
+    }
 
     setLoading(true);
+
     try {
+
+      /**
+       * 기존 자료 삭제 후 새로 등록 
+       */
+      const deleteGoodsFeeResult = await deleteAllGoodsFee(carPurInfo?.CAR_REG_ID || '', session?.usrId || ''); 
+      if (!deleteGoodsFeeResult.success) {
+        alert('기존 상품화비용 삭제에 실패했습니다.');
+        return;
+      }
+
+      /**
+       * 새로 등록
+       */
       const payloadRows = productCostRows.map((row) => ({
         goodsFeeSeq: row.id,
         carRegId: carPurInfo?.CAR_REG_ID || '',
@@ -179,9 +211,7 @@ export default function EditPage(param) {
         cashRecptRcgnNo: '',
         cashMgmtkey: '',
         delYn: 'N',
-        regDtime: new Date().toISOString(),
         regrId: session?.usrId || '',
-        modDtime: new Date().toISOString(),
         modrId: session?.usrId || ''
       }));
 
@@ -189,11 +219,11 @@ export default function EditPage(param) {
       // 각 행을 개별 payload로 호출합니다.
       console.log('updateGoodsFeeHandler - payloadRows:', payloadRows);
 
-      if (updateGoodsFee && typeof updateGoodsFee === 'function') {
+      if (insertGoodsFee && typeof insertGoodsFee === 'function') {
         // server action으로 각 행을 병렬로 전송
         const results = await Promise.all(
-          payloadRows.map((r) => updateGoodsFee({
-            goodsFeeSeq: r.goodsFeeSeq,
+          payloadRows.map((r) => insertGoodsFee({
+            agentId: session?.agentId,
             carRegId: r.carRegId,
             expdItemCd: r.expdItemCd,
             expdItemNm: r.expdItemNm,
@@ -211,9 +241,7 @@ export default function EditPage(param) {
             cashRecptRcgnNo: r.cashRecptRcgnNo,
             cashMgmtkey: r.cashMgmtkey,
             delYn: r.delYn,
-            regDtime: r.regDtime,
             regrId: r.regrId,
-            modDtime: r.modDtime,
             modrId: r.modrId
           }))
         );
@@ -225,6 +253,9 @@ export default function EditPage(param) {
       }
       alert('상품화비용이 성공적으로 수정되었습니다.');
       setLoading(false);
+      
+      // 페이지 이동 시 클라이언트 라우터 사용으로 새로고침 없이 라우트 이동
+      router.push('/car-goods/list');
     } catch (error) {
       console.error('상품화비용 수정 오류:', error);
       setError(error.message);
@@ -478,9 +509,9 @@ export default function EditPage(param) {
                       type="text" 
                       className="input__field" 
                       placeholder="" 
-                      value={row.amount}
+                      value={row.amount ? Number(row.amount).toLocaleString() : '0'}
                       onChange={(e) => {
-                        const amount = e.target.value;
+                        const amount = e.target.value.replace(/[^\d]/g, '');
                         const calculated = calculateAmounts(amount, row.taxType);
                         updateProductCostRow(row.id, 'amount', amount);
                         updateProductCostRow(row.id, 'supplyPrice', calculated.supplyPrice.toString());
@@ -654,7 +685,9 @@ export default function EditPage(param) {
         <button 
           className="btn btn--primary" 
           type="button" 
-          onClick={updateGoodsFeeHandler}
+          onClick={async () => {
+            await updateGoodsFeeHandler();
+          }}
           disabled={loading}
         >
           {loading ? '수정 중...' : '확인'}

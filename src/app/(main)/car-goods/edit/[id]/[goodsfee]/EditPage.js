@@ -11,6 +11,8 @@ export default function EditPage(param) {
   // 상품화비용 행 상태 초기값(빈 배열로 시작)
   const [productCostRows, setProductCostRows] = useState([]);
 
+  const router = useRouter();
+
   // goodsFeeDetail이 있으면 테이블 행으로 매핑하여 초기화
   useEffect(() => {
     if (!goodsFeeDetail) return;
@@ -184,9 +186,7 @@ export default function EditPage(param) {
         cashRecptRcgnNo: '',
         cashMgmtkey: '',
         delYn: 'N',
-        regDtime: new Date().toISOString(),
         regrId: session?.usrId || '',
-        modDtime: new Date().toISOString(),
         modrId: session?.usrId || ''
       }));
 
@@ -216,9 +216,7 @@ export default function EditPage(param) {
             cashRecptRcgnNo: r.cashRecptRcgnNo,
             cashMgmtkey: r.cashMgmtkey,
             delYn: r.delYn,
-            regDtime: r.regDtime,
             regrId: r.regrId,
-            modDtime: r.modDtime,
             modrId: r.modrId
           }))
         );
@@ -229,6 +227,8 @@ export default function EditPage(param) {
         throw new Error('updateGoodsFee server action이 제공되지 않았습니다.');
       }
       alert('상품화비용이 성공적으로 수정되었습니다.');
+
+      router.push('/car-goods/cost');
       setLoading(false);
     } catch (error) {
       console.error('상품화비용 수정 오류:', error);
@@ -297,13 +297,7 @@ export default function EditPage(param) {
       <div className="table-wrap">
         <div className="table-wrap__head">
           <h2 className="table-wrap__title">상품화비용</h2>
-          <button 
-            className="btn btn--dark btn--padding--r20" 
-            type="button" 
-            onClick={addProductCostRow}
-          >
-            <span className="ico ico--add"></span>상품화비용 추가
-          </button>
+          <div className="table-wrap__actions"></div>
         </div>
         <table className="table table--xl" id="myTable">
           <colgroup>
@@ -483,14 +477,15 @@ export default function EditPage(param) {
                       type="text" 
                       className="input__field" 
                       placeholder="" 
-                      value={row.amount}
+                      value={row.amount ? Number(row.amount).toLocaleString() : '0'}
                       onChange={(e) => {
-                        const amount = e.target.value;
+                        const amount = e.target.value.replace(/[^\d]/g, '');;
                         const calculated = calculateAmounts(amount, row.taxType);
                         updateProductCostRow(row.id, 'amount', amount);
                         updateProductCostRow(row.id, 'supplyPrice', calculated.supplyPrice.toString());
                         updateProductCostRow(row.id, 'taxAmount', calculated.taxAmount.toString());
                       }}
+                      onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
                       <button

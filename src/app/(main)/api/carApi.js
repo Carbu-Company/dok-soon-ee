@@ -165,6 +165,8 @@ export const getGoodsFeeCarSummary = (payload) =>
   apiPost("getGoodsFeeCarSummary", payload);
 export const insertGoodsFee = (payload) => apiPost("insertGoodsFee", payload);
 export const updateGoodsFee = (payload) => apiPost("updateGoodsFee", payload);
+export const deleteAllGoodsFee = (carRegId, usrId) => apiGet("deleteAllGoodsFee", { carRegId, usrId });
+export const deleteGoodsFee = (goodsFeeSeq, usrId) => apiGet("deleteGoodsFee", { goodsFeeSeq, usrId });
 /* --------------------------- 재고금융 2.0 --------------------------- */
 export const getCarLoanSumList = (payload) =>
   apiPost("getCarLoanSumList", payload);

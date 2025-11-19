@@ -62,7 +62,7 @@ export default function ProductCostList(props) {
   // 매입취소/삭제 모달 관련 state
   const [isGoodsFeeCarRemoveModalOpen, setIsGoodsFeeCarRemoveModalOpen] = useState(false);
   const [selectedGoodsFeeCarForRemove, setSelectedGoodsFeeCarForRemove] = useState(null);
-  const [selectedGoodsFeeCarTypeForRemove, setSelectedGoodsFeeCarTypeForRemove] = useState(null);
+  const [selectedGoodsFeeCarTypeForRemove, setSelectedGoodsFeeCarTypeForRemove] = useState("all");
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1721,7 +1721,7 @@ export default function ProductCostList(props) {
                               onClick={e => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                handleGoodsFeeCarRemoveModalOpen(car, "one");
+                                handleGoodsFeeCarRemoveModalOpen(car, "all");
                               }}
                               style={{
                                 border: "none",

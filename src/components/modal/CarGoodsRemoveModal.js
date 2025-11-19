@@ -10,6 +10,10 @@ export default function CarGoodsRemoveModal(props) {
         , onConfirm = () => {}
         , session = null } = props;
 
+
+  console.log('carData', carData);
+  console.log('flagType*************', flagType);
+
   const handleConfirm = async () => {
 
     try {
@@ -40,7 +44,7 @@ export default function CarGoodsRemoveModal(props) {
         }
       }
 
-      const successMessage = flagType === 'cancel' ? '상품화비용 삭제에  성공했습니다.' : '매입차량 삭제에 성공했습니다.';
+      const successMessage = flagType === 'cancel' ? '비용 전체 삭제처리 성공했습니다.' : '비용 개별 삭제처리 성공했습니다.';
       alert(successMessage);
       onConfirm();
       onClose();
@@ -48,7 +52,7 @@ export default function CarGoodsRemoveModal(props) {
       window.location.reload();
 
     } catch (error) {
-        console.error('상품화비용 삭제 오류:', error);
+        console.error('비용 삭제 오류:', error);
         throw error;
     }
 

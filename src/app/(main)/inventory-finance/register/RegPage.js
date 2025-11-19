@@ -342,14 +342,14 @@ export default function InventoryFinanceRegisterPage({
 
                     <ul className={`select__menu ${isLoanCompSelectOpen ? 'active' : ''}`}>
                       <li className={`select__option ${!loanCorpCd ? 'select__option--selected' : ''}`} data-value="" onClick={() => {
-                        setloanCorpCd('');
+                        setLoanCorpCd('');
                         setIsLoanCompSelectOpen(false);
                       }}>
                         선택
                       </li>
                       {loanCompList.map((comp) => (
                         <li key={comp.LOAN_CORP_CD} className={`select__option ${loanCorpCd === comp.LOAN_CORP_CD ? 'select__option--selected' : ''}`} data-value={comp.LOAN_CORP_CD} onClick={() => {
-                          setloanCorpCd(comp.LOAN_CORP_CD);
+                          setLoanCorpCd(comp.LOAN_CORP_CD);
                           setIsLoanCompSelectOpen(false);
                         }}>
                           {comp.LOAN_CORP_NM}

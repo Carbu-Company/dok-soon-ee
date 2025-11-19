@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import EditPage from "@/app/(main)/car-goods/edit/[id]/EditPage";
-import { getCarPurInfo, getCDList, updateGoodsFee, getCarGoodsInfo } from "@/app/(main)/api/carApi";
+import { getCarPurInfo, getCDList, getCarGoodsInfo, deleteAllGoodsFee, insertGoodsFee } from "@/app/(main)/api/carApi";
 
 export default async function EditorPage({ params }) {
   const cookieStore = await cookies();
@@ -14,10 +14,16 @@ export default async function EditorPage({ params }) {
   const expdCdList = await getCDList('08');
   const evdcCDList = await getCDList('07');   // 매입 증빙 코드 목록
 
-  async function updateGoodsFeeAction(data) {
+  async function insertGoodsFeeAction(data) {
     "use server";
-    return updateGoodsFee(data);
+    return insertGoodsFee(data);
   }
+
+  async function deleteAllGoodsFeeAction(carRegId, usrId) {
+    "use server";
+    return deleteAllGoodsFee(carRegId, usrId);
+  }
+  
 
 //   console.log('carPurInfo**********', carPurInfo);
   console.log('carGoodsInfo**********', carGoodsInfo);
@@ -28,6 +34,7 @@ export default async function EditorPage({ params }) {
                    expdCdList={expdCdList.data}
                    evdcCdList={evdcCDList.data}
                    goodsFeeDetail={[]}
-                   updateGoodsFee={updateGoodsFeeAction}
+                   insertGoodsFee={insertGoodsFeeAction}
+                   deleteAllGoodsFee={deleteAllGoodsFeeAction}
    />;
 }

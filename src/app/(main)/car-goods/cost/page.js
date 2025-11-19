@@ -104,7 +104,14 @@ export default async function CarSelList() {
     ordAscDesc: 'desc'
   };
 
+
+
   const goodsFeeList = await searchGoodsFeeList({ ...defaultParams, ...searchParams });
+
+
+  console.log('goodsFeeList:', goodsFeeList.data.carlist);
+
+
   const dealerList = await getDealerList(session.agentId);
   const expdItemList = await getCDList('08');   // 지출 항목 코드목록
   const expdEvdcList = await getCDList('07');   // 지출 증빙 코드목록

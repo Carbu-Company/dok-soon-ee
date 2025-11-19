@@ -14,6 +14,8 @@ export default function ProductCostRegisterPage({
     carPurDetail = [] 
 
 }) {
+  const router = useRouter();
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -177,9 +179,28 @@ export default function ProductCostRegisterPage({
     );
 
     if (validRows.length === 0) {
-      alert('유효한 상품화비용을 입력해주세요.');
+      alert('상품화비용을 입력해주세요.');
       return;
     }
+
+    /**
+     * 처리하기 전에 데이터 검증 
+     * 
+     */
+
+    for (const row of productCostRows) {
+      if (!row.productItem) {
+        alert('상품화항목을 선택해주세요.');
+        return;
+      }
+
+      if (!row.amount || row.amount === '0') {
+        alert('금액을 입력해주세요.');
+        return;
+      }
+
+    }
+
 
     setLoading(true);
     setError(null);
@@ -231,10 +252,11 @@ export default function ProductCostRegisterPage({
 
       await Promise.all(promises);
       
-      alert('상품화비용이 성공적으로 등록되었습니다.');
+      alert('상품화비용이 등록되었습니다.');
       setLoading(false);
+
       // 성공 후 목록 페이지로 이동하거나 필요한 처리
-      // router.push('/car-goods/list');
+      router.push('/car-goods/list');
       
     } catch (error) {
       console.error('상품화비용 등록 오류:', error);
@@ -497,14 +519,15 @@ export default function ProductCostRegisterPage({
                       type="text" 
                       className="input__field" 
                       placeholder="" 
-                      value={row.amount}
+                      value={row.amount ? Number(row.amount).toLocaleString() : '0'}
                       onChange={(e) => {
-                        const amount = e.target.value;
+                        const amount = e.target.value.replace(/[^\d]/g, '');
                         const calculated = calculateAmounts(amount, row.taxType);
                         updateProductCostRow(row.id, 'amount', amount);
                         updateProductCostRow(row.id, 'supplyPrice', calculated.supplyPrice.toString());
                         updateProductCostRow(row.id, 'taxAmount', calculated.taxAmount.toString());
                       }}
+                      onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
                       <button
@@ -673,7 +696,9 @@ export default function ProductCostRegisterPage({
         <button 
           className="btn btn--primary" 
           type="button" 
-          onClick={insertGoodsFee}
+          onClick={async () => {
+            await insertGoodsFee();
+          }}
           disabled={loading}
         >
           {loading ? '등록 중...' : '확인'}
