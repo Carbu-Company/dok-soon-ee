@@ -121,11 +121,11 @@ export default function CarLoanRemoveModal(props) {
                 </tr>
                 <tr>
                   <th>재고금융 대출 금액</th>
-                  <td>{carData?.EXPD_AMT.toLocaleString() || '-'}</td>
+                  <td>{carData?.EXPD_AMT?.toLocaleString() || '-'}</td>
                   <th>총 이자납입 금액</th>
-                  <td>{carData?.EXPD_SUP_PRC.toLocaleString() || '-'}</td>
+                  <td>{carData?.EXPD_SUP_PRC?.toLocaleString() || '-'}</td>
                   <th>잔여 이자납입 예정 금액</th>
-                  <td>{carData?.EXPD_VAT.toLocaleString() || '-'}</td>
+                  <td>{carData?.EXPD_VAT?.toLocaleString() || '-'}</td>
                 </tr>
               </tbody>
             </table>

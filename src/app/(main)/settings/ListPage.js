@@ -2,15 +2,19 @@
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { 
+  getLoginInfo,
   getAgentInfo,         // 공통 모듈에서 
   getDealerList,        // getUsrList 
+  getCapitalInfo,
   getPurchaseCost,
   getSellCostSummary,
   getCompanyExpense,
   getCompanyIncome,
   getAgentAcctList
 } from '@/app/(main)/api/carApi'
+import LoginInfo from '@/components/settings/LoginInfo'
 import CompanyInfo from '@/components/settings/CompanyInfo'
+import Capital from '@/components/settings/CapitalInfo'
 import DealerManagement from '@/components/settings/DealerManagement'
 import CostSettings from '@/components/settings/CostSettings'
 import Certificate from '@/components/settings/Certificate'
@@ -18,12 +22,21 @@ import Account from '@/components/settings/Account'
 
 export default function SettingsPage(props) {
   const agentId = props.session.agentId;
+  const usrId = props.session.usrId;
 
   // 탭 상태 관리
   const [activeTab, setActiveTab] = useState('company-info')
   
   // 로딩 상태
   const [loading, setLoading] = useState(false)
+
+  // 로그인 정보 상태
+  const [loginInfo, setLoginInfo] = useState({
+    loginId: '',
+    password: '',
+    mobilePhone: '',
+    email: '',
+  })
   
   // 상사 정보 상태
   const [agentInfo, setAgentInfo] = useState({
@@ -66,6 +79,22 @@ export default function SettingsPage(props) {
     //loadAccountList()
   }, [])
   
+  // 로그인 정보 로드
+  const loadLoginInfo = async () => {
+    try {
+      const result = await getLoginInfo(usrId)
+      if (result.success && result.data) {
+        setLoginInfo({
+          loginId: result.data.LOGIN_ID || '',
+          password: result.data.LOGIN_PASSWD || '',
+          mobilePhone: result.data.USR_PHON || '',
+          email: result.data.USR_EMAIL || '',
+        })
+      }
+    } catch (error) {
+      console.error('Error loading login info:', error);
+    }
+  }
   // 상사 정보 로드
   const loadAgentInfo = async () => {
     try {
@@ -171,7 +200,16 @@ export default function SettingsPage(props) {
     } catch (error) {
     }
   }
-  
+
+
+  // 로그인 정보 업데이트
+  const handleLoginInfoChange = (field, value) => {
+    setLoginInfo(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
   // 상사 정보 업데이트
   const handleCompanyInfoChange = (field, value) => {
     setAgentInfo(prev => ({
@@ -220,7 +258,39 @@ export default function SettingsPage(props) {
   // 탭 변경 처리
   const handleTabChange = (tab) => {
     setActiveTab(tab)
+    switch (tab) {
+      case 'login-info':
+        loadLoginInfo()
+        break
+      case 'company-info':
+        loadAgentInfo()
+        break
+      case 'dealer-management':
+        loadDealerList()
+        break
+      case 'cost-settings':
+        loadPurchaseCost()
+        break
+      case 'capital-info':
+        loadCapitalInfo()
+        break
+      case 'certificate':
+        break
+      case 'account':
+        loadAccountList()
+        break
+      default:
+        break
+    }
   }
+
+  /**
+   * 상사 정보 수정
+   * updateCarAgent
+   * 
+   * 로그인 정보 수정
+   * updateUsrPasswd
+   */
 
   // 딜러 수정
   const usrUpdate = (usrId) => {
@@ -263,7 +333,7 @@ export default function SettingsPage(props) {
   
             <div className="guidebox">
               <p className="guidebox__title">도움말</p>
-              <p className="guidebox__desc">도움말 안내 텍스트 문구가 들어갑니다. 도움말 안내 텍스트 문구가 들어갑니다. 도움말 안내 텍스트 문구가 들어갑니다. 도움말 안내 텍스트 문구가 들어갑니다. 도움말 안내 텍스트 문구가 들어갑니다.</p>
+              <p className="guidebox__desc">수정을 원할 경우 오른쪽 아래 수정버튼으로 클릭하여 진행바랍니다. 수정 후 저장버튼으로 저장하여 진행바랍니다.</p>
             </div>
           </div>
   
@@ -279,6 +349,18 @@ export default function SettingsPage(props) {
                   }}
                 >
                   상사 정보 관리
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#" 
+                  className={`tab-menu__menu ${activeTab === 'login-info' ? 'on' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleTabChange('login-info')
+                  }}
+                >
+                  로그인 정보 관리
                 </a>
               </li>
               <li>
@@ -303,6 +385,18 @@ export default function SettingsPage(props) {
                   }}
                 >
                   매입/매도비 설정
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="#" 
+                  className={`tab-menu__menu ${activeTab === 'capital-info' ? 'on' : ''}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleTabChange('capital-info')
+                  }}
+                >
+                  캐피탈 정보 관리
                 </a>
               </li>
               <li>
@@ -341,6 +435,14 @@ export default function SettingsPage(props) {
             />
           )}
 
+          {/* 로그인 정보 관리 탭 */}
+          {activeTab === 'login-info' && (
+            <LoginInfo 
+              loginInfo={loginInfo}
+              onLoginInfoChange={handleLoginInfoChange}
+            />
+          )}
+
           {/* 상사 딜러 관리 탭 */}
           {activeTab === 'dealer-management' && (
             <DealerManagement 
@@ -362,6 +464,14 @@ export default function SettingsPage(props) {
               onSellCostSummaryChange={handleSellCostSummaryChange}
               onExpenseListChange={handleExpenseListChange}
               onIncomeListChange={handleIncomeListChange}
+            />
+          )}
+
+          {/* 캐피탈 정보 관리 탭 */}
+          {activeTab === 'capital-info' && (
+            <Capital 
+              capitalInfo={capitalInfo}
+              onCapitalInfoChange={handleCapitalInfoChange}
             />
           )}
 

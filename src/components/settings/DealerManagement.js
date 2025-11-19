@@ -209,7 +209,7 @@ export default function DealerManagement({ dealerList, loading, onDealerListChan
           <col style={{ width: "110px" }} />
           <col style={{ width: "90px" }} />
           <col style={{ width: "90px" }} />
-          <col style={{ width: "400px" }} />
+          <col style={{ width: "300px" }} />
           <col style={{ width: "60px" }} />
         </colgroup>
         <thead>
@@ -336,13 +336,14 @@ export default function DealerManagement({ dealerList, loading, onDealerListChan
                 </td>
                 <td>
                   <div className="input-group">
-                    <div className="input w100">
-                      <input 
-                        type="text" 
-                        className={`input__field ${getFieldClassName('zip')}`}
-                        placeholder="" 
+                    <div className="input w50">
+                      <input
+                        type="text"
+                        className={`input__field w-auto text-left ${getFieldClassName(index, 'zip')}`}
+                        style={{ width: '90px', textAlign: 'left' }}
+                        placeholder=""
                         value={dealer.ZIP || ''}
-                        onChange={(e) => handleFieldChange('zip', e.target.value)}
+                        onChange={(e) => handleFieldChange(index, 'ZIP', e.target.value)}
                         readOnly={!isRowEditing(index)}
                       />
                       <div className="input__utils">

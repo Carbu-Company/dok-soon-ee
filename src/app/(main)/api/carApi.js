@@ -228,6 +228,12 @@ export const getCompanyInfo = (payload) => apiPost("getCompanyInfo", payload);
 export const getAgentInfo = async (agentId) => {
   return apiGet("getAgentInfo", { agentId: agentId });
 };
+export const getLoginInfo = async (usrId) => {
+  return apiGet("getLoginInfo", { usrId: usrId });
+};
+export const getCapitalInfo = async (agentId) => {
+  return apiGet("getCapitalInfo", { agentId: agentId });
+};
 export const getCompanySangsaDealer = async (agentId, sangsaCode, additionalParams = {}) => {
   return apiPost("getCompanySangsaDealer", { agentId, sangsaCode, ...additionalParams });
 };

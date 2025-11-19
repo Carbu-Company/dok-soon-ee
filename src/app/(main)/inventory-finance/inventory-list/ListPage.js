@@ -594,7 +594,7 @@ export default function InventoryFinanceList(props) {
                   <button
                     type="button"
                     className="btn btn--type03"
-                    onClick={() => {
+                    onClick={(e) => {
                       e.preventDefault(); // 기본 동작 방지
                       setSearchBtn(1);
                       handleSearch();
@@ -1529,7 +1529,7 @@ export default function InventoryFinanceList(props) {
                   <td>{summary.TOT_LMT_AMT.toLocaleString()}</td>
                   <td>{summary.TOT_LOAN_AMT.toLocaleString()}</td>
                   <td>{summary.LMT_AMT.toLocaleString()}</td>
-                  <td>{summary.RT}일</td>
+                  <td>{summary.INTR_PAY_DD}일</td>
                   <td>{summary.RT}%</td>
                   <td>{summary.TOT_CNT}건</td>
                   <td>{summary.CAR_NO}</td>
