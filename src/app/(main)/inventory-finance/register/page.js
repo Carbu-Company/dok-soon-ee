@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { verifySession } from "@/lib/auth";
 import RegPage from "@/app/(main)/inventory-finance/register/RegPage";
-import { getSuggestOne } from "./api";
+import { getCarPurInfo } from "./api";
 import { getDealerList } from "@/app/(main)/common/api";
 import { getCarLoanCorpList } from "@/app/(main)/api/carApi";
 
@@ -48,7 +48,7 @@ export default async function RegisterPage({ searchParams }) {
   // URL 파라미터에서 carId를 확인하여 차량 정보 조회
   let carPurDetail = null;
   if (resolvedSearchParams?.carRegId) {
-    carPurDetail = await getSuggestOne(resolvedSearchParams.carRegId).catch(error => {
+    carPurDetail = await getCarPurInfo(resolvedSearchParams.carRegId).catch(error => {
       console.error('차량 정보 조회 실패:', error);
       return null; // 에러 발생 시 null 반환
     });

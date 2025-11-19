@@ -126,7 +126,7 @@ export default async function CarLoanCarSumList() {
   const carLoanSummary = await searchCarLoanSummary({ ...defaultParams, ...searchParams });
   
 
-  //console.log('carLoanSummary*******************:', carLoanSummary);
+  console.log('carLoanSummary*******************:', carLoanSummary);
 
   return <ListPage session={session}
                    carList={carLoanCarSumList}

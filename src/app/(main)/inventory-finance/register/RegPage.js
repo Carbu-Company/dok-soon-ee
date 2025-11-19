@@ -31,10 +31,34 @@ export default function InventoryFinanceRegisterPage({
   // 선택된 대출회사 정보(실제 데이터 필드명 기준)
   const selectedLoanComp = loanCompList.find(c => c.LOAN_CORP_CD === loanCorpCd) || null;
 
+  // 선택된 대출회사 정보에서 selectedLoanComp.TOT_LMT_AMT 값을 저장하기
+  const [totLmtAmt, setTotLmtAmt] = useState(0);
+  const [totLoanAmt, setTotLoanAmt] = useState(0);
+  const [lmtAmt, setLmtAmt] = useState(0);
+  useEffect(() => {
+    if (selectedLoanComp) {
+      setTotLmtAmt(selectedLoanComp.TOT_LMT_AMT);
+      setTotLoanAmt(selectedLoanComp.TOT_LOAN_AMT);
+      setLmtAmt(selectedLoanComp.TOT_LMT_AMT - selectedLoanComp.TOT_LOAN_AMT);
+    }
+    else {
+      setTotLmtAmt(0);
+      setTotLoanAmt(0);
+      setLmtAmt(0);
+    }
+  }, [selectedLoanComp]);
+
   // 대출금액 선택 상태 관리
   const [loanAmt, setLoanAmt] = useState('');
   const [loanDt, setLoanDt] = useState('');
 
+  // 대출금액이 변경되면 자동으로 잔여한도 계산
+  useEffect(() => {
+    if (loanAmt) {
+      setLmtAmt(totLmtAmt - totLoanAmt - loanAmt);
+    }
+  }, [loanAmt]);
+  
   // 개월수 콤보 선택
   const [isLoanMmCntSelectOpen, setIsLoanMmCntSelectOpen] = useState(false);
   const [loanMmCnt, setLoanMmCnt] = useState('');
@@ -91,10 +115,7 @@ export default function InventoryFinanceRegisterPage({
     }
     
     // URL 쿼리 파라미터에서 showModal이 true이면 모달을 열기
-    if (searchParams.get("showModal") === "true") {
-      setIsModalOpen(true);
-    } else if (!carPurDetail || !carPurDetail.CAR_REG_ID) {
-      // 차량 정보가 없으면 모달을 자동으로 열기
+    if (searchParams.get("showModal") === "true" && !carPurDetail) {
       setIsModalOpen(true);
     }
   }, [searchParams, carPurDetail]);
@@ -145,6 +166,12 @@ export default function InventoryFinanceRegisterPage({
     // 캐피탈사
     if(!loanCorpCd) {
       alert('캐피탈사를 선택해주세요.');
+      return;
+    }
+
+    // 잔여한도 체크
+    if(lmtAmt < Number(loanAmt) || Number(loanAmt) <= 0) {
+      alert('대출금액을 초과하였습니다. 잔여한도를 확인해주세요.');
       return;
     }
 
@@ -360,9 +387,9 @@ export default function InventoryFinanceRegisterPage({
                 </div>
               </td>
               <th>총한도</th>
-              <td>{selectedLoanComp ? formatNum(selectedLoanComp.TOT_LMT_AMT) : '-'}</td>
+              <td>{formatNum(totLmtAmt)}</td>
               <th>잔여한도</th>
-              <td>{selectedLoanComp ? `${formatNum(selectedLoanComp.TOT_LMT_AMT - (selectedLoanComp.TOT_LOAN_AMT || 0))} (${selectedLoanComp.TOT_LOAN_AMT ? Math.round(((selectedLoanComp.TOT_LMT_AMT - (selectedLoanComp.TOT_LOAN_AMT || 0)) / selectedLoanComp.TOT_LMT_AMT) * 100) : 0}%)` : '-'}</td>
+              <td>{formatNum(lmtAmt)} ({Math.round(((lmtAmt / totLmtAmt) * 100))}%)</td>
             </tr>
             <tr>
               <th>
@@ -614,7 +641,7 @@ export default function InventoryFinanceRegisterPage({
           className="btn btn--light"
           type="button"
           onClick={() => {
-            window.location.href = "m3.jsp";
+            window.history.back();
           }}
         >
           취소

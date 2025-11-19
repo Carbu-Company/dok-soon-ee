@@ -442,22 +442,9 @@ export default function InventoryFinanceList(props) {
                   <div className="input__utils">
                     <button
                       type="button"
-                      onClick={e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleLoanRemoveModalOpen(car, "all");
-                      }}
-                      style={{
-                        border: "none",
-                        background: "none",
-                        padding: 0,
-                        color: "inherit",
-                        cursor: "pointer",
-                        width: "100%",
-                        textAlign: "left",
-                      }}
+                      className="jsInputClear input__clear ico ico--input-delete"
                     >
-                      비용 전체 삭제
+                      삭제
                     </button>
                   </div>
                 </div>
