@@ -3,12 +3,12 @@ import { useState } from 'react'
 
 export default function CostSettings({ 
   purchaseCost, 
-  sellCostSummary, 
+  sellCost, 
   expenseList, 
   incomeList, 
   loading,
   onPurchaseCostChange,
-  onSellCostSummaryChange,
+  onSellCostChange,
   onExpenseListChange,
   onIncomeListChange
 }) {
@@ -54,13 +54,23 @@ export default function CostSettings({
     
     // 새로 추가된 항목의 특징: 모든 필드가 기본값이거나 빈 값
     if (section === 'purchase' || section === 'sell') {
-      return item.CNFG_FEE_TITLE === '' && 
-             item.CNFG_FEE_RATE === 0 && 
-             item.CNFG_FEE_AMT === 0
-    } else if (section === 'expense' || section === 'income') {
-      return item.CODE1 === '' && 
-             item.NAME === '' && 
-             item.NAME2 === '0'
+      return item.TRADE_ITEM_SEQ === 0 && 
+             item.TRADE_ITEM_CD === '' && 
+             item.TRADE_ITEM_NM === '' && 
+             item.TRADE_ITEM_RT === 0 && 
+             item.TRADE_ITEM_AMT === 0
+    } else if (section === 'expense') {
+      return item.EXPD_ITEM_CD === '' && 
+             item.EXPD_ITEM_NM === '' && 
+             item.BASE_AMT === 0 && 
+             item.SORT_SEQ === 0 && 
+             item.USE_YN === 'Y'
+    } else if (section === 'income') {
+      return item.IMP_ITEM_CD === '' && 
+             item.IMP_ITEM_NM === '' && 
+             item.BASE_AMT === 0 && 
+             item.SORT_SEQ === 0 && 
+             item.USE_YN === 'Y'
     }
     return false
   }
@@ -208,7 +218,7 @@ export default function CostSettings({
   const getCurrentData = (section) => {
     switch (section) {
       case 'purchase': return purchaseCost
-      case 'sell': return sellCostSummary
+      case 'sell': return sellCost
       case 'expense': return expenseList
       case 'income': return incomeList
       default: return []
@@ -222,7 +232,7 @@ export default function CostSettings({
         onPurchaseCostChange(data)
         break
       case 'sell': 
-        onSellCostSummaryChange(data)
+        onSellCostChange(data)
         break
       case 'expense': 
         onExpenseListChange(data)
@@ -239,32 +249,28 @@ export default function CostSettings({
       case 'purchase':
       case 'sell':
         return {
-          CNFG_FEE_SEQ: 0,
-          CNFG_FEE_NO: 0,
-          CNFG_FEE_TITLE: '',
-          CNFG_FEE_COND: '1',
-          CNFG_FEE_RATE: 0,
-          CNFG_FEE_AMT: 0
+          TRADE_ITEM_SEQ: 0,
+          TRADE_ITEM_CD: '',
+          TRADE_ITEM_NM: '',
+          TRADE_ITEM_RT: 0,
+          TRADE_ITEM_AMT: 0,
+          DEL_YN: 'N'
         }
       case 'expense':
         return {
-          INDEXCD: '80',
-          CODE1: '',
-          CODE2: '   ',
-          NAME: '',
-          ISUSE: '사용',
-          NAME2: '0',
-          SORTNO: 0
+          EXPD_ITEM_CD: '',
+          EXPD_ITEM_NM: '',
+          BASE_AMT: 0,
+          SORT_SEQ: 0,
+          USE_YN: 'Y'
         }
       case 'income':
         return {
-          INDEXCD: '81',
-          CODE1: '',
-          CODE2: '   ',
-          NAME: '',
-          ISUSE: '사용',
-          NAME2: '0',
-          SORTNO: 0
+          IMP_ITEM_CD: '',
+          IMP_ITEM_NM: '',
+          BASE_AMT: 0,
+          SORT_SEQ: 0,
+          USE_YN: 'Y'
         }
       default:
         return {}
@@ -322,18 +328,23 @@ export default function CostSettings({
                   <td>
                     <div className="input">
                       <input 
+                        type="hidden"
+                        value={item.TRADE_ITEM_SEQ || ''}
+                        name="TRADE_ITEM_SEQ"
+                      />
+                      <input 
                         type="text" 
                         className={`input__field ${getFieldClassName('purchase', index)}`}
                         placeholder="항목명" 
-                        value={item.CNFG_FEE_TITLE || ''}
-                        onChange={(e) => handleFieldChange('purchase', index, 'CNFG_FEE_TITLE', e.target.value)}
+                        value={item.TRADE_ITEM_NM || ''}
+                        onChange={(e) => handleFieldChange('purchase', index, 'TRADE_ITEM_NM', e.target.value)}
                         readOnly={!isRowEditing('purchase', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('purchase', index, 'CNFG_FEE_TITLE', '')}
+                          onClick={() => handleFieldChange('purchase', index, 'TRADE_ITEM_NM', '')}
                         >
                           삭제
                         </button>
@@ -346,15 +357,15 @@ export default function CostSettings({
                         type="number" 
                         className={`input__field ${getFieldClassName('purchase', index)}`}
                         placeholder="0" 
-                        value={item.CNFG_FEE_RATE || ''}
-                        onChange={(e) => handleFieldChange('purchase', index, 'CNFG_FEE_RATE', parseFloat(e.target.value) || 0)}
+                        value={item.TRADE_ITEM_RT || ''}
+                        onChange={(e) => handleFieldChange('purchase', index, 'TRADE_ITEM_RT', parseFloat(e.target.value) || 0)}
                         readOnly={!isRowEditing('purchase', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('purchase', index, 'CNFG_FEE_RATE', 0)}
+                          onClick={() => handleFieldChange('purchase', index, 'TRADE_ITEM_RT', 0)}
                         >
                           삭제
                         </button>
@@ -367,15 +378,15 @@ export default function CostSettings({
                         type="number" 
                         className={`input__field ${getFieldClassName('purchase', index)}`}
                         placeholder="0" 
-                        value={item.CNFG_FEE_AMT || ''}
-                        onChange={(e) => handleFieldChange('purchase', index, 'CNFG_FEE_AMT', parseInt(e.target.value) || 0)}
+                        value={item.TRADE_ITEM_AMT || ''}
+                        onChange={(e) => handleFieldChange('purchase', index, 'TRADE_ITEM_AMT', parseInt(e.target.value) || 0)}
                         readOnly={!isRowEditing('purchase', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('purchase', index, 'CNFG_FEE_AMT', 0)}
+                          onClick={() => handleFieldChange('purchase', index, 'TRADE_ITEM_AMT', 0)}
                         >
                           삭제
                         </button>
@@ -462,24 +473,29 @@ export default function CostSettings({
             </tr>
           </thead>
           <tbody>
-            {sellCostSummary.length > 0 ? (
-              sellCostSummary.map((item, index) => (
+            {sellCost.length > 0 ? (
+              sellCost.map((item, index) => (
                 <tr key={index}>
                   <td>
                     <div className="input">
                       <input 
+                        type="hidden"
+                        value={item.TRADE_ITEM_SEQ || ''}
+                        name="TRADE_ITEM_SEQ"
+                      />
+                      <input 
                         type="text" 
                         className={`input__field ${getFieldClassName('sell', index)}`}
                         placeholder="항목명" 
-                        value={item.CNFG_FEE_TITLE || ''}
-                        onChange={(e) => handleFieldChange('sell', index, 'CNFG_FEE_TITLE', e.target.value)}
+                        value={item.TRADE_ITEM_NM || ''}
+                        onChange={(e) => handleFieldChange('sell', index, 'TRADE_ITEM_NM', e.target.value)}
                         readOnly={!isRowEditing('sell', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('sell', index, 'CNFG_FEE_TITLE', '')}
+                          onClick={() => handleFieldChange('sell', index, 'TRADE_ITEM_NM', '')}
                         >
                           삭제
                         </button>
@@ -492,15 +508,15 @@ export default function CostSettings({
                         type="number" 
                         className={`input__field ${getFieldClassName('sell', index)}`}
                         placeholder="0" 
-                        value={item.CNFG_FEE_RATE || ''}
-                        onChange={(e) => handleFieldChange('sell', index, 'CNFG_FEE_RATE', parseFloat(e.target.value) || 0)}
+                        value={item.TRADE_ITEM_RT || ''}
+                        onChange={(e) => handleFieldChange('sell', index, 'TRADE_ITEM_RT', parseFloat(e.target.value) || 0)}
                         readOnly={!isRowEditing('sell', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('sell', index, 'CNFG_FEE_RATE', 0)}
+                          onClick={() => handleFieldChange('sell', index, 'TRADE_ITEM_RT', 0)}
                         >
                           삭제
                         </button>
@@ -513,15 +529,15 @@ export default function CostSettings({
                         type="number" 
                         className={`input__field ${getFieldClassName('sell', index)}`}
                         placeholder="0" 
-                        value={item.CNFG_FEE_AMT || ''}
-                        onChange={(e) => handleFieldChange('sell', index, 'CNFG_FEE_AMT', parseInt(e.target.value) || 0)}
+                        value={item.TRADE_ITEM_AMT || ''}
+                        onChange={(e) => handleFieldChange('sell', index, 'TRADE_ITEM_AMT', parseInt(e.target.value) || 0)}
                         readOnly={!isRowEditing('sell', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('sell', index, 'CNFG_FEE_AMT', 0)}
+                          onClick={() => handleFieldChange('sell', index, 'TRADE_ITEM_AMT', 0)}
                         >
                           삭제
                         </button>
@@ -594,16 +610,18 @@ export default function CostSettings({
         
         <table className="table cost-table">
           <colgroup>
-            <col style={{ width: "100px" }} />
             <col style={{ width: "200px" }} />
             <col style={{ width: "100px" }} />
+            <col style={{ width: "60px" }} />
+            <col style={{ width: "90px" }} />
             <col style={{ width: "60px" }} />
           </colgroup>
           <thead>
             <tr>
-              <th>코드</th>
-              <th>항목명</th>
+              <th>지출 항목명</th>
               <th>금액</th>
+              <th>정렬순서</th>
+              <th>사용여부</th>
               <th>관리</th>
             </tr>
           </thead>
@@ -614,39 +632,23 @@ export default function CostSettings({
                   <td>
                     <div className="input">
                       <input 
-                        type="text" 
-                        className={`input__field ${getFieldClassName('expense', index)}`}
-                        placeholder="코드" 
-                        value={item.CODE1 || ''}
-                        onChange={(e) => handleFieldChange('expense', index, 'CODE1', e.target.value)}
-                        readOnly={!isRowEditing('expense', index)}
+                        type="hidden"
+                        value={item.EXPD_ITEM_CD || ''}
+                        name="EXPD_ITEM_CD"
                       />
-                      <div className="input__utils">
-                        <button 
-                          type="button" 
-                          className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('expense', index, 'CODE1', '')}
-                        >
-                          삭제
-                        </button>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="input">
                       <input 
                         type="text" 
                         className={`input__field ${getFieldClassName('expense', index)}`}
                         placeholder="항목명" 
-                        value={item.NAME || ''}
-                        onChange={(e) => handleFieldChange('expense', index, 'NAME', e.target.value)}
+                        value={item.EXPD_ITEM_NM || ''}
+                        onChange={(e) => handleFieldChange('expense', index, 'EXPD_ITEM_NM', e.target.value)}
                         readOnly={!isRowEditing('expense', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('expense', index, 'NAME', '')}
+                          onClick={() => handleFieldChange('expense', index, 'EXPD_ITEM_NM', '')}
                         >
                           삭제
                         </button>
@@ -659,18 +661,67 @@ export default function CostSettings({
                         type="number" 
                         className={`input__field ${getFieldClassName('expense', index)}`}
                         placeholder="0" 
-                        value={item.NAME2 || ''}
-                        onChange={(e) => handleFieldChange('expense', index, 'NAME2', e.target.value)}
+                        value={item.BASE_AMT || ''}
+                        onChange={(e) => handleFieldChange('expense', index, 'BASE_AMT', e.target.value)}
                         readOnly={!isRowEditing('expense', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('expense', index, 'NAME2', '0')}
+                          onClick={() => handleFieldChange('expense', index, 'BASE_AMT', '0')}
                         >
                           삭제
                         </button>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="input">
+                      <input 
+                        type="number" 
+                        className={`input__field ${getFieldClassName('expense', index)}`}
+                        placeholder="0" 
+                        value={item.SORT_SEQ || ''}
+                        onChange={(e) => handleFieldChange('expense', index, 'SORT_SEQ', e.target.value)}
+                        readOnly={!isRowEditing('expense', index)}
+                      />
+                      <div className="input__utils">
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => handleFieldChange('expense', index, 'SORT_SEQ', '0')}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="form-option-wrap">
+                      <div className="form-option">
+                        <label className="form-option__label">
+                          <input 
+                            type="radio" 
+                            name={`EXPENSE_USE_YN_${index}`}
+                            value="Y" 
+                            checked={item.USE_YN === 'Y'}
+                            onChange={(e) => handleFieldChange('expense', index, 'USE_YN', e.target.value)}
+                          />
+                          <span className="form-option__title">예</span>
+                        </label>
+                      </div>
+                      <div className="form-option">
+                        <label className="form-option__label">
+                          <input 
+                            type="radio" 
+                            name={`EXPENSE_USE_YN_${index}`} 
+                            value="N"
+                            checked={item.USE_YN === 'N'}
+                            onChange={(e) => handleFieldChange('expense', index, 'USE_YN', e.target.value)}
+                          />
+                          <span className="form-option__title">아니오</span>
+                        </label>
                       </div>
                     </div>
                   </td>
@@ -740,17 +791,19 @@ export default function CostSettings({
         
         <table className="table cost-table">
           <colgroup>
+          <col style={{ width: "200px" }} />
             <col style={{ width: "100px" }} />
-            <col style={{ width: "200px" }} />
-            <col style={{ width: "100px" }} />
+            <col style={{ width: "60px" }} />
+            <col style={{ width: "90px" }} />
             <col style={{ width: "60px" }} />
           </colgroup>
           <thead>
             <tr>
-              <th>코드</th>
-              <th>항목명</th>
-              <th>금액</th>
-              <th>관리</th>
+            <th>수입 항목명</th>
+            <th>금액</th>
+            <th>정렬순서</th>
+            <th>사용여부</th>
+            <th>관리</th>
             </tr>
           </thead>
           <tbody>
@@ -760,39 +813,23 @@ export default function CostSettings({
                   <td>
                     <div className="input">
                       <input 
-                        type="text" 
-                        className={`input__field ${getFieldClassName('income', index)}`}
-                        placeholder="코드" 
-                        value={item.CODE1 || ''}
-                        onChange={(e) => handleFieldChange('income', index, 'CODE1', e.target.value)}
-                        readOnly={!isRowEditing('income', index)}
+                        type="hidden"
+                        value={item.IMP_ITEM_CD || ''}
+                        name="IMP_ITEM_CD"
                       />
-                      <div className="input__utils">
-                        <button 
-                          type="button" 
-                          className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('income', index, 'CODE1', '')}
-                        >
-                          삭제
-                        </button>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="input">
                       <input 
                         type="text" 
                         className={`input__field ${getFieldClassName('income', index)}`}
                         placeholder="항목명" 
-                        value={item.NAME || ''}
-                        onChange={(e) => handleFieldChange('income', index, 'NAME', e.target.value)}
+                        value={item.IMP_ITEM_NM || ''}
+                        onChange={(e) => handleFieldChange('income', index, 'IMP_ITEM_NM', e.target.value)}
                         readOnly={!isRowEditing('income', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('income', index, 'NAME', '')}
+                          onClick={() => handleFieldChange('income', index, 'IMP_ITEM_NM', '')}
                         >
                           삭제
                         </button>
@@ -805,18 +842,67 @@ export default function CostSettings({
                         type="number" 
                         className={`input__field ${getFieldClassName('income', index)}`}
                         placeholder="0" 
-                        value={item.NAME2 || ''}
-                        onChange={(e) => handleFieldChange('income', index, 'NAME2', e.target.value)}
+                        value={item.BASE_AMT || ''}
+                        onChange={(e) => handleFieldChange('income', index, 'BASE_AMT', e.target.value)}
                         readOnly={!isRowEditing('income', index)}
                       />
                       <div className="input__utils">
                         <button 
                           type="button" 
                           className="jsInputClear input__clear ico ico--input-delete"
-                          onClick={() => handleFieldChange('income', index, 'NAME2', '0')}
+                          onClick={() => handleFieldChange('income', index, 'BASE_AMT', '0')}
                         >
                           삭제
                         </button>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="input">
+                      <input 
+                        type="number" 
+                        className={`input__field ${getFieldClassName('income', index)}`}
+                        placeholder="0" 
+                        value={item.SORT_SEQ || ''}
+                        onChange={(e) => handleFieldChange('income', index, 'SORT_SEQ', e.target.value)}
+                        readOnly={!isRowEditing('income', index)}
+                      />
+                      <div className="input__utils">
+                        <button 
+                          type="button" 
+                          className="jsInputClear input__clear ico ico--input-delete"
+                          onClick={() => handleFieldChange('income', index, 'SORT_SEQ', '0')}
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="form-option-wrap">
+                      <div className="form-option">
+                        <label className="form-option__label">
+                          <input 
+                            type="radio" 
+                            name={`INCOME_USE_YN_${index}`}
+                            value="Y" 
+                            checked={item.USE_YN === 'Y'}
+                            onChange={(e) => handleFieldChange('income', index, 'USE_YN', e.target.value)}
+                          />
+                          <span className="form-option__title">예</span>
+                        </label>
+                      </div>
+                      <div className="form-option">
+                        <label className="form-option__label">
+                          <input 
+                            type="radio" 
+                            name={`INCOME_USE_YN_${index}`} 
+                            value="N"
+                            checked={item.USE_YN === 'N'}
+                            onChange={(e) => handleFieldChange('income', index, 'USE_YN', e.target.value)}
+                          />
+                          <span className="form-option__title">아니오</span>
+                        </label>
                       </div>
                     </div>
                   </td>

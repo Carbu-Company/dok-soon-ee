@@ -60,7 +60,18 @@ export default function CompanyInfo({
   // 주소 검색 함수
   const handleAddressSearch = () => {
     openPostcodeSearch((data) => {
+      handleFieldChange('zip', data.zonecode);
       handleFieldChange('address', data.address);
+      handleFieldChange('detailAddress', '');
+      // detailAddress 포커스 이동
+      setTimeout(() => {
+        const detailAddressInput = document.querySelector('input.input__field[name="detailAddress"]') 
+          || document.querySelector('input.input__field[placeholder="상세 주소"]')
+          || document.querySelector('input.input__field[placeholder="상세주소"]');
+        if (detailAddressInput) {
+          detailAddressInput.focus();
+        }
+      }, 0);
     });
   };
 

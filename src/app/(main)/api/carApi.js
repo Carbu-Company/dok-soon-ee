@@ -234,6 +234,11 @@ export const getLoginInfo = async (usrId) => {
 export const getCapitalInfo = async (agentId) => {
   return apiGet("getCapitalInfo", { agentId: agentId });
 };
+
+export const getAgentLoanCorpList = async (agentId) => {
+  return apiGet("getAgentLoanCorpList", { agentId: agentId });
+};
+
 export const getCompanySangsaDealer = async (agentId, sangsaCode, additionalParams = {}) => {
   return apiPost("getCompanySangsaDealer", { agentId, sangsaCode, ...additionalParams });
 };
@@ -243,14 +248,14 @@ export const getDealerList = async (agentId) => {
 export const getPurchaseCost = async (agentId, additionalParams = {}) => {
   return apiPost("getPurchaseCost", { agentId, ...additionalParams });
 };
-export const getSellCostSummary = async (agentId, additionalParams = {}) => {
-  return apiPost("getSellCostSummary", { agentId, ...additionalParams });
+export const getSellCost = async (agentId, additionalParams = {}) => {
+  return apiPost("getSellCost", { agentId, ...additionalParams });
 };
-export const getCompanyExpense = async (agentId, additionalParams = {}) => {
-  return apiPost("getCompanyExpense", { agentId, ...additionalParams });
+export const getIncomeItem = async (agentId, additionalParams = {}) => {
+  return apiPost("getIncomeItem", { agentId, ...additionalParams });
 };
-export const getCompanyIncome = async (agentId, additionalParams = {}) => {
-  return apiPost("getCompanyIncome", { agentId, ...additionalParams });
+export const getExpenseItem = async (agentId, additionalParams = {}) => {
+  return apiPost("getExpenseItem", { agentId, ...additionalParams });
 };
 
 /* -------------------------------- 공통 -------------------------------- */

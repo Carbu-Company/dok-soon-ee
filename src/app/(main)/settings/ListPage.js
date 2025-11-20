@@ -5,11 +5,11 @@ import {
   getLoginInfo,
   getAgentInfo,         // 공통 모듈에서 
   getDealerList,        // getUsrList 
-  getCapitalInfo,
+  getAgentLoanCorpList,
   getPurchaseCost,
-  getSellCostSummary,
-  getCompanyExpense,
-  getCompanyIncome,
+  getSellCost,
+  getIncomeItem,
+  getExpenseItem,
   getAgentAcctList
 } from '@/app/(main)/api/carApi'
 import LoginInfo from '@/components/settings/LoginInfo'
@@ -59,11 +59,14 @@ export default function SettingsPage(props) {
   
   // 매입/매도비 설정 상태
   const [purchaseCost, setPurchaseCost] = useState([])
-  const [sellCostSummary, setSellCostSummary] = useState([])
+  const [sellCost, setSellCost] = useState([])
   
   // 지출/수입 항목 상태
   const [expenseList, setExpenseList] = useState([])
   const [incomeList, setIncomeList] = useState([])
+
+  // 캐피탈 정보 상태
+  const [capitalInfo, setCapitalInfo] = useState([])
   
   // 계좌 목록 상태
   const [accountList, setAccountList] = useState([])
@@ -72,10 +75,11 @@ export default function SettingsPage(props) {
   useEffect(() => {
     loadAgentInfo()
     loadDealerList()
-    //loadPurchaseCost()
-    //loadSellCostSummary()
-    //loadExpenseList()
-    //loadIncomeList()
+    loadPurchaseCost()
+    loadSellCost()
+    loadExpenseList()
+    loadIncomeList()
+    loadCapitalInfo()
     //loadAccountList()
   }, [])
   
@@ -157,11 +161,11 @@ export default function SettingsPage(props) {
   }
   
   // 매도비 설정 로드
-  const loadSellCostSummary = async () => {
+  const loadSellCost = async () => {
     try {
-      const result = await getSellCostSummary(agentId) // carAgent는 자동으로 세션에서 가져옴
+      const result = await getSellCost(agentId) // carAgent는 자동으로 세션에서 가져옴
       if (result.success && result.data) {
-        setSellCostSummary(result.data)
+        setSellCost(result.data)
       }
     } catch (error) {
     }
@@ -170,7 +174,7 @@ export default function SettingsPage(props) {
   // 지출 항목 로드
   const loadExpenseList = async () => {
     try {
-      const result = await getCompanyExpense(agentId) // carAgent는 자동으로 세션에서 가져옴
+      const result = await getExpenseItem(agentId) // carAgent는 자동으로 세션에서 가져옴
       if (result.success && result.data) {
         setExpenseList(result.data)
       }
@@ -181,14 +185,27 @@ export default function SettingsPage(props) {
   // 수입 항목 로드
   const loadIncomeList = async () => {
     try {
-      const result = await getCompanyIncome(agentId) // carAgent는 자동으로 세션에서 가져옴
+      const result = await getIncomeItem(agentId) // carAgent는 자동으로 세션에서 가져옴
       if (result.success && result.data) {
         setIncomeList(result.data)
       }
     } catch (error) {
     }
   }
-  
+
+  // 캐피탈 정보 로드
+  const loadCapitalInfo = async () => {
+    try {
+      const result = await getAgentLoanCorpList(agentId) // carAgent는 자동으로 세션에서 가져옴
+      console.log('캐피탈 정보 로드:', result)
+      if (result.success && result.data) {
+        setCapitalInfo(result.data)
+      }
+    } catch (error) {
+      console.error('Error loading capital info:', error);
+    }
+  }
+
   // 계좌 목록 로드
   const loadAccountList = async () => {
     try {
@@ -229,8 +246,8 @@ export default function SettingsPage(props) {
   }
   
   // 매도비 설정 업데이트
-  const handleSellCostSummaryChange = (newSellCostSummary) => {
-    setSellCostSummary(newSellCostSummary)
+  const handleSellCostChange = (newSellCost) => {
+    setSellCost(newSellCost)
   }
   
   // 지출 항목 업데이트
@@ -241,6 +258,11 @@ export default function SettingsPage(props) {
   // 수입 항목 업데이트
   const handleIncomeListChange = (newIncomeList) => {
     setIncomeList(newIncomeList)
+  }
+
+  // 캐피탈 정보 업데이트
+  const handleCapitalInfoChange = (newCapitalInfo) => {
+    setCapitalInfo(newCapitalInfo)
   }
   
   // 계좌 목록 업데이트
@@ -270,6 +292,9 @@ export default function SettingsPage(props) {
         break
       case 'cost-settings':
         loadPurchaseCost()
+        loadSellCost()
+        loadExpenseList()
+        loadIncomeList()
         break
       case 'capital-info':
         loadCapitalInfo()
@@ -289,7 +314,52 @@ export default function SettingsPage(props) {
    * updateCarAgent
    * 
    * 로그인 정보 수정
-   * updateUsrPasswd
+   * updateSettingLogin
+   * 
+   * 딜러 추가 
+   * insertSettingDealer
+   * 
+   * 딜러 수정
+   * updateSettingDealer
+   * 
+   * 딜러 삭제
+   * deleteSettingDealer
+   * 
+   * 매입/매도비 설정
+   * updateSettingCost
+   * 
+   * 매입/매도비 설정 삭제
+   * deleteSettingCost
+   * 
+   * 지출/수입 항목 등록
+   * insertExpenseItem
+   * 
+   * 지출/수입 항목 수정
+   * updateExpenseItem
+   * 
+   * 지출/수입 항목 삭제
+   * deleteExpenseItem
+   * 
+   * 수입 항목 등록
+   * insertIncomeItem
+   * 
+   * 수입 항목 수정
+   * updateIncomeItem
+   * 
+   * 수입 항목 삭제
+   * deleteIncomeItem
+   * 
+   * 캐피탈 정보 등록
+   * insertAgentLoanCorp
+   * 
+   * 캐피탈 정보 수정
+   * updateAgentLoanCorp
+   * 
+   * 캐피탈 정보 삭제
+   * deleteAgentLoanCorp
+   * 
+   * 
+   * 
    */
 
   // 딜러 수정
@@ -456,12 +526,12 @@ export default function SettingsPage(props) {
           {activeTab === 'cost-settings' && (
             <CostSettings 
               purchaseCost={purchaseCost}
-              sellCostSummary={sellCostSummary}
+              sellCost={sellCost}
               expenseList={expenseList}
               incomeList={incomeList}
               loading={loading}
               onPurchaseCostChange={handlePurchaseCostChange}
-              onSellCostSummaryChange={handleSellCostSummaryChange}
+              onSellCostChange={handleSellCostChange}
               onExpenseListChange={handleExpenseListChange}
               onIncomeListChange={handleIncomeListChange}
             />
