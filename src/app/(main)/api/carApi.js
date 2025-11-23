@@ -224,39 +224,55 @@ export const deleteCarAdj = (params) => apiGet("deleteCarAdj", params);
 export const deleteCarAdjDtl = (params) => apiGet("deleteCarAdjDtl", params);
 
 /* ------------------------------ 환경설정 ------------------------------ */
+// 환경설정 관련 함수
 export const getCompanyInfo = (payload) => apiPost("getCompanyInfo", payload);
-export const getAgentInfo = async (agentId) => {
-  return apiGet("getAgentInfo", { agentId: agentId });
-};
-export const getLoginInfo = async (usrId) => {
-  return apiGet("getLoginInfo", { usrId: usrId });
-};
-export const getCapitalInfo = async (agentId) => {
-  return apiGet("getCapitalInfo", { agentId: agentId });
-};
 
-export const getAgentLoanCorpList = async (agentId) => {
-  return apiGet("getAgentLoanCorpList", { agentId: agentId });
-};
+// 상사(Agent) 정보 조회/수정
+export const getAgentInfo = (agentId) => apiGet("getAgentInfo", { agentId });
+export const updateCarAgent = (payload) => apiPost("updateCarAgent", payload);
 
-export const getCompanySangsaDealer = async (agentId, sangsaCode, additionalParams = {}) => {
-  return apiPost("getCompanySangsaDealer", { agentId, sangsaCode, ...additionalParams });
-};
-export const getDealerList = async (agentId) => {
-  return apiGet("getDealerList", { agentId: agentId });
-};
-export const getPurchaseCost = async (agentId, additionalParams = {}) => {
-  return apiPost("getPurchaseCost", { agentId, ...additionalParams });
-};
-export const getSellCost = async (agentId, additionalParams = {}) => {
-  return apiPost("getSellCost", { agentId, ...additionalParams });
-};
-export const getIncomeItem = async (agentId, additionalParams = {}) => {
-  return apiPost("getIncomeItem", { agentId, ...additionalParams });
-};
-export const getExpenseItem = async (agentId, additionalParams = {}) => {
-  return apiPost("getExpenseItem", { agentId, ...additionalParams });
-};
+// 로그인 정보 조회/수정
+export const getLoginInfo = (usrId) => apiGet("getLoginInfo", { usrId });
+export const updateSettingLogin = (payload) => apiPost("updateSettingLogin", payload);
+
+// 대출(캐피탈) 정보 관련
+export const getCapitalInfo = (agentId) => apiGet("getCapitalInfo", { agentId });
+export const getAgentLoanCorpList = (agentId) => apiGet("getAgentLoanCorpList", { agentId });
+export const insertAgentLoanCorp = (payload) => apiPost("insertAgentLoanCorp", payload);
+export const updateAgentLoanCorp = (payload) => apiPost("updateAgentLoanCorp", payload);
+export const deleteAgentLoanCorp = (params) => apiGet("deleteAgentLoanCorp", params);
+
+// 상사 딜러 매핑(상사 딜러 관리)
+export const getCompanySangsaDealer = (agentId, sangsaCode, additionalParams = {}) => apiPost("getCompanySangsaDealer", { agentId, sangsaCode, ...additionalParams });
+
+// 딜러 관리 (목록, 추가, 수정, 삭제)
+export const getDealerList = (agentId) => apiGet("getDealerList", { agentId });
+export const insertSettingDealer = (payload) => apiPost("insertSettingDealer", payload);
+export const updateSettingDealer = (payload) => apiPost("updateSettingDealer", payload);
+export const deleteSettingDealer = (params) => apiGet("deleteSettingDealer", params);
+
+// 매입/매도비 설정 관련
+export const getPurchaseCost = (agentId, additionalParams = {}) => apiPost("getPurchaseCost", { agentId, ...additionalParams });
+export const getSellCost = (agentId, additionalParams = {}) => apiPost("getSellCost", { agentId, ...additionalParams });
+export const updateSettingCost = (payload) => apiPost("updateSettingCost", payload);
+export const deleteSettingCost = (params) => apiGet("deleteSettingCost", params);
+
+// 지출/수입 항목(Expense/Income) 관리
+export const getExpenseItem = (agentId, additionalParams = {}) => apiPost("getExpenseItem", { agentId, ...additionalParams });
+export const insertExpenseItem = (payload) => apiPost("insertExpenseItem", payload);
+export const updateExpenseItem = (payload) => apiPost("updateExpenseItem", payload);
+export const deleteExpenseItem = (params) => apiGet("deleteExpenseItem", params);
+
+export const getIncomeItem = (agentId, additionalParams = {}) => apiPost("getIncomeItem", { agentId, ...additionalParams });
+export const insertIncomeItem = (payload) => apiPost("insertIncomeItem", payload);
+export const updateIncomeItem = (payload) => apiPost("updateIncomeItem", payload);
+export const deleteIncomeItem = (params) => apiGet("deleteIncomeItem", params);
+
+// 계좌(Account) 관리
+export const getAgentAcctList = (agentId) => apiGet("getAgentAcctList", { agentId });
+export const insertAgentAcct = (payload) => apiPost("insertAgentAcct", payload);
+export const updateAgentAcct = (payload) => apiPost("updateAgentAcct", payload);
+export const deleteAgentAcct = (params) => apiGet("deleteAgentAcct", params);
 
 /* -------------------------------- 공통 -------------------------------- */
 export const getMgtKey = async (params = {}) => {
