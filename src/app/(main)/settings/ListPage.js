@@ -10,7 +10,8 @@ import {
   getSellCost,
   getIncomeItem,
   getExpenseItem,
-  getAgentAcctList
+  getAgentAcctList,
+  getCDList
 } from '@/app/(main)/api/carApi'
 import LoginInfo from '@/components/settings/LoginInfo'
 import CompanyInfo from '@/components/settings/CompanyInfo'
@@ -70,6 +71,7 @@ export default function SettingsPage(props) {
   
   // 계좌 목록 상태
   const [accountList, setAccountList] = useState([])
+  const [bankList, setBankList] = useState([])
   
   // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
@@ -80,7 +82,7 @@ export default function SettingsPage(props) {
     loadExpenseList()
     loadIncomeList()
     loadCapitalInfo()
-    //loadAccountList()
+    loadAccountList()
   }, [])
   
   // 로그인 정보 로드
@@ -213,8 +215,22 @@ export default function SettingsPage(props) {
       console.log('계좌 목록 로드:', result)
       if (result.success && result.data) {
         setAccountList(result.data)
+        console.log('계좌 목록:', result.data)
       }
+      else {
+        console.error('Error loading account list:', result)
+      }
+
+      const bankList = await getCDList('09')
+      if (bankList.success && bankList.data) {
+        setBankList(bankList.data)
+        console.log('은행 목록:', bankList.data)
+      } else {
+        console.error('Error loading bank list:', bankList)
+      }
+
     } catch (error) {
+      console.error('Error loading account list:', error);
     }
   }
 
@@ -359,7 +375,17 @@ export default function SettingsPage(props) {
    * deleteAgentLoanCorp
    * 
    * 
+   * 계좌 조회 
+   * getAgentAcctList
    * 
+   * 계좌 등록
+   * insertAgentAcct
+   * 
+   * 계좌 수정
+   * updateAgentAcct
+   * 
+   * 계좌 삭제
+   * deleteAgentAcct
    */
 
   // 딜러 수정
@@ -557,6 +583,7 @@ export default function SettingsPage(props) {
           {activeTab === 'account' && (
             <Account 
               accountList={accountList}
+              bankList={bankList}
               loading={loading}
               onAccountListChange={handleAccountListChange}
             />

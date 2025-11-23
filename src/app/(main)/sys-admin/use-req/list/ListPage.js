@@ -485,7 +485,7 @@ export default function AgentList(props) {
                 <button
                   type="button"
                   className="btn btn--light btn--sm"
-                  onClick={() => router.push("/detail/car-sell/1")}
+                  onClick={() => router.push(`/sys-admin/use-req/edit/${agent.AGENT_ID}`)}
                 >
                   수정하기
                 </button>

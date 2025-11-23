@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-export default function Account({ accountList, loading, onAccountListChange }) {
+export default function Account({ accountList, bankList, loading, onAccountListChange }) {
   // 행별 수정 모드 상태 관리
   const [editingRows, setEditingRows] = useState(new Set())
   const [originalData, setOriginalData] = useState({})
@@ -98,7 +98,8 @@ export default function Account({ accountList, loading, onAccountListChange }) {
       BNK_NM: '',
       ACCT_NO: '',
       ACCT_NM: '',
-      MAST_YN: 'N'
+      MAST_YN: 'N',
+      USE_YN: 'Y'
     }
     
     // 기존 newlyAddedItems의 인덱스를 모두 1씩 증가 (새 항목이 맨 앞에 추가되므로)
@@ -203,11 +204,11 @@ export default function Account({ accountList, loading, onAccountListChange }) {
         </colgroup>
         <thead>
           <tr>
-            <th>은행코드</th>
-            <th>은행명</th>
+            <th>은행명 / 코드</th>
             <th>계좌번호</th>
             <th>계좌명</th>
-            <th>주거래</th>
+            <th>주거래 통장</th>
+            <th>사용여부</th>
             <th>관리</th>
           </tr>
         </thead>
@@ -217,40 +218,25 @@ export default function Account({ accountList, loading, onAccountListChange }) {
               <tr key={index}>
                 <td>
                   <div className="input">
-                    <input 
-                      type="text" 
+                    <select
                       className={`input__field ${getFieldClassName(index)}`}
-                      placeholder="은행코드" 
-                      value={account.BNK_CD || ''}
-                      onChange={(e) => handleFieldChange(index, 'BNK_CD', e.target.value)}
-                      readOnly={!isRowEditing(index)}
-                    />
+                      value={account.BAK_CD !== undefined ? account.BAK_CD : (account.BNK_CD || '')}
+                      onChange={(e) => handleFieldChange(index, 'BAK_CD', e.target.value)}
+                      disabled={!isRowEditing(index)}
+                    >
+                      <option value="">은행 선택</option>
+                      {bankList && bankList.map((bank, i) => (
+                        <option key={i} value={bank.CD}>
+                          {bank.CD_NM} ({bank.CD})
+                        </option>
+                      ))}
+                    </select>
                     <div className="input__utils">
                       <button 
                         type="button" 
                         className="jsInputClear input__clear ico ico--input-delete"
-                        onClick={() => handleFieldChange(index, 'BNK_CD', '')}
-                      >
-                        삭제
-                      </button>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div className="input">
-                    <input 
-                      type="text" 
-                      className={`input__field ${getFieldClassName(index)}`}
-                      placeholder="은행명" 
-                      value={account.BNK_NM || ''}
-                      onChange={(e) => handleFieldChange(index, 'BNK_NM', e.target.value)}
-                      readOnly={!isRowEditing(index)}
-                    />
-                    <div className="input__utils">
-                      <button 
-                        type="button" 
-                        className="jsInputClear input__clear ico ico--input-delete"
-                        onClick={() => handleFieldChange(index, 'BNK_NM', '')}
+                        onClick={() => handleFieldChange(index, 'BAK_CD', '')}
+                        disabled={!isRowEditing(index)}
                       >
                         삭제
                       </button>
@@ -300,16 +286,59 @@ export default function Account({ accountList, loading, onAccountListChange }) {
                   </div>
                 </td>
                 <td>
-                  <div className="input">
-                    <select 
-                      className={`input__field ${getFieldClassName(index)}`}
-                      value={account.MAST_YN || 'N'}
-                      onChange={(e) => handleFieldChange(index, 'MAST_YN', e.target.value)}
-                      disabled={!isRowEditing(index)}
-                    >
-                      <option value="Y">주거래</option>
-                      <option value="N">일반</option>
-                    </select>
+                  <div className="form-option-wrap">
+                    <div className="form-option">
+                      <label className="form-option__label">
+                        <input 
+                          type="radio" 
+                          name={`MAST_YN_${index}`}
+                          value="Y" 
+                          checked={account.MAST_YN === 'Y'}
+                          onChange={(e) => handleFieldChange(index, 'MAST_YN', e.target.value)}
+                        />
+                        <span className="form-option__title">예</span>
+                      </label>
+                    </div>
+                    <div className="form-option">
+                      <label className="form-option__label">
+                        <input 
+                          type="radio" 
+                          name={`MAST_YN_${index}`} 
+                          value="N"
+                          checked={account.MAST_YN === 'N'}
+                          onChange={(e) => handleFieldChange(index, 'MAST_YN', e.target.value)}
+                        />
+                        <span className="form-option__title">아니오</span>
+                      </label>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div className="form-option-wrap">
+                    <div className="form-option">
+                      <label className="form-option__label">
+                        <input 
+                          type="radio" 
+                          name={`USE_YN_${index}`}
+                          value="Y" 
+                          checked={account.USE_YN === 'Y'}
+                          onChange={(e) => handleFieldChange(index, 'USE_YN', e.target.value)}
+                        />
+                        <span className="form-option__title">예</span>
+                      </label>
+                    </div>
+                    <div className="form-option">
+                      <label className="form-option__label">
+                        <input 
+                          type="radio" 
+                          name={`USE_YN_${index}`} 
+                          value="N"
+                          checked={account.USE_YN === 'N'}
+                          onChange={(e) => handleFieldChange(index, 'USE_YN', e.target.value)}
+                        />
+                        <span className="form-option__title">아니오</span>
+                      </label>
+                    </div>
                   </div>
                 </td>
                 <td>
