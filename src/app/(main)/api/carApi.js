@@ -175,9 +175,6 @@ export const getCarLoanSummary = (payload) => apiPost("getCarLoanSummary", paylo
 export const insertCarLoan = (payload) => apiPost("insertCarLoan", payload);
 export const updateCarLoan = (payload) => apiPost("updateCarLoan", payload);
 export const deleteCarLoan = (params) => apiGet("deleteCarLoan", params);
-export const insertAgentLoanCorp = (payload) => apiPost("insertAgentLoanCorp", payload);
-export const updateAgentLoanCorp = (payload) => apiPost("updateAgentLoanCorp", payload);
-export const deleteAgentLoanCorp = (params) => apiGet("deleteAgentLoanCorp", params);
 export const getCarLoanCorpList = (agentId) => apiGet("getCarLoanCorpList", { agentId });
 export const getCarLoanIdOneInfo = (loanId) => apiGet("getCarLoanIdOneInfo", { loanId });
 
@@ -225,7 +222,6 @@ export const deleteCarAdjDtl = (params) => apiGet("deleteCarAdjDtl", params);
 
 /* ------------------------------ 환경설정 ------------------------------ */
 // 환경설정 관련 함수
-export const getCompanyInfo = (payload) => apiPost("getCompanyInfo", payload);
 
 // 상사(Agent) 정보 조회/수정
 export const getAgentInfo = (agentId) => apiGet("getAgentInfo", { agentId });
@@ -236,7 +232,6 @@ export const getLoginInfo = (usrId) => apiGet("getLoginInfo", { usrId });
 export const updateSettingLogin = (payload) => apiPost("updateSettingLogin", payload);
 
 // 대출(캐피탈) 정보 관련
-export const getCapitalInfo = (agentId) => apiGet("getCapitalInfo", { agentId });
 export const getAgentLoanCorpList = (agentId) => apiGet("getAgentLoanCorpList", { agentId });
 export const insertAgentLoanCorp = (payload) => apiPost("insertAgentLoanCorp", payload);
 export const updateAgentLoanCorp = (payload) => apiPost("updateAgentLoanCorp", payload);
