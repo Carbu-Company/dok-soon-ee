@@ -264,7 +264,6 @@ export const updateIncomeItem = (payload) => apiPost("updateIncomeItem", payload
 export const deleteIncomeItem = (params) => apiGet("deleteIncomeItem", params);
 
 // 계좌(Account) 관리
-export const getAgentAcctList = (agentId) => apiGet("getAgentAcctList", { agentId });
 export const insertAgentAcct = (payload) => apiPost("insertAgentAcct", payload);
 export const updateAgentAcct = (payload) => apiPost("updateAgentAcct", payload);
 export const deleteAgentAcct = (params) => apiGet("deleteAgentAcct", params);
