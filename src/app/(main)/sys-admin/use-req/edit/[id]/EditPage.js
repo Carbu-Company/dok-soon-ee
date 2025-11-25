@@ -62,7 +62,7 @@ export default function EditPage({
     // 사업자번호
     if(brno) {
       if(!checkBizID(brno.replace(/-/g, ''))) {
-        alert('사업자등록번호를 확인해주세요.');
+        alert(brno.replace(/-/g, '') + '는 사업자등록번호가 아닙니다.');
         return;
       }
     }
@@ -127,6 +127,44 @@ export default function EditPage({
       alert('상사 정보 수정 되었습니다.'); // 테스트용 알림
       setLoading(false);
       if (res.success) {
+
+        /**
+         * 상사 POPBILL 등록
+         */
+        const popbillResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/popbill/v1/bizinfo/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formValues)
+        });
+        const popbillRes = await popbillResponse.json();
+
+        if(popbillRes.success) {
+          alert('상사 POPBILL 등록 되었습니다.'); // 테스트용 알림
+        } else {
+          alert('상사 POPBILL 등록에 실패했습니다.'); // 테스트용 알림
+        }
+
+
+        /** 
+         * 팝빌 등록이 성공하면 사용 승인 처리 (db UPDATE)
+         */
+        const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateAgentInfo`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formValues)
+        });
+        const updateRes = await updateResponse.json();
+
+        if(updateRes.success) {
+          alert('사용 승인 처리 되었습니다.'); // 테스트용 알림
+        } else {
+          alert('사용 승인 처리에 실패했습니다.'); // 테스트용 알림
+        }
+
         router.back();
         return { success: true, res, error: null };
       } else {
@@ -460,15 +498,17 @@ export default function EditPage({
                     value={feeSctCd || ''} 
                   />
                   <button className="select__toggle" type="button">
-                    <span className="select__text">베이직</span>
+                    <span className="select__text">
+                      {feeSctCd === 'B' ? '베이직' : feeSctCd === 'P' ? '프리미엄' : '선택'}
+                    </span>
                     <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
                   </button>
-
                   <ul className="select__menu">
                     <li
                       className={`select__option${feeSctCd === 'B' ? ' select__option--selected' : ''}`}
                       data-value="B"
                       onClick={() => setFeeSctCd('B')}
+                      aria-selected={feeSctCd === 'B'}
                     >
                       베이직
                     </li>
@@ -476,6 +516,7 @@ export default function EditPage({
                       className={`select__option${feeSctCd === 'P' ? ' select__option--selected' : ''}`}
                       data-value="P"
                       onClick={() => setFeeSctCd('P')}
+                      aria-selected={feeSctCd === 'P'}
                     >
                       프리미엄
                     </li>
