@@ -59,7 +59,7 @@ export default async function AgentList() {
 
 
 
-  console.log('agentList*******************:', agentList);
+  //console.log('agentList*******************:', agentList);
   const combCdList = await getCDList('31');   // 조합코드 목록
 
   return <ListPage session={session}

@@ -2,37 +2,48 @@
 import Image from 'next/image'
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { checkBizID } from '@/lib/util.js'
 import { openPostcodeSearch } from '@/components/modal/AddressModal'
+import { getAcqTax, autoHypenTelNo, autoHypenBizNO, autoHypenSNO } from '@/app/(main)/common/script.js'
 
 // ===== 메인 컴포넌트 =====
 export default function EditPage({ 
   session = null, 
-  agentInfo = [] ,  
+  agentInfo = {} ,  
 }) {
-  console.log('agentInfo**********', agentInfo);
+
+  const router = useRouter();
+
+
+  console.log('agentInfo11111111111111111111111', agentInfo);
 
   // ===== 기본 정보 상태 =====
-  const [agentId, setAgentId] = useState(agentInfo.AGENT_ID || '');
-  const [agentNm, setAgentNm] = useState(agentInfo.AGENT_NM || '');
-  const [agentTel, setAgentTel] = useState(agentInfo.AGENT_TEL || '');
-  const [agentEmail, setAgentEmail] = useState(agentInfo.AGENT_EMAIL || '');
-  const [agentAddr, setAgentAddr] = useState(agentInfo.AGENT_ADDR || '');
-  const [agentZip, setAgentZip] = useState(agentInfo.AGENT_ZIP || '');
-
-  // 상사 유형
-  const [agentType, setAgentType] = useState(agentInfo.AGENT_TYPE || '0');
-
+  const [agentId, setAgentId] = useState(agentInfo?.AGENT_ID || '');
+  const [agentNm, setAgentNm] = useState(agentInfo?.AGENT_NM || '');
+  const [companyNm, setCompanyNm] = useState(agentInfo?.COMPANY_NM || '');
+  const [brno, setBrno] = useState(agentInfo?.BRNO || '');
+  const [presNm, setPresNm] = useState(agentInfo?.PRES_NM || '');
+  const [phon, setPhon] = useState(agentInfo?.PHON || '');
+  const [email, setEmail] = useState(agentInfo?.EMAIL || '');
+  const [zip, setZip] = useState(agentInfo?.ZIP || '');
+  const [addr1, setAddr1] = useState(agentInfo?.ADDR1 || '');
+  const [addr2, setAddr2] = useState(agentInfo?.ADDR2 || '');
+  const [useEndDt, setUseEndDt] = useState(agentInfo?.USE_END_DT || '');
+  const [presPhon, setPresPhon] = useState(agentInfo?.PRES_PHON || '');
+  const [memo, setMemo] = useState(agentInfo?.MEMO || '');
+  const [feeSctCd, setFeeSctCd] = useState(agentInfo?.FEE_SCT_CD || 'B');
+  const [feeAmt, setFeeAmt] = useState(agentInfo?.FEE_AMT || '0');
+  const [useYn, setUseYn] = useState(agentInfo?.USE_YN || 'N');
   // ===== UI 상태 =====
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // ===== 이벤트 핸들러 =====
   // 주소 검색 핸들러
   const handleAddressSearch = useCallback(() => {
     openPostcodeSearch((addressData) => {
-      setOwnrZip(addressData.zonecode);
-      setOwnrAddr1(addressData.address);
-      setOwnrAddr2(''); // 상세주소는 초기화
+      setZip(addressData.zonecode);
+      setAddr1(addressData.address);
+      setAddr2(''); // 상세주소는 초기화
     });
   }, []);
 
@@ -42,43 +53,69 @@ export default function EditPage({
     setLoading(true);
     setError(null);
 
-    console.log('agentId', agentId);    // 상사 ID
-    console.log('agentNm', agentNm);    // 상사명
-    console.log('agentTel', agentTel);    // 연락처
-    console.log('agentEmail', agentEmail);    // e메일 주소
-    console.log('agentAddr', agentAddr);    // 주소
-    console.log('agentZip', agentZip);    // 우편번호
-
-    // 주민(법인)등록번호
-    if(!agentTel) {
-      alert('연락처를 입력해주세요.');
-      return;
-    }
-
-    if(!agentEmail) {
-      alert('e메일 주소를 입력해주세요.');
+    // 상사명 체크
+    if(!agentNm) {
+      alert('상사명을 입력해주세요.');
       return;
     }
 
     // 사업자번호
-    if(ownrBrno) {
-      if(!checkBizID(ownrBrno.replace(/-/g, ''))) {
+    if(brno) {
+      if(!checkBizID(brno.replace(/-/g, ''))) {
         alert('사업자등록번호를 확인해주세요.');
         return;
       }
     }
 
+    // 대표자명 체크
+    if(!presNm) {
+      alert('대표자명을 입력해주세요.');
+      return;
+    }
+
+    // 연락처
+    if(!phon) {
+      alert('연락처를 입력해주세요.');
+      return;
+    }
+
+    // e메일 주소
+    if(!zip) {
+      alert('주소를 입력해주세요.');
+      return;
+    }
+
+    // 사용여부 체크하여 월이용료 금액 체크
+    if(useYn === 'Y') {
+      if(!feeAmt) {
+        alert('월이용료를 입력해주세요.');
+        return;
+      }
+    }
+
     const formValues = {
-      agentId: agentId,
-      agentNm: agentNm,
-      agentTel: agentTel,
-      agentEmail: agentEmail,
-      agentAddr: agentAddr,
-      agentZip: agentZip,
+      agentId,
+      agentNm,
+      brno,
+      presNm,
+      phon,
+      email,
+      zip,
+      addr1,
+      addr2,
+      useEndDt,
+      presPhon,
+      memo,
+      feeSctCd,
+      feeAmt,
+      useYn,
+      usrId: session?.usrId,
     };
 
+    console.log('formValues', formValues);
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateAgentInfo`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateAdminAgent`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -115,7 +152,7 @@ export default function EditPage({
       </div>
 
       <div className="table-wrap">
-        <h2 className="table-wrap__title">필수 입력 정보</h2>
+        <h2 className="table-wrap__title">상사 정보</h2>
         <table className="table table--lg">
           <colgroup>
             <col style={{ width: "10%" }} />
@@ -125,102 +162,347 @@ export default function EditPage({
           </colgroup>
           <tbody>
             <tr>
-              <th>제시구분<span className="text-red">*</span></th>
+              <th>상사명(상호명)<span className="text-red">*</span></th>
               <td>
-                <div className="form-option-wrap">
-                  <div className="form-option">
-                    <label className="form-option__label">
-                      <input 
-                        type="radio" 
-                        name="prsnSctCd" 
-                        value="0"
-                        checked={agentType === "0"}
-                        onChange={(e) => setAgentType(e.target.value)}
-                      />
-                      <span className="form-option__title">상사매입</span>
-                    </label>
-                  </div>
-                  <div className="form-option">
-                    <label className="form-option__label">
-                      <input 
-                        type="radio" 
-                        name="agentType" 
-                        value="1"
-                        checked={agentType === "1"}
-                        onChange={(e) => setAgentType(e.target.value)}
-                      />
-                      <span className="form-option__title">고객위탁</span>
-                    </label>
+                <div className="input">
+                  <input 
+                    type="text" 
+                    className="input__field" 
+                    placeholder="상사명(상호명)"
+                    name="agentNm"
+                    value={agentNm}
+                    onChange={(e) => setAgentNm(e.target.value)}
+                    onFocus={(e) => e.target.select()}
+                  />
+                  <div className="input__utils">
+                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                   </div>
                 </div>
+
               </td>
-              <th>매입딜러</th>
+              <th>회사명</th>
               <td>
-                <div className="select">
+                <div className="input">
                   <input 
-                    className="select__input" 
-                    type="hidden" 
-                    name="dealerId" 
-                    value={''} 
+                    type="text" 
+                    className="input__field" 
+                    placeholder="회사명"
+                    name="agentNm"
+                    value={companyNm}
+                    onChange={(e) => setCompanyNm(e.target.value)}
+                    onFocus={(e) => e.target.select()}
                   />
+                  <div className="input__utils">
+                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                  </div>
                 </div>
               </td>
             </tr>
             <tr>
-              <th>제시일</th>
+              <th>사업자등록번호 <span className="text-red">*</span></th>
               <td>
                   <div className="input-group">
                     <div className="input w200">
                       <input 
-                        type="date" 
+                        type="text" 
                         className="input__field" 
-                        placeholder="제시일" 
+                        placeholder="-없이 입력" 
                         autoComplete="off"
-                        name='agentReqDt'
+                        name='brno'
+                        value={brno}
+                        onChange={(e) => {
+                          autoHypenBizNO(e.target);
+                          setBrno(e.target.value);
+                        }}
+                        onFocus={(e) => e.target.select()}
                       />
+                    </div>
+                    <div className="input__utils">
+                      <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
                   </div>
                 </td>
-              <th>상사매입비</th>
+              <th>대표자명 <span className="text-red">*</span></th>
               <td>
                 <div className="input-group input-group--sm">
                   <div className="input w200">
                     <input 
                       type="text" 
                       className="input__field" 
-                      placeholder="상사매입금액" 
-                      name="agentPurCst"
+                      placeholder="대표자명" 
+                      name="presNm"
+                      value={presNm}
+                      onChange={(e) => setPresNm(e.target.value)}
+                      onFocus={(e) => e.target.select()}
                     />
                     <div className="input__utils">
                       <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
                     </div>
                   </div>
-
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>연락처 <span className="text-red">*</span></th>
+              <td>
+                  <div className="input-group">
+                    <div className="input w200">
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="-없이 입력" 
+                        autoComplete="off"
+                        name='phon'
+                        value={phon}
+                        onChange={(e) => {
+                          let value = autoHypenTelNo(e.target.value);
+                          setPhon(value);
+                        }}
+                        onFocus={(e) => e.target.select()}
+                      />
+                    </div>
+                    <div className="input__utils">
+                      <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                    </div>
+                  </div>
+                </td>
+              <th>e메일주소</th>
+              <td>
+                <div className="input-group input-group--sm">
                   <div className="input w200">
                     <input 
-                      type="date" 
+                      type="text" 
                       className="input__field" 
-                      placeholder="상사매입비 입금일" 
-                      autoComplete="off"
-                      name='brokerageDate'
+                      placeholder="e메일주소" 
+                      name="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value.trim())}
+                      onFocus={(e) => e.target.select()}
                     />
-                  </div>
-
-                  <div className="select w120">
-                    <input 
-                      className="select__input" 
-                      type="hidden" 
-                      name="agentPurCst" 
-                    />
+                    <div className="input__utils">
+                      <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                    </div>
                   </div>
                 </div>
               </td>
             </tr>
-
+            <tr>
+              <th>주소 <span className="text-red">*</span></th>
+              <td colSpan={3}>
+                <div className="input-group">
+                    <div className="input w200">
+                      <input 
+                        type="text" 
+                        className="input__field" 
+                        placeholder="우편번호"
+                        value={zip}
+                        readOnly
+                        onChange={(e) => setZip(e.target.value)}
+                      />
+                    </div>
+                      <div className="input w500">
+                        <input 
+                          type="text" 
+                          className="input__field" 
+                          placeholder="주소"
+                          value={addr1}
+                          onChange={(e) => setAddr1(e.target.value)}
+                        />
+                        <div className="input__utils">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                            onClick={() => setAddr1('')}
+                          >
+                            주소
+                          </button>
+                        </div>
+                      </div>
+                      <button className="btn btn--dark" type="button" onClick={handleAddressSearch} style={{ width: "50px" }}>검색</button>
+                      <div className="input w500">
+                        <input 
+                          type="text" 
+                          className="input__field" 
+                          placeholder="상세주소"
+                          value={addr2}
+                          onChange={(e) => setAddr2(e.target.value)}
+                        />
+                        <div className="input__utils">
+                          <button
+                            type="button"
+                            className="jsInputClear input__clear ico ico--input-delete"
+                            onClick={() => setAddr2('')}
+                          >
+                            상세주소
+                          </button>
+                        </div>
+                      </div>
+                  </div>
+              </td>
+            </tr>
+            <tr>
+              <th>시스템 사용 만료일</th>
+              <td>
+                <div className="input-group">
+                  <div className="input w200">
+                    <input 
+                      type="date" 
+                      className="input__field" 
+                      placeholder="만료일" 
+                      autoComplete="off"
+                      name='useEndDt'
+                      onChange={(e) => setUseEndDt(e.target.value)}
+                      value={useEndDt || ''} 
+                    />
+                  </div>
+                  <span className="input-help">시스템 사용 만료일</span>
+                </div>
+              </td>
+              <th>대표 핸드폰</th>
+              <td>
+                <div className="input w200">
+                  <input 
+                    type="text" 
+                    className="input__field" 
+                    placeholder="- 없이 입력"
+                    name="presPhon"
+                    value={presPhon || ''}
+                    onChange={(e) => {
+                      let value = autoHypenTelNo(e.target.value);
+                      setPresPhon(value);
+                    }}
+                    onFocus={(e) => e.target.select()}
+                  />
+                  <div className="input__utils">
+                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>특이사항</th>
+              <td colSpan="3">
+                <div className="input">
+                  <textarea 
+                    className="input__field textarea" 
+                    placeholder="특이사항" 
+                    name="memo"
+                    value={memo || ''}
+                    onChange={(e) => setMemo(e.target.value.trim())}
+                    onFocus={(e) => e.target.select()}
+                    style={{ height: '100px' }}
+                  ></textarea>
+                  <div className="input__utils">
+                    <button
+                      type="button"
+                      className="jsInputClear input__clear ico ico--input-delete"
+                      onClick={() => setMemo('')}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
+      <div className="table-wrap">
+        <h2 className="table-wrap__title">버전 관리</h2>
+        <table className="table table--lg">
+          <colgroup>
+            <col style={{ width: "10%" }} />
+            <col style={{ width: "auto" }} />
+            <col style={{ width: "10%" }} />
+            <col style={{ width: "auto" }} />
+          </colgroup>
+          <tbody>
+            <tr>
+              <th>사용여부<span className="text-red">*</span></th>
+              <td colSpan="3">
+                <div className="form-option-wrap">
+                  <div className="form-option">
+                    <label className="form-option__label">
+                      <input 
+                        type="radio" 
+                        name="useYn" 
+                        value="Y" 
+                        defaultChecked={useYn === 'Y'}
+                        onChange={(e) => setUseYn(e.target.value)}
+                      />
+                      <span className="form-option__title">사용</span>
+                    </label>
+                  </div>
+                  <div className="form-option">
+                    <label className="form-option__label">
+                      <input 
+                        type="radio" 
+                        name="useYn" 
+                        value="N"
+                        defaultChecked={useYn === 'N'}
+                        onChange={(e) => setUseYn(e.target.value)}
+                      />
+                      <span className="form-option__title">미사용</span>
+                    </label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th>사용버전<span className="text-red">*</span></th>
+              <td>
+                <div className="select">
+                  <input 
+                    className="select__input" 
+                    type="hidden" 
+                    name="verCd" 
+                    value={feeSctCd || ''} 
+                  />
+                  <button className="select__toggle" type="button">
+                    <span className="select__text">베이직</span>
+                    <Image className="select__arrow" src="/images/ico-dropdown.svg" alt="" width={10} height={10} />
+                  </button>
+
+                  <ul className="select__menu">
+                    <li
+                      className={`select__option${feeSctCd === 'B' ? ' select__option--selected' : ''}`}
+                      data-value="B"
+                      onClick={() => setFeeSctCd('B')}
+                    >
+                      베이직
+                    </li>
+                    <li
+                      className={`select__option${feeSctCd === 'P' ? ' select__option--selected' : ''}`}
+                      data-value="P"
+                      onClick={() => setFeeSctCd('P')}
+                    >
+                      프리미엄
+                    </li>
+                  </ul>
+                </div>
+              </td>
+              <th>월이용료</th>
+              <td>
+                <div className="input">
+                  <input 
+                      type="text" 
+                      className="input__field" 
+                      placeholder="월이용료" 
+                      name="feeAmt"
+                      value={feeAmt ? Number(feeAmt).toLocaleString() : '0'}
+                      onChange={(e) => setFeeAmt(e.target.value.replace(/[^\d]/g, ''))}
+                      onFocus={(e) => e.target.select()}
+                    />
+                  <div className="input__utils">
+                    <button type="button" className="jsInputClear input__clear ico ico--input-delete">삭제</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div className="container__btns">
         <button className="btn btn--light" type="button" onClick={() => { window.location.href = '/purchases/list'; }}>취소</button>
         <button className="btn btn--primary" type="button" onClick={handleSubmit}>확인</button>
