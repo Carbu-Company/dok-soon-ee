@@ -436,33 +436,25 @@ export const createKakaoTemplatePopupURL = async (userData) => {
   export const sendKakaoMessage = async (userData, messageData) => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/popbill/v1/kakao/sendMessage/`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/popbill/v1/kakao/sendATS_one`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            CorpNum: userData.EMPID,
-            templateCode: messageData.templateCode || "019021000000",
-            Sender: messageData.Sender || "07012345678",
-            content: messageData.content || "주문하신 #{상품}이 금일 발송 처리되었습니다.",
-            altSubject: messageData.altSubject || "대체문자 제목",
-            altContent: messageData.altContent || "주문하신 상품이 발송되었습니다.",
-            altSendType: messageData.altSendType || "A",
-            sndDT: messageData.sndDT || "20250101123000",
-            receiver: messageData.receiver || "01033500564",
-            receiverName: messageData.receiverName || "홍길동",
-            UserID: userData.EMPID || "AIBZCOKR",
-            requestNum: messageData.requestNum || "REQ001",
-            btns: messageData.btns || [
-              {
-                n: "주문 상세",
-                t: "WL",
-                u1: "https://m.example.com",
-                u2: "https://www.example.com"
-              }
-            ]
+            CorpNum: "5258103621",
+            templateCode: "025050000297",
+            Sender:  "01033500564",
+            content: messageData.content || `[똑순이] 상사이용신청이 등록되었습니다.
+
+- 상사명 : ${messageData.agentNm}
+- 상사코드 : ${messageData.agentRegNo}
+- 연락처 : ${userData.UsrTel}
+- 조합명 : ${messageData.cmbtCd}
+- 신청일시 : ${new Date().toLocaleString()}
+`,
+            receiver: messageData.receiver || "01033500564"
           }),
         }
       );
@@ -723,29 +715,26 @@ export const registerRelatedCorporation = async (userData, corporationData) => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/popbill/v1/bizinfo/joinMember`,
-
-      {
+       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          CorpNum: userData?.EMPID || "8218701635",
           JoinForm: {
-            ID: corporationData?.ID || "sbs_ifbs99",
-            Password: corporationData?.Password || "thsqhdtn!1",
+            ID: corporationData?.ID || "",
+            Password: corporationData?.Password || "winesoft!1",
             LinkID: corporationData?.LinkID || "AIBIZCOKR",
-            CorpNum: corporationData?.CorpNum || "8218701635",
-            CEOName: corporationData?.CEOName || "이선희",
-            CorpName: corporationData?.CorpName || "에이치제이브레인",
+            CorpNum: corporationData?.CorpNum || "1448122074",
+            CEOName: corporationData?.CEOName || "최승훈",
+            CorpName: corporationData?.CorpName || "위넥스소프트(주)",
             Addr: corporationData?.Addr || "사업장 주소",
             BizType: corporationData?.BizType || "서비스",
             BizClass: corporationData?.BizClass || "소트프웨어개발및",
             ContactName: corporationData?.ContactName || "손봉수",
             ContactEmail: corporationData?.ContactEmail || "ifbs99@naver.com",
             ContactTEL: corporationData?.ContactTEL || "01033500564"
-          },
-          UserID: userData?.EMPID || "sbs_ifbs99"
+          }
         }),
       }
     );
@@ -762,6 +751,41 @@ export const registerRelatedCorporation = async (userData, corporationData) => {
     throw new Error(`연관회원 신규가입에 실패했습니다: ${error.message}`);
   }
 };
+
+
+
+// 연관회원 탈퇴
+export const withdrawRelatedCorporation = async (userData, corporationData) => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/popbill/v1/bizinfo/quitMember`,
+       {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            CorpNum: corporationData?.CorpNum || "1448122074",
+            QuitReason: corporationData?.QuitReason || "회원 탈퇴 사유",
+            UserID: userData?.EMPID || "winesoft99"
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("연관회원 탈퇴에 실패했습니다");
+    }
+
+    const data = await res.json();
+    console.log("연관회원 탈퇴 결과:", data);
+    return data;
+  } catch (error) {
+    console.error("연관회원 탈퇴 오류:", error);
+    throw new Error(`연관회원 탈퇴에 실패했습니다: ${error.message}`);
+  }
+};
+
+
 
 
 // 회사 정보 조회

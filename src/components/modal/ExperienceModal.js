@@ -3,18 +3,18 @@
 import React, { useState, useEffect } from "react";
 import Image from 'next/image'
 import { checkBizID } from '../../lib/util.js'
+import { sendKakaoMessage } from '@/app/(main)/api/popbill';
+
+export default function ExperienceRegistrationModal({ open = true, onClose, onPrint, session = null }) {
 
 
-export default function ExperienceRegistrationModal({ open = true, onClose, onPrint }) {
 
-
-/*
   const [AgentNm, setAgentNm] = useState('테스트상사사');
   const [AgentRegNo, setAgentRegNo] = useState('8218701635');
   const [CeoNm, setCeoNm] = useState('테스트대표자');
-  const [Email, setEmail] = useState('testuser');
+  const [Email, setEmail] = useState('testuser80');
   const [CombAgentCd, setCombAgentCd] = useState('302348');
-  const [UserId, setUserId] = useState('testuser');
+  const [UserId, setUserId] = useState('testuser70');
   const [UserPw, setUserPw] = useState('testuser'); 
   const [UsrNm, setUsrNm] = useState('테스트신청자');
   const [UsrTel, setUsrTel] = useState('01033500564');
@@ -24,9 +24,9 @@ export default function ExperienceRegistrationModal({ open = true, onClose, onPr
   const [sangsaCodeCheckMsg, setSangsaCodeCheckMsg] = useState(null);
   const [sangsaCodeCheckCss, setSangsaCodeCheckCss] = useState(null);
   const [allinputCheck, setAllinputCheck] = useState(false);
-*/
 
 
+/*
 const [AgentNm, setAgentNm] = useState('');
 const [AgentRegNo, setAgentRegNo] = useState('');
 const [CeoNm, setCeoNm] = useState('');
@@ -43,7 +43,7 @@ const [sangsaCodeCheckMsg, setSangsaCodeCheckMsg] = useState(null);
 const [sangsaCodeCheckCss, setSangsaCodeCheckCss] = useState(null);
 const [allinputCheck, setAllinputCheck] = useState(false);
 
-
+*/
 /*
   const [AgentNm, setAgentNm] = useState('');
   const [AgentRegNo, setAgentRegNo] = useState('');
@@ -77,6 +77,11 @@ const [allinputCheck, setAllinputCheck] = useState(false);
     setAllinputCheck(allFieldsFilled);
   }, [AgentNm, AgentRegNo, CeoNm, Email, CombAgentCd, UserId, UserPw, UsrNm, UsrTel]);
 
+
+  /**
+   * 
+   * 조합상사코드 확인 - 조합상사 코드 존재 안할 경우에도 그냥 신청 가능하게 처리
+   */
   const handleSangsaCodeCheck = async () => {
 
     if (!CombAgentCd || CombAgentCd.trim() === '') {
@@ -129,6 +134,7 @@ const [allinputCheck, setAllinputCheck] = useState(false);
         setLoading(false);
         return;
       }
+      
 
       const formValues = {
         AgentNm,
@@ -157,11 +163,50 @@ const [allinputCheck, setAllinputCheck] = useState(false);
            setLoading(false);
            return { success: false, res: [], error: res.error };
          }
-         else {         
-          onClose();
-          alert('신청 승인 되었습니다.'); // 테스트용 알림
-          setLoading(false);
-          return { success: true, res, error: null };
+         else {        
+          
+          
+          console.log('DB 등록은 된듯.... !!!!', res);
+
+          /**
+           * 팝빌 연동회원 신청 처리
+           */
+
+
+
+          const userData = {
+            UserId,
+            UserPw,
+            UsrNm,
+            UsrTel
+          };
+          
+          const messageData = {
+            AgentNm,
+            AgentRegNo, 
+            CeoNm,
+            Email,
+            CmbtNm,
+            CmbtCd,
+          };
+
+
+          console.log('userData)))))))))))))', userData);
+          console.log('messageData***************', messageData);
+
+
+          const result = await sendKakaoMessage(userData, messageData);
+
+          if (result.code === 0) {
+            alert('신청 승인 되었습니다.');
+            setLoading(false);
+            onClose();
+            return { success: true, res, error: null };
+          } else {
+            alert('신청 승인 실패 되었습니다.');
+            setLoading(false);
+            return { success: false, res: [], error: result.error };
+          }
          }
 
       } catch (error) {

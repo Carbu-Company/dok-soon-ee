@@ -218,7 +218,7 @@ export default function LoginPage() {
             </a>
           </div>
           {showExperience && (
-            <Experience open={showExperience} onClose={closeExperience} />
+            <Experience open={showExperience} onClose={closeExperience}/>
           )}
         </div>
       </main>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Pagination from "@/components/ui/pagination";
+import { joinMember } from '@/app/(main)/api/popbill';
 
 export default function AgentList(props) {
   
@@ -26,13 +27,9 @@ export default function AgentList(props) {
 
   const [agentList, setAgentList] = useState(initialAgentListData);
 
-
-
-
   console.log('agentList*******************:', agentList);
   const [pagination, setPagination] = useState(initialPagination);
   const [totalPages, setTotalPages] = useState(initialPagination.totalPages || 1);
-
 
   const [currentPage, setCurrentPage] = useState(initialPagination.currentPage || 1);
   const [pageSize, setPageSize] = useState(initialPagination.pageSize || 10);
@@ -60,13 +57,12 @@ export default function AgentList(props) {
   const [listCount, setListCount] = useState(10);
   const [isListCountSelectOpen, setIsListCountSelectOpen] = useState(false);
 
-
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 상세 검색 영역
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // 페이지네이션 영역
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -147,6 +143,97 @@ export default function AgentList(props) {
     endDt: searchBtn === 1 ? endDt : '',
   };
 
+  // 승인 처리
+  const approveAgent = async (agentId) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateAdminAgentConfirm?agentId=${agentId}&usrId=${props.session?.usrId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert('승인 처리 되었습니다.');
+        handleSearch();
+        return { success: true, error: null };
+      } else {
+        return { success: false, error: "승인 처리 실패" };
+      }
+    } catch (error) {
+      console.error("승인 처리 에러:", error);
+      alert("승인 처리 중 오류가 발생했습니다.");
+      return { success: false, error: error.message };
+    }
+  };
+
+  // POPBILL 등록
+  const registerPopbill = async (
+    agentId, 
+    agentNm, 
+    agentRegNo, 
+    ceoNm, 
+    email, 
+    cmbtCd, 
+    userId, 
+    userPw
+  ) => {
+    console.log('registerPopbill*******************', agentId, 
+      agentNm, agentRegNo, ceoNm, email, cmbtCd, userId, userPw);
+    try {
+       /**
+       * 팝빌 연동회원 신청 처리
+       * popbill api 호출
+       */
+      const popbillResult = await joinMember({
+        ID: userId || "",
+        Password: userPw || "winesoft!1",
+        LinkID: "AIBIZCOKR",
+        CorpNum: agentRegNo || "1448122074",
+        CEOName: ceoNm || "최승훈",
+        CorpName: agentNm || "위넥스소프트(주)",
+        Addr: "사업장 주소",
+        BizType: "서비스",
+        BizClass: "소트프웨어개발및",
+        ContactName: "손봉수",
+        ContactEmail: "ifbs99@naver.com",
+        ContactTEL: "01033500564"
+      });
+
+      /**
+       * 팝빌 등록이 성공하면 DB 반영 (UPDATE)
+       */
+      if (popbillResult.code === 0) {
+
+        /**
+         * 상사 POPBILL 등록 (DB)
+         */
+        const updateResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/updateAdminAgentPopbillConfirm?agentId=${agentId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const updateResult = await updateResponse.json();
+        if (updateResult.success) {
+          alert('POPBILL 등록 되었습니다.');
+          handleSearch();
+          return { success: true, error: null };
+        } else {
+          return { success: false, error: updateResult.error };
+        }
+      } else {
+        return { success: false, error: popbillResult.error || "상사 POPBILL 등록 실패" };
+      }
+    } catch (error) {
+      console.error("상사 POPBILL 등록 에러:", error);
+      alert("상사 POPBILL 등록 중 오류가 발생했습니다.");
+      return { success: false, error: error.message };
+    }
+  };
+
+
+  
   // 검색 버튼 클릭 핸들러
   const handleSearch = async (pageNum = 1) => {
     console.log("검색 버튼 클릭", { pageNum, pageSize });
@@ -438,21 +525,24 @@ export default function AgentList(props) {
 
         <table className="table">
           <colgroup>
-            <col style={{ width: "auto" }} />
+            <col style={{ width: "50px" }} />
+            <col style={{ width: "200px" }} />
             <col style={{ width: "120px" }} />
             <col style={{ width: "120px" }} />
-            <col style={{ width: "120px" }} />
-            <col style={{ width: "auto" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "200px" }} />
             {/*고객명*/}
             <col style={{ width: "130px" }} />
+            <col style={{ width: "150px" }} />
+            <col style={{ width: "auto" }} />
             <col style={{ width: "120px" }} />
-            <col style={{ width: "120px" }} />
-            <col style={{ width: "125px" }} />
+            <col style={{ width: "150px" }} />
             {/*매도일*/}
             <col style={{ width: "100px" }} />
           </colgroup>
           <thead>
             <tr>
+              <th>번호    </th>
               <th>상사명</th>
               <th>등록일</th>
               <th>사업자번호</th>
@@ -460,16 +550,16 @@ export default function AgentList(props) {
               <th>조합명</th>
               <th>담당자명</th>
               <th>담당자연락처</th>
-              <th>회사연락처</th>
-              <th>주소</th>
               <th>상태</th>
-              <th>상태</th>
+              <th>승인처리</th>
+              <th>POPBILL등록</th>
               <th>수정하기</th>
             </tr>
           </thead>
           <tbody>
             {agentList.map((agent, index) => (
             <tr key={index}>
+              <td>{(pagination?.totalCount || agentList.length) - index}</td>
               <td>{agent.COMNAME}</td>
               <td>{agent.REGDATE}</td>
               <td>{agent.BRNO}</td>
@@ -477,10 +567,59 @@ export default function AgentList(props) {
               <td>{agent.CMBT_NM}</td>
               <td>{agent.AEMP_NM}</td>
               <td>{agent.AEMP_PHON}</td>
-              <td>{agent.PHON}</td>
-              <td>{agent.AGENT_EMAIL}</td>
-              <td>{agent.AGENT_ADDR}</td>
               <td>{agent.AGENT_STAT_CD_NM}</td>
+              <td>
+                {agent.AGENT_STAT_CD === "0" ? (
+                  <button
+                    type="button"
+                    className="btn btn--primary btn--sm"
+                    onClick={() => {
+                      // 예: 승인처리 로직 넣기 (router 또는 props 이용)
+                      // 예시: approveAgent(agent.AGENT_ID)
+                      //ALERT CONFIRM
+                      if (confirm('승인하시겠습니까?')) {
+                        // 예: 승인처리 로직 넣기 (router 또는 props 이용)
+                        // 예시: approveAgent(agent.AGENT_ID)
+                        approveAgent(agent.AGENT_ID);
+                        handleSearch();
+                        return { success: true, error: null };
+                      } else {
+                        return { success: false, error: "승인처리 취소" };
+                      }
+                    }}
+                  >
+                    승인하기
+                  </button>
+                ) : (
+                  agent.REG_DTIME
+                )}
+              </td>
+              <td>
+                {agent.AGENT_STAT_CD === "1" ? (
+                  <button
+                    type="button"
+                    className="btn btn--primary btn--sm"
+                    onClick={() => {
+                      // 예: 승인처리 로직 넣기 (router 또는 props 이용)
+                      // 예시: approveAgent(agent.AGENT_ID)
+                      registerPopbill(
+                        agent.AGENT_ID,
+                        agent.COMNAME,
+                        agent.BRNO,
+                        agent.PRES_NM,
+                        agent.EMAIL,
+                        agent.CMBT_CD,
+                        agent.USER_ID,
+                        agent.USER_PW
+                      );
+                    }}
+                  >
+                    POPBILL등록
+                  </button>
+                ) : (
+                  agent.POPBILL_REG_DTIME
+                )}
+              </td>
               <td>
                 <button
                   type="button"
